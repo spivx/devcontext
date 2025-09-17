@@ -1,0 +1,30 @@
+[
+    {
+        "id": "vscode",
+        "label": "VS Code",
+        "icon": "/icons/vscode.svg",
+        "enabled": true,
+        "outputFiles": [
+            "instructions-md"
+        ]
+    },
+    {
+        "id": "cursor",
+        "label": "Cursor",
+        "icon": "/icons/cursor.svg",
+        "enabled": false,
+        "outputFiles": [
+            "cursor-rules",
+            "json-rules"
+        ]
+    },
+    {
+        "id": "jetbrains",
+        "label": "JetBrains IDEs",
+        "icon": "/icons/jetbrains.svg",
+        "enabled": false,
+        "outputFiles": [
+            "instructions-md"
+        ]
+    }
+]

@@ -1,0 +1,23 @@
+[
+    {
+        "id": "react",
+        "label": "React",
+        "icon": "/icons/react.svg",
+        "enabled": true,
+        "questionsFile": "/data/questions/react.json"
+    },
+    {
+        "id": "nextjs",
+        "label": "Next.js",
+        "icon": "/icons/nextdotjs.svg",
+        "enabled": false,
+        "questionsFile": "/data/questions/nextjs.json"
+    },
+    {
+        "id": "angular",
+        "label": "Angular",
+        "icon": "/icons/angular.svg",
+        "enabled": false,
+        "questionsFile": "/data/questions/angular.json"
+    }
+]

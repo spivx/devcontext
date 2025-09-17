@@ -1,0 +1,200 @@
+[
+    {
+        "id": "tooling",
+        "question": "What build tooling do you use?",
+        "answers": [
+            {
+                "value": "vite",
+                "label": "Vite",
+                "icon": "/icons/vite.svg",
+                "pros": [
+                    "Fast dev server",
+                    "Modern ecosystem"
+                ],
+                "cons": [
+                    "Less official docs compared to CRA"
+                ],
+                "example": "npx create-vite@latest my-app --template react"
+            },
+            {
+                "value": "cra",
+                "label": "Create React App",
+                "icon": "/icons/react.svg",
+                "pros": [
+                    "Official React team support",
+                    "Beginner friendly"
+                ],
+                "cons": [
+                    "Slower build times",
+                    "Less customizable without eject"
+                ],
+                "example": "npx create-react-app my-app"
+            }
+        ],
+        "explanation": "Choose the build tool / project scaffolder you’re using."
+    },
+    {
+        "id": "language",
+        "question": "What language do you use?",
+        "answers": [
+            {
+                "value": "typescript",
+                "label": "TypeScript",
+                "icon": "/icons/typescript.svg",
+                "pros": [
+                    "Type safety",
+                    "Better IDE support"
+                ],
+                "cons": [
+                    "Slightly more boilerplate"
+                ],
+                "example": "npx create-vite@latest my-app --template react-ts"
+            },
+            {
+                "value": "javascript",
+                "label": "JavaScript",
+                "icon": "/icons/javascript.svg",
+                "pros": [
+                    "Less boilerplate",
+                    "Beginner friendly"
+                ],
+                "cons": [
+                    "No static typing"
+                ],
+                "example": "npx create-vite@latest my-app --template react"
+            }
+        ],
+        "explanation": "Language choice impacts type safety and Copilot suggestions."
+    },
+    {
+        "id": "fileStructure",
+        "question": "How do you prefer to organize your components?",
+        "answers": [
+            {
+                "value": "flat",
+                "label": "Flat structure",
+                "icon": "/icons/layout.svg",
+                "pros": [
+                    "Simple, easy to navigate"
+                ],
+                "cons": [
+                    "May get messy with large codebase"
+                ],
+                "example": "src/components/Button.tsx"
+            },
+            {
+                "value": "nested",
+                "label": "Nested folders by domain",
+                "icon": "/icons/folder-tree.svg",
+                "pros": [
+                    "Scales well",
+                    "Encourages modularity"
+                ],
+                "cons": [
+                    "Overhead for small projects"
+                ],
+                "example": "src/features/auth/components/LoginForm.tsx"
+            }
+        ],
+        "explanation": "Component organization affects maintainability as the project grows."
+    },
+    {
+        "id": "styling",
+        "question": "Which styling approach do you use?",
+        "answers": [
+            {
+                "value": "tailwind",
+                "label": "Tailwind CSS",
+                "icon": "/icons/tailwindcss.svg",
+                "pros": [
+                    "Utility-first",
+                    "Great for rapid prototyping"
+                ],
+                "cons": [
+                    "HTML can get cluttered with classes"
+                ],
+                "example": "<button class='bg-blue-500 text-white p-2 rounded'>Click</button>"
+            },
+            {
+                "value": "cssmodules",
+                "label": "CSS Modules",
+                "icon": "/icons/css3.svg",
+                "pros": [
+                    "Scoped styles",
+                    "No runtime cost"
+                ],
+                "cons": [
+                    "Verbose imports"
+                ],
+                "example": "import styles from './Button.module.css'"
+            }
+        ],
+        "explanation": "Styling choice impacts developer experience and bundle size."
+    },
+    {
+        "id": "testingUT",
+        "question": "Which framework do you use for unit testing?",
+        "answers": [
+            {
+                "value": "jest",
+                "label": "Jest",
+                "icon": "/icons/jest.svg",
+                "pros": [
+                    "Rich ecosystem",
+                    "Snapshot testing"
+                ],
+                "cons": [
+                    "Slower for large projects"
+                ],
+                "example": "npm install --save-dev jest @testing-library/react"
+            },
+            {
+                "value": "vitest",
+                "label": "Vitest",
+                "icon": "/icons/vitest.svg",
+                "pros": [
+                    "Fast with Vite",
+                    "Compatible with Jest APIs"
+                ],
+                "cons": [
+                    "Less mature than Jest"
+                ],
+                "example": "npm install --save-dev vitest @testing-library/react"
+            }
+        ],
+        "explanation": "Unit testing ensures components work as expected in isolation."
+    },
+    {
+        "id": "testingE2E",
+        "question": "Which framework do you use for end-to-end (E2E) testing?",
+        "answers": [
+            {
+                "value": "cypress",
+                "label": "Cypress",
+                "icon": "/icons/cypress.svg",
+                "pros": [
+                    "Great DX",
+                    "Live reloading"
+                ],
+                "cons": [
+                    "More resource-heavy"
+                ],
+                "example": "npm install --save-dev cypress"
+            },
+            {
+                "value": "playwright",
+                "label": "Playwright",
+                "icon": "/icons/playwright.svg",
+                "pros": [
+                    "Multi-browser support",
+                    "Powerful API"
+                ],
+                "cons": [
+                    "Steeper learning curve"
+                ],
+                "example": "npm install --save-dev playwright"
+            }
+        ],
+        "explanation": "E2E testing ensures workflows function correctly in the browser."
+    }
+]

@@ -1,0 +1,23 @@
+[
+    {
+        "id": "instructions-md",
+        "label": "Copilot Instructions (Markdown)",
+        "filename": "copilot-instructions.md",
+        "format": "markdown",
+        "enabled": true
+    },
+    {
+        "id": "cursor-rules",
+        "label": "Cursor Rules",
+        "filename": ".cursor/rules",
+        "format": "cursor-rules",
+        "enabled": false
+    },
+    {
+        "id": "json-rules",
+        "label": "Generic JSON Config",
+        "filename": ".devcontext.json",
+        "format": "json",
+        "enabled": false
+    }
+]
