@@ -1,8 +1,6 @@
 ![devcontext logo](public/logo.png)
 
-# devcontext
-
-**Generate the perfect context file for your development workflow**
+## Generate the perfect context file for your development workflow**
 
 A tool that helps developers create optimized context files based on their IDE, framework, and coding conventions.
 
