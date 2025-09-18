@@ -19,7 +19,7 @@
             {
                 "value": "cra",
                 "label": "Create React App",
-                "icon": "/icons/react.svg",
+                "icon": "react",
                 "pros": [
                     "Official React team support",
                     "Beginner friendly"

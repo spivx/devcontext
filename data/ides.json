@@ -2,7 +2,7 @@
     {
         "id": "vscode",
         "label": "VS Code",
-        "icon": "/icons/vscode.svg",
+        "icon": "visualstudiocode",
         "enabled": true,
         "outputFiles": [
             "instructions-md"

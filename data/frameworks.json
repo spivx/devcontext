@@ -2,22 +2,25 @@
     {
         "id": "react",
         "label": "React",
-        "icon": "/icons/react.svg",
-        "enabled": true,
-        "questionsFile": "/data/questions/react.json"
+        "icon": "react",
+        "enabled": true
     },
     {
         "id": "nextjs",
         "label": "Next.js",
-        "icon": "/icons/nextdotjs.svg",
-        "enabled": false,
-        "questionsFile": "/data/questions/nextjs.json"
+        "icon": "nextdotjs",
+        "enabled": true
     },
     {
         "id": "angular",
         "label": "Angular",
-        "icon": "/icons/angular.svg",
-        "enabled": false,
-        "questionsFile": "/data/questions/angular.json"
+        "icon": "angular",
+        "enabled": false
+    },
+    {
+        "id": "vite",
+        "label": "Vite",
+        "icon": "vite",
+        "enabled": true
     }
 ]
