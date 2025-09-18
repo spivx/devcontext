@@ -28,14 +28,18 @@ devcontext helps you generate customized context files that work perfectly with 
 
 ## Getting Started
 
+Visit [https://www.devcontext.xyz/](https://www.devcontext.xyz/) to start generating your context files.
+
+### For Developers
+
+If you want to contribute to the project or run it locally:
+
 ```bash
 git clone https://github.com/spivx/devcontext.git
 cd devcontext
 npm install
 npm run dev
 ```
-
-Open [http://localhost:3000](http://localhost:3000) to start generating your context files.
 
 ## Contributing
 
