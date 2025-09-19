@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { ThemeProvider } from "@/components/theme-provider";
+import { MixpanelInit } from "@/components/MixpanelInit";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -63,6 +64,7 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+
   return (
     <html lang="en" suppressHydrationWarning>
       <body
@@ -74,6 +76,7 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
+          <MixpanelInit />
           {children}
         </ThemeProvider>
       </body>
