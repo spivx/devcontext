@@ -1,0 +1,34 @@
+[
+    {
+        "id": "dataFetching",
+        "question": "What are the data-fetching performance rules?",
+        "answers": [
+            {
+                "value": "paginate",
+                "label": "Always paginate large queries",
+                "example": "Use ?limit=50&offset=0"
+            },
+            {
+                "value": "infiniteScroll",
+                "label": "Use infinite scroll for feeds",
+                "example": "Load more on scroll"
+            }
+        ]
+    },
+    {
+        "id": "reactPerf",
+        "question": "What React performance rules should we follow?",
+        "answers": [
+            {
+                "value": "memoHooks",
+                "label": "Memoize heavy components",
+                "example": "useMemo/useCallback for expensive calculations"
+            },
+            {
+                "value": "dynamicImport",
+                "label": "Dynamic imports for non-critical code",
+                "example": "import('chart.js') only when needed"
+            }
+        ]
+    }
+]

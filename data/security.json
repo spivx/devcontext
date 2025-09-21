@@ -1,0 +1,50 @@
+[
+    {
+        "id": "auth",
+        "question": "How should authentication and secrets be handled?",
+        "answers": [
+            {
+                "value": "env",
+                "label": "Environment variables only",
+                "example": "API keys must come from process.env"
+            },
+            {
+                "value": "vault",
+                "label": "Secrets manager (Vault, AWS, etc.)",
+                "example": "Fetch secrets from a secure vault"
+            }
+        ]
+    },
+    {
+        "id": "validation",
+        "question": "What validation rules should we follow?",
+        "answers": [
+            {
+                "value": "zod",
+                "label": "Zod schema validation",
+                "example": "Use Zod for all API input validation"
+            },
+            {
+                "value": "yup",
+                "label": "Yup validation",
+                "example": "Use Yup schemas for forms and requests"
+            }
+        ]
+    },
+    {
+        "id": "logging",
+        "question": "What logging practices should we follow?",
+        "answers": [
+            {
+                "value": "noSecrets",
+                "label": "Never log secrets",
+                "example": "Do not log tokens or passwords"
+            },
+            {
+                "value": "structured",
+                "label": "Structured logging",
+                "example": "Use JSON logs with context fields"
+            }
+        ]
+    }
+]

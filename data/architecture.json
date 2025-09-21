@@ -1,0 +1,50 @@
+[
+    {
+        "id": "stateManagement",
+        "question": "Which state management approach should be used?",
+        "answers": [
+            {
+                "value": "reactQuery",
+                "label": "React Query",
+                "example": "Use React Query for server state management"
+            },
+            {
+                "value": "reduxToolkit",
+                "label": "Redux Toolkit",
+                "example": "Use Redux Toolkit for app-wide state"
+            }
+        ]
+    },
+    {
+        "id": "apiLayer",
+        "question": "How should API calls be structured?",
+        "answers": [
+            {
+                "value": "servicesFolder",
+                "label": "Dedicated services folder",
+                "example": "All API calls go into /src/services"
+            },
+            {
+                "value": "hooks",
+                "label": "Custom hooks",
+                "example": "Encapsulate API calls in useFetchSomething()"
+            }
+        ]
+    },
+    {
+        "id": "folders",
+        "question": "What folder structure rules should we follow?",
+        "answers": [
+            {
+                "value": "featureFolders",
+                "label": "Feature-based folders",
+                "example": "src/features/auth/LoginForm.tsx"
+            },
+            {
+                "value": "domainDriven",
+                "label": "Domain-driven folders",
+                "example": "src/domain/order/components/OrderCard.tsx"
+            }
+        ]
+    }
+]

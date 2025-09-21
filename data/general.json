@@ -1,0 +1,128 @@
+[
+    {
+        "id": "projectPriority",
+        "question": "What is the main priority for this project?",
+        "answers": [
+            {
+                "value": "maintainability",
+                "label": "Maintainability",
+                "example": "Prefer clarity and modularity over speed."
+            },
+            {
+                "value": "speed",
+                "label": "Speed of development",
+                "example": "Use shortcuts and rapid prototyping practices."
+            },
+            {
+                "value": "accessibility",
+                "label": "Accessibility",
+                "example": "Follow WCAG guidelines strictly."
+            },
+            {
+                "value": "performance",
+                "label": "Performance",
+                "example": "Optimize code for runtime speed and bundle size."
+            }
+        ]
+    },
+    {
+        "id": "codeStyle",
+        "question": "Which code style guidelines should we follow?",
+        "answers": [
+            {
+                "value": "airbnb",
+                "label": "Airbnb JavaScript Style Guide",
+                "example": "Follow https://github.com/airbnb/javascript"
+            },
+            {
+                "value": "standardjs",
+                "label": "StandardJS",
+                "example": "Use StandardJS (https://standardjs.com)"
+            },
+            {
+                "value": "custom",
+                "label": "Custom team rules",
+                "example": "See internal style guide."
+            }
+        ]
+    },
+    {
+        "id": "naming",
+        "question": "What naming conventions should be applied?",
+        "answers": [
+            {
+                "value": "camelCase",
+                "label": "camelCase",
+                "example": "function handleClick() {}"
+            },
+            {
+                "value": "PascalCase",
+                "label": "PascalCase for components",
+                "example": "export function LoginForm() {}"
+            },
+            {
+                "value": "snake_case",
+                "label": "snake_case",
+                "example": "const user_id = 123"
+            }
+        ]
+    },
+    {
+        "id": "exports",
+        "question": "Do we prefer named or default exports?",
+        "answers": [
+            {
+                "value": "named",
+                "label": "Named exports",
+                "example": "export const Button = () => {}"
+            },
+            {
+                "value": "default",
+                "label": "Default exports",
+                "example": "export default function Button() {}"
+            }
+        ]
+    },
+    {
+        "id": "comments",
+        "question": "How should we handle comments and documentation?",
+        "answers": [
+            {
+                "value": "minimal",
+                "label": "Minimal comments",
+                "example": "// Explain complex logic only"
+            },
+            {
+                "value": "jsdoc",
+                "label": "JSDoc",
+                "example": "/** Adds two numbers */"
+            },
+            {
+                "value": "inline",
+                "label": "Inline explanations",
+                "example": "// Explain why, not what"
+            }
+        ]
+    },
+    {
+        "id": "collaboration",
+        "question": "What collaboration rules should we enforce?",
+        "answers": [
+            {
+                "value": "smallPRs",
+                "label": "Small PRs",
+                "example": "Keep pull requests under 400 lines."
+            },
+            {
+                "value": "reviewBeforeMerge",
+                "label": "Require reviews before merging",
+                "example": "At least one approval is mandatory."
+            },
+            {
+                "value": "docBeforeMerge",
+                "label": "Documentation required",
+                "example": "New APIs must be documented in /docs."
+            }
+        ]
+    }
+]

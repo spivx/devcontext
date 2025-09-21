@@ -31,19 +31,18 @@ export default function Home() {
 
           {/* Headline */}
           <h2 className="text-3xl font-bold max-w-4xl">
-            Generate AI Instructions for Your Project in Minutes
+            AI Coding Instructions, Backed by Real Developer Experience
           </h2>
 
           {/* Subheadline */}
           <p className="text-muted-foreground max-w-xl text-lg leading-relaxed">
-            Choose your IDE and framework, and instantly get a tailored configuration file
-            for Copilot, Cursor, or other AI tools.
+            Turn developer best practices into ready-to-use AI instructions.
           </p>
 
           {/* CTA Button */}
           <div className="pt-4">
             <Button size="lg" className="text-lg px-8 py-6">
-              Get Started
+              Create My Instructions File
             </Button>
           </div>
         </div>
@@ -54,7 +53,7 @@ export default function Home() {
             <div className="flex h-16 w-16 items-center justify-center rounded-full border bg-card shadow-sm hover:shadow-md transition-shadow">
               <Code className="h-6 w-6 text-primary" />
             </div>
-            <p className="text-sm font-medium">VSCode</p>
+            <p className="text-sm font-medium">VS Code</p>
           </div>
 
           <div className="flex flex-col items-center gap-2">
@@ -82,7 +81,7 @@ export default function Home() {
             <div className="flex h-16 w-16 items-center justify-center rounded-full border bg-card shadow-sm hover:shadow-md transition-shadow">
               <Bot className="h-6 w-6 text-primary" />
             </div>
-            <p className="text-sm font-medium">Copilot</p>
+            <p className="text-sm font-medium">GitHub Copilot</p>
           </div>
         </div>
       </main>
@@ -90,7 +89,7 @@ export default function Home() {
       {/* Footer */}
       <footer className="absolute bottom-6 left-1/2 transform -translate-x-1/2">
         <p className="text-sm text-muted-foreground">
-          © 2025 devcontext
+          © 2025 DevContext — Instructions powered by developer experience
         </p>
       </footer>
     </div>
