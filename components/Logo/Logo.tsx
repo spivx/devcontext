@@ -1,15 +1,12 @@
 import Image from "next/image";
-import logoLight from "./logo.svg";
-import logoDark from "./logo-dark.svg";
-import { useTheme } from "next-themes";
 
 interface LogoProps {
     width?: number;
     height?: number;
 }
 
-export default function Logo({ width = 240, height = 240 }: LogoProps) {
-    const logoSrc = logoLight;
+export default function Logo({ width = 350, height = 350 }: LogoProps) {
+    const logoSrc = "/logo.png";
     return (
         <div className="flex flex-col items-center justify-center">
             <Image
