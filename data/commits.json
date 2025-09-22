@@ -1,0 +1,44 @@
+[
+    {
+        "id": "commitStyle",
+        "question": "What commit message style should we follow?",
+        "answers": [
+            {
+                "value": "conventional",
+                "label": "Conventional Commits",
+                "example": "feat(auth): add login endpoint"
+            },
+            {
+                "value": "gitmoji",
+                "label": "Gitmoji",
+                "example": "✨ add login endpoint"
+            },
+            {
+                "value": "custom",
+                "label": "Custom team rules",
+                "example": "LOGIN: implemented login endpoint"
+            }
+        ]
+    },
+    {
+        "id": "prRules",
+        "question": "What PR conventions should we enforce?",
+        "answers": [
+            {
+                "value": "small",
+                "label": "Small PRs",
+                "example": "Keep pull requests under 400 lines."
+            },
+            {
+                "value": "reviewRequired",
+                "label": "Require at least one review",
+                "example": "PRs must be approved by another team member."
+            },
+            {
+                "value": "changelog",
+                "label": "Update changelog",
+                "example": "Each PR should update CHANGELOG.md with notable changes."
+            }
+        ]
+    }
+]
