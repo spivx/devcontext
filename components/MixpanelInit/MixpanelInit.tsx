@@ -1,12 +1,26 @@
-'use client';
+"use client"
 
-import { useEffect } from 'react';
-import { initMixpanel } from '@/lib/mixpanel';
+import { useEffect } from "react"
+import { usePathname, useSearchParams } from "next/navigation"
+
+import { initMixpanel, trackPageView } from "@/lib/mixpanel"
 
 export function MixpanelInit() {
-    useEffect(() => {
-        initMixpanel();
-    }, []);
+  const pathname = usePathname()
+  const searchParams = useSearchParams()
 
-    return null; // This component doesn't render anything
+  useEffect(() => {
+    initMixpanel()
+  }, [])
+
+  useEffect(() => {
+    if (!pathname) {
+      return
+    }
+
+    const search = searchParams?.toString()
+    trackPageView(pathname, search ? `?${search}` : undefined)
+  }, [pathname, searchParams])
+
+  return null
 }
