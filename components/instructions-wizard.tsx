@@ -636,6 +636,9 @@ export function InstructionsWizard({ onClose }: InstructionsWizardProps) {
         </div>
 
         <div className="flex flex-wrap gap-2">
+          <Button variant="outline" onClick={goToPrevious}>
+            Back to questions
+          </Button>
           <Button variant="ghost" onClick={requestResetWizard}>
             Start Over
           </Button>
@@ -654,7 +657,7 @@ export function InstructionsWizard({ onClose }: InstructionsWizardProps) {
   return (
     <div className="mx-auto flex w-full max-w-4xl flex-col gap-6">
       {onClose ? (
-        <Button variant="ghost" onClick={onClose} className="self-start -ml-2">
+        <Button variant="ghost" onClick={requestResetWizard} className="self-start -ml-2">
           <ArrowLeft className="mr-2 h-4 w-4" />
           Start over
         </Button>
@@ -741,7 +744,7 @@ export function InstructionsWizard({ onClose }: InstructionsWizardProps) {
                 Back
               </Button>
               <div className="text-xs text-muted-foreground">
-                Question {questionNumber} of {totalQuestions} · {answeredQuestionsCount} answered
+                Question {questionNumber} of {totalQuestions}
               </div>
             </div>
           </section>
