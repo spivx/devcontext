@@ -77,12 +77,6 @@ export default function Home() {
         )}
       </main>
 
-      {/* Footer */}
-      <footer className="absolute bottom-6 left-1/2 transform -translate-x-1/2">
-        <p className="text-sm text-muted-foreground">
-          © 2025 DevContext — Instructions powered by developer experience
-        </p>
-      </footer>
     </div>
   )
 }
