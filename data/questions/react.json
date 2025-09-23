@@ -7,6 +7,7 @@
                 "value": "vite",
                 "label": "Vite",
                 "icon": "/icons/vite.svg",
+                "docs": "https://vitejs.dev/guide/",
                 "pros": [
                     "Fast dev server",
                     "Modern ecosystem"
@@ -20,6 +21,7 @@
                 "value": "cra",
                 "label": "Create React App",
                 "icon": "react",
+                "docs": "https://create-react-app.dev/docs/getting-started/",
                 "pros": [
                     "Official React team support",
                     "Beginner friendly"
@@ -41,6 +43,7 @@
                 "value": "typescript",
                 "label": "TypeScript",
                 "icon": "/icons/typescript.svg",
+                "docs": "https://www.typescriptlang.org/docs/",
                 "pros": [
                     "Type safety",
                     "Better IDE support"
@@ -54,6 +57,7 @@
                 "value": "javascript",
                 "label": "JavaScript",
                 "icon": "/icons/javascript.svg",
+                "docs": "https://developer.mozilla.org/en-US/docs/Web/JavaScript",
                 "pros": [
                     "Less boilerplate",
                     "Beginner friendly"
@@ -106,6 +110,7 @@
                 "value": "tailwind",
                 "label": "Tailwind CSS",
                 "icon": "/icons/tailwindcss.svg",
+                "docs": "https://tailwindcss.com/docs",
                 "pros": [
                     "Utility-first",
                     "Great for rapid prototyping"
@@ -119,6 +124,7 @@
                 "value": "cssmodules",
                 "label": "CSS Modules",
                 "icon": "/icons/css3.svg",
+                "docs": "https://github.com/css-modules/css-modules",
                 "pros": [
                     "Scoped styles",
                     "No runtime cost"
@@ -139,6 +145,7 @@
                 "value": "jest",
                 "label": "Jest",
                 "icon": "/icons/jest.svg",
+                "docs": "https://jestjs.io/docs/getting-started",
                 "pros": [
                     "Rich ecosystem",
                     "Snapshot testing"
@@ -152,6 +159,7 @@
                 "value": "vitest",
                 "label": "Vitest",
                 "icon": "/icons/vitest.svg",
+                "docs": "https://vitest.dev/guide/",
                 "pros": [
                     "Fast with Vite",
                     "Compatible with Jest APIs"
@@ -172,6 +180,7 @@
                 "value": "cypress",
                 "label": "Cypress",
                 "icon": "/icons/cypress.svg",
+                "docs": "https://docs.cypress.io/guides/overview/why-cypress",
                 "pros": [
                     "Great DX",
                     "Live reloading"
@@ -185,6 +194,7 @@
                 "value": "playwright",
                 "label": "Playwright",
                 "icon": "/icons/playwright.svg",
+                "docs": "https://playwright.dev/docs/intro",
                 "pros": [
                     "Multi-browser support",
                     "Powerful API"

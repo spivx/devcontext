@@ -5,14 +5,16 @@
         "filename": "copilot-instructions.md",
         "format": "markdown",
         "enabled": true,
-        "icon": "markdown"
+        "icon": "markdown",
+        "docs": "https://docs.github.com/en/copilot"
     },
     {
         "id": "cursor-rules",
         "label": "Cursor Rules",
         "filename": ".cursor/rules",
         "format": "cursor-rules",
-        "enabled": false
+        "enabled": false,
+        "docs": "https://docs.cursor.com/workflows/rules"
     },
     {
         "id": "json-rules",
@@ -20,6 +22,7 @@
         "filename": ".devcontext.json",
         "format": "json",
         "enabled": false,
-        "icon": "json"
+        "icon": "json",
+        "docs": "https://json-schema.org/"
     }
 ]

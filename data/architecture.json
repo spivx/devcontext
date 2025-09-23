@@ -6,12 +6,14 @@
             {
                 "value": "reactQuery",
                 "label": "React Query",
-                "example": "Use React Query for server state management"
+                "example": "Use React Query for server state management",
+                "docs": "https://tanstack.com/query/latest/docs/react/overview"
             },
             {
                 "value": "reduxToolkit",
                 "label": "Redux Toolkit",
-                "example": "Use Redux Toolkit for app-wide state"
+                "example": "Use Redux Toolkit for app-wide state",
+                "docs": "https://redux-toolkit.js.org/introduction/getting-started"
             }
         ]
     },
@@ -27,7 +29,8 @@
             {
                 "value": "hooks",
                 "label": "Custom hooks",
-                "example": "Encapsulate API calls in useFetchSomething()"
+                "example": "Encapsulate API calls in useFetchSomething()",
+                "docs": "https://react.dev/learn/reusing-logic-with-custom-hooks"
             }
         ]
     },

@@ -6,12 +6,14 @@
             {
                 "value": "env",
                 "label": "Environment variables only",
-                "example": "API keys must come from process.env"
+                "example": "API keys must come from process.env",
+                "docs": "https://12factor.net/config"
             },
             {
                 "value": "vault",
                 "label": "Secrets manager (Vault, AWS, etc.)",
-                "example": "Fetch secrets from a secure vault"
+                "example": "Fetch secrets from a secure vault",
+                "docs": "https://developer.hashicorp.com/vault/docs"
             }
         ]
     },
@@ -22,12 +24,14 @@
             {
                 "value": "zod",
                 "label": "Zod schema validation",
-                "example": "Use Zod for all API input validation"
+                "example": "Use Zod for all API input validation",
+                "docs": "https://zod.dev/?id=introduction"
             },
             {
                 "value": "yup",
                 "label": "Yup validation",
-                "example": "Use Yup schemas for forms and requests"
+                "example": "Use Yup schemas for forms and requests",
+                "docs": "https://github.com/jquense/yup"
             }
         ]
     },
@@ -38,12 +42,14 @@
             {
                 "value": "noSecrets",
                 "label": "Never log secrets",
-                "example": "Do not log tokens or passwords"
+                "example": "Do not log tokens or passwords",
+                "docs": "https://cheatsheetseries.owasp.org/cheatsheets/Logging_Cheat_Sheet.html"
             },
             {
                 "value": "structured",
                 "label": "Structured logging",
-                "example": "Use JSON logs with context fields"
+                "example": "Use JSON logs with context fields",
+                "docs": "https://12factor.net/logs"
             }
         ]
     }

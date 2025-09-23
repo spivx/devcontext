@@ -4,6 +4,7 @@
         "label": "VS Code",
         "icon": "visualstudiocode",
         "enabled": true,
+        "docs": "https://code.visualstudio.com/docs",
         "outputFiles": [
             "instructions-md"
         ]
@@ -13,6 +14,7 @@
         "label": "Cursor",
         "icon": "/icons/cursor.svg",
         "enabled": false,
+        "docs": "https://docs.cursor.com/",
         "outputFiles": [
             "cursor-rules",
             "json-rules"
@@ -23,8 +25,20 @@
         "label": "JetBrains IDEs",
         "icon": "/icons/jetbrains.svg",
         "enabled": false,
+        "docs": "https://www.jetbrains.com/help/",
         "outputFiles": [
             "instructions-md"
+        ]
+    },
+    {
+        "id": "windsurf",
+        "label": "Windsurf",
+        "icon": "windsurf",
+        "enabled": false,
+        "docs": "https://codeium.com/windsurf",
+        "outputFiles": [
+            "instructions-md",
+            "json-rules"
         ]
     }
 ]

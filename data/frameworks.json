@@ -3,24 +3,21 @@
         "id": "react",
         "label": "React",
         "icon": "react",
-        "enabled": true
+        "enabled": true,
+        "docs": "https://react.dev/learn"
     },
     {
         "id": "nextjs",
         "label": "Next.js",
         "icon": "nextdotjs",
-        "enabled": true
+        "enabled": true,
+        "docs": "https://nextjs.org/docs"
     },
     {
         "id": "angular",
         "label": "Angular",
         "icon": "angular",
-        "enabled": false
-    },
-    {
-        "id": "vite",
-        "label": "Vite",
-        "icon": "vite",
-        "enabled": true
+        "enabled": false,
+        "docs": "https://angular.io/docs"
     }
 ]

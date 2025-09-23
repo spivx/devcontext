@@ -3,7 +3,9 @@
 import { useMemo, useState } from "react"
 import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
-import { ArrowLeft, Check, ChevronRight, Info } from "lucide-react"
+import { ArrowLeft, Check, ChevronRight, ExternalLink, Info } from "lucide-react"
+import * as simpleIcons from "simple-icons"
+import type { SimpleIcon } from "simple-icons"
 
 import rawIdes from "@/data/ides.json"
 import rawFrameworks from "@/data/frameworks.json"
@@ -14,6 +16,7 @@ type IdeConfig = {
   icon?: string
   enabled?: boolean
   outputFiles?: string[]
+  docs?: string
 }
 
 type FrameworkConfig = {
@@ -21,6 +24,7 @@ type FrameworkConfig = {
   label: string
   icon?: string
   enabled?: boolean
+  docs?: string
 }
 
 type FrameworkAnswerSource = {
@@ -30,6 +34,7 @@ type FrameworkAnswerSource = {
   example?: string
   pros?: string[]
   cons?: string[]
+  docs?: string
 }
 
 type FrameworkQuestionSource = {
@@ -42,12 +47,14 @@ type FrameworkQuestionSource = {
 type WizardAnswer = {
   value: string
   label: string
+  icon?: string
   example?: string
   infoLines?: string[]
   tags?: string[]
   isDefault?: boolean
   disabled?: boolean
   disabledLabel?: string
+  docs?: string
 }
 
 type WizardQuestion = {
@@ -72,6 +79,100 @@ type Responses = Record<string, string | string[] | null | undefined>
 const FRAMEWORK_STEP_ID = "frameworks"
 const FRAMEWORK_QUESTION_ID = "frameworkSelection"
 
+const iconSlugOverrides: Record<string, string> = {
+  vscode: "microsoft",
+  visualstudiocode: "microsoft",
+}
+
+const simpleIconBySlug = (() => {
+  const map = new Map<string, SimpleIcon>()
+  const isSimpleIcon = (icon: unknown): icon is SimpleIcon =>
+    typeof icon === "object" && icon !== null && "slug" in icon && "svg" in icon
+
+  Object.values(simpleIcons).forEach((icon) => {
+    if (isSimpleIcon(icon)) {
+      map.set(icon.slug, icon)
+    }
+  })
+
+  return map
+})()
+
+const simpleIconMarkupCache = new Map<string, string>()
+
+const getSimpleIconMarkup = (icon: SimpleIcon) => {
+  if (simpleIconMarkupCache.has(icon.slug)) {
+    return simpleIconMarkupCache.get(icon.slug)!
+  }
+
+  const markup = icon.svg.replace(
+    "<svg ",
+    '<svg fill="currentColor" class="fill-current" '
+  )
+
+  simpleIconMarkupCache.set(icon.slug, markup)
+  return markup
+}
+
+const normalizeHex = (hex: string) => {
+  const trimmed = hex.trim().replace(/^#/, "")
+  if (trimmed.length === 3) {
+    return trimmed
+      .split("")
+      .map((char) => char + char)
+      .join("")
+  }
+  return trimmed.padEnd(6, "0").slice(0, 6)
+}
+
+const getAccessibleIconColor = (hex: string) => {
+  const normalized = normalizeHex(hex)
+  const r = parseInt(normalized.slice(0, 2), 16)
+  const g = parseInt(normalized.slice(2, 4), 16)
+  const b = parseInt(normalized.slice(4, 6), 16)
+
+  const luminance = (0.2126 * r + 0.7152 * g + 0.0722 * b) / 255
+
+  if (Number.isNaN(luminance)) {
+    return "#A0AEC0"
+  }
+
+  if (luminance < 0.35) {
+    const lighten = (component: number) =>
+      Math.min(255, Math.round(component + (255 - component) * 0.45))
+
+    const lr = lighten(r)
+    const lg = lighten(g)
+    const lb = lighten(b)
+
+    return `#${lr.toString(16).padStart(2, "0")}${lg
+      .toString(16)
+      .padStart(2, "0")}${lb.toString(16).padStart(2, "0")}`
+  }
+
+  return `#${normalized}`
+}
+
+const normalizeIconSlug = (raw?: string) => {
+  if (!raw) {
+    return null
+  }
+
+  const cleaned = raw
+    .trim()
+    .toLowerCase()
+    .replace(/^https?:\/\//, "")
+    .replace(/^cdn\.simpleicons\.org\//, "")
+    .replace(/^\/icons\//, "")
+    .replace(/\.svg$/, "")
+
+  if (!cleaned) {
+    return null
+  }
+
+  return iconSlugOverrides[cleaned] ?? cleaned
+}
+
 const idesStep: WizardStep = {
   id: "ides",
   title: "Choose Your IDE",
@@ -83,6 +184,7 @@ const idesStep: WizardStep = {
       answers: (rawIdes as IdeConfig[]).map((ide) => ({
         value: ide.id,
         label: ide.label,
+        icon: ide.icon,
         example:
           ide.outputFiles && ide.outputFiles.length > 0
             ? `We'll generate: ${ide.outputFiles.join(", ")}`
@@ -90,6 +192,9 @@ const idesStep: WizardStep = {
         infoLines: ide.enabled ? ["Enabled by default"] : undefined,
         tags: ide.outputFiles,
         isDefault: ide.enabled,
+        disabled: ide.enabled === false,
+        disabledLabel: ide.enabled === false ? "Soon" : undefined,
+        docs: ide.docs,
       })),
     },
   ],
@@ -105,8 +210,10 @@ const frameworksStep: WizardStep = {
       answers: (rawFrameworks as FrameworkConfig[]).map((framework) => ({
         value: framework.id,
         label: framework.label,
+        icon: framework.icon,
         disabled: framework.enabled === false,
         disabledLabel: framework.enabled === false ? "Soon" : undefined,
+        docs: framework.docs,
       })),
     },
   ],
@@ -255,8 +362,10 @@ export function InstructionsWizard({ onClose }: InstructionsWizardProps) {
           return {
             value: answer.value,
             label: answer.label,
+            icon: answer.icon,
             example: answer.example,
             infoLines: infoLines.length > 0 ? infoLines : undefined,
+            docs: answer.docs,
           }
         }),
       }))
@@ -445,68 +554,118 @@ export function InstructionsWizard({ onClose }: InstructionsWizardProps) {
 
           <section className="rounded-3xl border border-border/80 bg-card/95 p-6 shadow-md">
             <div className="grid gap-3 sm:grid-cols-2">
-              {currentQuestion.answers.map((answer) => (
-                <button
-                  key={answer.value}
-                  type="button"
-                  onClick={() => {
-                    void handleAnswerClick(answer)
-                  }}
-                  aria-disabled={answer.disabled}
-                  className={cn(
-                    "group relative flex h-full items-center justify-between rounded-2xl border border-border/60 bg-background/90 px-5 py-4 text-left transition-all hover:border-primary/40 hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
-                    answer.disabled &&
+              {currentQuestion.answers.map((answer) => {
+                const normalizedIconSlug = normalizeIconSlug(answer.icon ?? answer.value)
+                const simpleIconData = normalizedIconSlug
+                  ? simpleIconBySlug.get(normalizedIconSlug) ?? null
+                  : null
+                const fallbackInitials = answer.label
+                  .split(" ")
+                  .map((part) => part.charAt(0))
+                  .join("")
+                  .slice(0, 2)
+                  .toUpperCase()
+
+                const iconElement = simpleIconData ? (
+                  <span
+                    aria-hidden
+                    className="flex h-10 w-10 items-center justify-center rounded-xl bg-secondary/40 text-muted-foreground ring-1 ring-border/40"
+                  >
+                    <span
+                      className="inline-flex h-6 w-6 items-center justify-center text-current [&>svg]:h-full [&>svg]:w-full"
+                      style={{ color: getAccessibleIconColor(simpleIconData.hex) }}
+                      dangerouslySetInnerHTML={{ __html: getSimpleIconMarkup(simpleIconData) }}
+                    />
+                  </span>
+                ) : (
+                  <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-secondary/40 text-xs font-semibold uppercase tracking-wide text-muted-foreground ring-1 ring-border/40">
+                    {fallbackInitials}
+                  </span>
+                )
+
+                const hasTooltipContent = Boolean(
+                  (answer.infoLines && answer.infoLines.length > 0) ||
+                  answer.example ||
+                  (answer.tags && answer.tags.length > 0) ||
+                  answer.docs
+                )
+
+                return (
+                  <button
+                    key={answer.value}
+                    type="button"
+                    onClick={() => {
+                      void handleAnswerClick(answer)
+                    }}
+                    aria-disabled={answer.disabled}
+                    className={cn(
+                      "group relative flex h-full items-center justify-between rounded-2xl border border-border/60 bg-background/90 px-5 py-4 text-left transition-all hover:border-primary/40 hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
+                      answer.disabled &&
                       "cursor-not-allowed opacity-60 hover:border-border/60 hover:shadow-none focus-visible:ring-0",
-                    isAnswerSelected(answer.value) &&
+                      isAnswerSelected(answer.value) &&
                       !answer.disabled &&
                       "border-primary bg-primary/5 shadow-lg shadow-primary/20"
-                  )}
-                >
-                  <div className="flex items-center gap-2">
-                    <span className="text-base font-medium text-foreground">
-                      {answer.label}
-                    </span>
-                    {answer.disabledLabel ? (
-                      <span className="rounded-full bg-muted px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-muted-foreground/80">
-                        {answer.disabledLabel}
-                      </span>
-                    ) : null}
-                  </div>
-
-                  <div className="flex items-center gap-2">
-                    {(answer.example || (answer.infoLines && answer.infoLines.length > 0) || (answer.tags && answer.tags.length > 0)) && (
-                      <div className="relative">
-                        <Info className="h-4 w-4 text-muted-foreground transition-colors group-hover:text-primary" />
-                        <div className="pointer-events-none absolute right-0 top-full z-20 mt-3 hidden w-60 rounded-xl border border-border/70 bg-popover p-3 text-xs leading-relaxed text-popover-foreground shadow-xl group-hover:flex group-hover:flex-col">
-                          {answer.infoLines?.map((line) => (
-                            <span key={line} className="text-foreground">
-                              {line}
-                            </span>
-                          ))}
-                          {answer.example ? (
-                            <span className="mt-1 text-muted-foreground">{answer.example}</span>
-                          ) : null}
-                          {answer.tags && answer.tags.length > 0 ? (
-                            <div className="mt-3 flex flex-wrap gap-1 text-[10px] uppercase tracking-wide text-muted-foreground/80">
-                              {answer.tags.map((tag) => (
-                                <span key={tag} className="rounded-full bg-muted/80 px-2 py-0.5">
-                                  {tag}
+                    )}
+                  >
+                    <div className="flex items-center gap-3">
+                      {iconElement}
+                      <div className="flex items-center gap-2">
+                        <span className="text-base font-medium text-foreground">
+                          {answer.label}
+                        </span>
+                        {hasTooltipContent ? (
+                          <span className="relative flex items-center group/icon">
+                            <Info className="h-4 w-4 cursor-pointer text-muted-foreground transition-colors group-hover/icon:text-primary" />
+                            <div className="pointer-events-none absolute left-0 top-full z-20 hidden w-60 rounded-xl border border-border/70 bg-popover p-3 text-xs leading-relaxed text-popover-foreground shadow-xl transition-all duration-150 ease-out group-hover/icon:flex group-hover/icon:flex-col group-hover/icon:pointer-events-auto group-hover/icon:opacity-100 group-hover/icon:translate-y-0 opacity-0 translate-y-2">
+                              {answer.infoLines?.map((line) => (
+                                <span key={line} className="text-foreground">
+                                  {line}
                                 </span>
                               ))}
+                              {answer.example ? (
+                                <span className="mt-1 text-muted-foreground">{answer.example}</span>
+                              ) : null}
+                              {answer.tags && answer.tags.length > 0 ? (
+                                <div className="mt-3 flex flex-wrap gap-1 text-[10px] uppercase tracking-wide text-muted-foreground/80">
+                                  {answer.tags.map((tag) => (
+                                    <span key={tag} className="rounded-full bg-muted/80 px-2 py-0.5">
+                                      {tag}
+                                    </span>
+                                  ))}
+                                </div>
+                              ) : null}
+                              {answer.docs ? (
+                                <a
+                                  href={answer.docs}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="mt-3 inline-flex items-center gap-1 text-xs font-medium text-primary hover:underline"
+                                >
+                                  <span>Open documentation</span>
+                                  <ExternalLink className="h-3.5 w-3.5" />
+                                </a>
+                              ) : null}
                             </div>
-                          ) : null}
-                        </div>
+                          </span>
+                        ) : null}
+                        {answer.disabledLabel ? (
+                          <span className="rounded-full bg-muted px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-muted-foreground/80">
+                            {answer.disabledLabel}
+                          </span>
+                        ) : null}
                       </div>
-                    )}
+                    </div>
 
-                    {isAnswerSelected(answer.value) && !answer.disabled ? (
-                      <span className="flex h-7 w-7 items-center justify-center rounded-full bg-primary text-primary-foreground">
-                        <Check className="h-4 w-4" />
-                      </span>
-                    ) : null}
-                  </div>
-                </button>
-              ))}
+                    <div className="flex items-center gap-2">
+                      {isAnswerSelected(answer.value) && !answer.disabled ? (
+                        <span className="flex h-7 w-7 items-center justify-center rounded-full bg-primary text-primary-foreground">
+                          <Check className="h-4 w-4" />
+                        </span>
+                      ) : null}
+                    </div>
+                  </button>
+                )
+              })}
             </div>
 
             <div className="mt-6 flex items-center justify-between gap-3">

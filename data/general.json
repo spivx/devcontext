@@ -16,7 +16,8 @@
             {
                 "value": "accessibility",
                 "label": "Accessibility",
-                "example": "Follow WCAG guidelines strictly."
+                "example": "Follow WCAG guidelines strictly.",
+                "docs": "https://www.w3.org/WAI/standards-guidelines/wcag/"
             },
             {
                 "value": "performance",
@@ -32,12 +33,14 @@
             {
                 "value": "airbnb",
                 "label": "Airbnb JavaScript Style Guide",
-                "example": "Follow https://github.com/airbnb/javascript"
+                "example": "Follow https://github.com/airbnb/javascript",
+                "docs": "https://github.com/airbnb/javascript"
             },
             {
                 "value": "standardjs",
                 "label": "StandardJS",
-                "example": "Use StandardJS (https://standardjs.com)"
+                "example": "Use StandardJS (https://standardjs.com)",
+                "docs": "https://standardjs.com/"
             },
             {
                 "value": "custom",
@@ -53,17 +56,20 @@
             {
                 "value": "camelCase",
                 "label": "camelCase",
-                "example": "function handleClick() {}"
+                "example": "function handleClick() {}",
+                "docs": "https://en.wikipedia.org/wiki/Camel_case"
             },
             {
                 "value": "PascalCase",
                 "label": "PascalCase for components",
-                "example": "export function LoginForm() {}"
+                "example": "export function LoginForm() {}",
+                "docs": "https://en.wikipedia.org/wiki/PascalCase"
             },
             {
                 "value": "snake_case",
                 "label": "snake_case",
-                "example": "const user_id = 123"
+                "example": "const user_id = 123",
+                "docs": "https://en.wikipedia.org/wiki/Snake_case"
             }
         ]
     },
@@ -74,12 +80,14 @@
             {
                 "value": "named",
                 "label": "Named exports",
-                "example": "export const Button = () => {}"
+                "example": "export const Button = () => {}",
+                "docs": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/export#named_exports"
             },
             {
                 "value": "default",
                 "label": "Default exports",
-                "example": "export default function Button() {}"
+                "example": "export default function Button() {}",
+                "docs": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/export#default_exports"
             }
         ]
     },
@@ -95,7 +103,8 @@
             {
                 "value": "jsdoc",
                 "label": "JSDoc",
-                "example": "/** Adds two numbers */"
+                "example": "/** Adds two numbers */",
+                "docs": "https://jsdoc.app/about-getting-started.html"
             },
             {
                 "value": "inline",
@@ -116,7 +125,8 @@
             {
                 "value": "reviewBeforeMerge",
                 "label": "Require reviews before merging",
-                "example": "At least one approval is mandatory."
+                "example": "At least one approval is mandatory.",
+                "docs": "https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/reviewing-changes-in-pull-requests"
             },
             {
                 "value": "docBeforeMerge",
