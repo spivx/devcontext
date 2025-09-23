@@ -98,6 +98,19 @@
                     "Overhead for small projects"
                 ],
                 "example": "src/features/auth/components/LoginForm.tsx"
+            },
+            {
+                "value": "component-directories",
+                "label": "Component directories with re-exports",
+                "icon": "/icons/folder-tree.svg",
+                "pros": [
+                    "Co-locates component logic and styles",
+                    "Enables clean imports via index barrels"
+                ],
+                "cons": [
+                    "Adds boilerplate files per component"
+                ],
+                "example": "components/Button/Button.tsx + components/Button/index.tsx"
             }
         ],
         "explanation": "Component organization affects maintainability as the project grows."
