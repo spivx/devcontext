@@ -2,8 +2,7 @@
 
 import { useMemo, useState } from "react"
 import { Button } from "@/components/ui/button"
-import { cn } from "@/lib/utils"
-import { ArrowLeft, Check, ExternalLink, Info } from "lucide-react"
+import { ArrowLeft } from "lucide-react"
 import * as simpleIcons from "simple-icons"
 import type { SimpleIcon } from "simple-icons"
 
@@ -15,6 +14,7 @@ import performanceData from "@/data/performance.json"
 import securityData from "@/data/security.json"
 import commitsData from "@/data/commits.json"
 import filesData from "@/data/files.json"
+import { InstructionsAnswerCard } from "./instructions-answer-card"
 
 type IdeConfig = {
   id: string
@@ -358,6 +358,7 @@ export function InstructionsWizard({ onClose }: InstructionsWizardProps) {
   const [responses, setResponses] = useState<Responses>({})
   const [dynamicSteps, setDynamicSteps] = useState<WizardStep[]>([])
   const [isComplete, setIsComplete] = useState(false)
+  const [showResetConfirm, setShowResetConfirm] = useState(false)
 
   const wizardSteps = useMemo(
     () => [...preFrameworkSteps, ...dynamicSteps, ...postFrameworkSteps],
@@ -568,6 +569,19 @@ export function InstructionsWizard({ onClose }: InstructionsWizardProps) {
     setIsComplete(false)
   }
 
+  const requestResetWizard = () => {
+    setShowResetConfirm(true)
+  }
+
+  const confirmResetWizard = () => {
+    resetWizard()
+    setShowResetConfirm(false)
+  }
+
+  const cancelResetWizard = () => {
+    setShowResetConfirm(false)
+  }
+
   const renderCompletion = () => {
     const summary = wizardSteps.flatMap((step) =>
       step.questions.map((question) => {
@@ -622,7 +636,7 @@ export function InstructionsWizard({ onClose }: InstructionsWizardProps) {
         </div>
 
         <div className="flex flex-wrap gap-2">
-          <Button variant="ghost" onClick={resetWizard}>
+          <Button variant="ghost" onClick={requestResetWizard}>
             Start Over
           </Button>
           <Button onClick={() => onClose?.()}>
@@ -698,79 +712,22 @@ export function InstructionsWizard({ onClose }: InstructionsWizardProps) {
                 )
 
                 return (
-                  <button
+                  <InstructionsAnswerCard
                     key={answer.value}
-                    type="button"
                     onClick={() => {
                       void handleAnswerClick(answer)
                     }}
-                    aria-disabled={answer.disabled}
-                    className={cn(
-                      "group relative flex h-full items-center justify-between rounded-2xl border border-border/60 bg-background/90 px-5 py-4 text-left transition-all hover:border-primary/40 hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
-                      answer.disabled &&
-                      "cursor-not-allowed opacity-60 hover:border-border/60 hover:shadow-none focus-visible:ring-0",
-                      isAnswerSelected(answer.value) &&
-                      !answer.disabled &&
-                      "border-primary bg-primary/5 shadow-lg shadow-primary/20"
-                    )}
-                  >
-                    <div className="flex items-center gap-3">
-                      {iconElement}
-                      <div className="flex items-center gap-2">
-                        <span className="text-base font-medium text-foreground">
-                          {answer.label}
-                        </span>
-                        {hasTooltipContent ? (
-                          <span className="relative flex items-center group/icon">
-                            <Info className="h-4 w-4 cursor-pointer text-muted-foreground transition-colors group-hover/icon:text-primary" />
-                            <div className="pointer-events-none absolute left-0 top-full z-20 hidden w-60 rounded-xl border border-border/70 bg-popover p-3 text-xs leading-relaxed text-popover-foreground shadow-xl transition-all duration-150 ease-out group-hover/icon:flex group-hover/icon:flex-col group-hover/icon:pointer-events-auto group-hover/icon:opacity-100 group-hover/icon:translate-y-0 opacity-0 translate-y-2">
-                              {answer.infoLines?.map((line) => (
-                                <span key={line} className="text-foreground">
-                                  {line}
-                                </span>
-                              ))}
-                              {answer.example ? (
-                                <span className="mt-1 text-muted-foreground">{answer.example}</span>
-                              ) : null}
-                              {answer.tags && answer.tags.length > 0 ? (
-                                <div className="mt-3 flex flex-wrap gap-1 text-[10px] uppercase tracking-wide text-muted-foreground/80">
-                                  {answer.tags.map((tag) => (
-                                    <span key={tag} className="rounded-full bg-muted/80 px-2 py-0.5">
-                                      {tag}
-                                    </span>
-                                  ))}
-                                </div>
-                              ) : null}
-                              {answer.docs ? (
-                                <a
-                                  href={answer.docs}
-                                  target="_blank"
-                                  rel="noopener noreferrer"
-                                  className="mt-3 inline-flex items-center gap-1 text-xs font-medium text-primary hover:underline"
-                                >
-                                  <span>Open documentation</span>
-                                  <ExternalLink className="h-3.5 w-3.5" />
-                                </a>
-                              ) : null}
-                            </div>
-                          </span>
-                        ) : null}
-                        {answer.disabledLabel ? (
-                          <span className="rounded-full bg-muted px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-muted-foreground/80">
-                            {answer.disabledLabel}
-                          </span>
-                        ) : null}
-                      </div>
-                    </div>
-
-                    <div className="flex items-center gap-2">
-                      {isAnswerSelected(answer.value) && !answer.disabled ? (
-                        <span className="flex h-7 w-7 items-center justify-center rounded-full bg-primary text-primary-foreground">
-                          <Check className="h-4 w-4" />
-                        </span>
-                      ) : null}
-                    </div>
-                  </button>
+                    label={answer.label}
+                    iconElement={iconElement}
+                    hasTooltipContent={hasTooltipContent}
+                    infoLines={answer.infoLines}
+                    example={answer.example}
+                    tags={answer.tags}
+                    docs={answer.docs}
+                    selected={isAnswerSelected(answer.value)}
+                    disabled={answer.disabled}
+                    disabledLabel={answer.disabledLabel}
+                  />
                 )
               })}
             </div>
@@ -790,6 +747,27 @@ export function InstructionsWizard({ onClose }: InstructionsWizardProps) {
           </section>
         </>
       )}
+
+      {showResetConfirm ? (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-background/80 p-4 backdrop-blur-sm">
+          <div className="w-full max-w-md space-y-4 rounded-2xl border border-border/70 bg-card/95 p-6 shadow-2xl">
+            <div className="space-y-2">
+              <h3 className="text-lg font-semibold text-foreground">Start over?</h3>
+              <p className="text-sm text-muted-foreground">
+                This will clear all of your current selections. Are you sure you want to continue?
+              </p>
+            </div>
+            <div className="flex flex-wrap justify-end gap-2">
+              <Button variant="ghost" onClick={cancelResetWizard}>
+                Keep My Answers
+              </Button>
+              <Button variant="destructive" onClick={confirmResetWizard}>
+                Reset Wizard
+              </Button>
+            </div>
+          </div>
+        </div>
+      ) : null}
     </div>
   )
 }
