@@ -7,6 +7,8 @@ import { InstructionsWizard } from "@/components/instructions-wizard"
 import HeroIconsRow from "@/components/HeroIconsRow"
 import { ThemeToggle } from "@/components/theme-toggle"
 import { getHeroIconItems, getHomeMainClasses } from "@/lib/utils"
+import { ANALYTICS_EVENTS } from "@/lib/analytics-events"
+import { track } from "@/lib/mixpanel"
 import { Github } from "lucide-react"
 import Link from "next/link"
 
@@ -56,7 +58,10 @@ export default function Home() {
                 <Button
                   size="lg"
                   className="px-8 py-6 text-lg"
-                  onClick={() => setShowWizard(true)}
+                  onClick={() => {
+                    track(ANALYTICS_EVENTS.CREATE_INSTRUCTIONS_FILE)
+                    setShowWizard(true)
+                  }}
                 >
                   Create My Instructions File
                 </Button>

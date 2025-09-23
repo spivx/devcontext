@@ -1,5 +1,7 @@
 import mixpanel from "mixpanel-browser"
 
+import { ANALYTICS_EVENTS, type AnalyticsEvent } from "@/lib/analytics-events"
+
 const MIXPANEL_TOKEN = process.env.NEXT_PUBLIC_MIXPANEL_TOKEN
 
 let isMixpanelInitialized = false
@@ -24,7 +26,7 @@ export const initMixpanel = () => {
   isMixpanelInitialized = true
 }
 
-export const track = (event: string, props?: Record<string, unknown>) => {
+export const track = (event: AnalyticsEvent, props?: Record<string, unknown>) => {
   if (typeof window === "undefined" || !isMixpanelInitialized) {
     return
   }
@@ -41,7 +43,7 @@ export const identify = (userId: string) => {
 }
 
 export const trackPageView = (path: string, search?: string) => {
-  track("Page View", {
+  track(ANALYTICS_EVENTS.PAGE_VIEW, {
     path,
     search: search || undefined,
   })
