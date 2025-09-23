@@ -3,15 +3,17 @@
 import { useState } from "react"
 
 import { Button } from "@/components/ui/button"
-import { Github, Code, Terminal, Zap, Bot, Activity } from "lucide-react"
-import Link from "next/link"
-
 import { InstructionsWizard } from "@/components/instructions-wizard"
 import { ThemeToggle } from "@/components/theme-toggle"
+import { getHeroIconItems, getHomeMainClasses } from "@/lib/utils"
+import { Github } from "lucide-react"
+import Link from "next/link"
+
 import Logo from "./../components/Logo"
 
 export default function Home() {
   const [showWizard, setShowWizard] = useState(false)
+  const heroIcons = getHeroIconItems()
 
   return (
     <div className="min-h-screen bg-background text-foreground">
@@ -29,11 +31,7 @@ export default function Home() {
       </div>
 
       {/* Hero Section */}
-      <main
-        className={`min-h-screen flex flex-col items-center px-4 pb-24 pt-28 transition-all duration-300 ${
-          showWizard ? "justify-start" : "justify-center text-center"
-        }`}
-      >
+      <main className={getHomeMainClasses(showWizard)}>
         {showWizard ? (
           <InstructionsWizard onClose={() => setShowWizard(false)} />
         ) : (
@@ -66,40 +64,14 @@ export default function Home() {
 
             {/* Icons Row */}
             <div className="mt-16 flex flex-wrap justify-center gap-8 px-6">
-              <div className="flex flex-col items-center gap-2">
-                <div className="flex h-16 w-16 items-center justify-center rounded-full border bg-card shadow-sm transition-shadow hover:shadow-md">
-                  <Code className="h-6 w-6 text-primary" />
+              {heroIcons.map(({ icon: Icon, label }) => (
+                <div key={label} className="flex flex-col items-center gap-2">
+                  <div className="flex h-16 w-16 items-center justify-center rounded-full border bg-card shadow-sm transition-shadow hover:shadow-md">
+                    <Icon className="h-6 w-6 text-primary" />
+                  </div>
+                  <p className="text-sm font-medium">{label}</p>
                 </div>
-                <p className="text-sm font-medium">VS Code</p>
-              </div>
-
-              <div className="flex flex-col items-center gap-2">
-                <div className="flex h-16 w-16 items-center justify-center rounded-full border bg-card shadow-sm transition-shadow hover:shadow-md">
-                  <Activity className="h-6 w-6 text-primary" />
-                </div>
-                <p className="text-sm font-medium">React</p>
-              </div>
-
-              <div className="flex flex-col items-center gap-2">
-                <div className="flex h-16 w-16 items-center justify-center rounded-full border bg-card shadow-sm transition-shadow hover:shadow-md">
-                  <Zap className="h-6 w-6 text-primary" />
-                </div>
-                <p className="text-sm font-medium">Angular</p>
-              </div>
-
-              <div className="flex flex-col items-center gap-2">
-                <div className="flex h-16 w-16 items-center justify-center rounded-full border bg-card shadow-sm transition-shadow hover:shadow-md">
-                  <Terminal className="h-6 w-6 text-primary" />
-                </div>
-                <p className="text-sm font-medium">Cursor</p>
-              </div>
-
-              <div className="flex flex-col items-center gap-2">
-                <div className="flex h-16 w-16 items-center justify-center rounded-full border bg-card shadow-sm transition-shadow hover:shadow-md">
-                  <Bot className="h-6 w-6 text-primary" />
-                </div>
-                <p className="text-sm font-medium">GitHub Copilot</p>
-              </div>
+              ))}
             </div>
           </>
         )}

@@ -44,3 +44,4 @@
 - When adding tooltip content, prefer concise prose and keep hover cards scannable.
 - Keep documentation links trustworthy; avoid marketing splash pages when direct references exist.
 - If adding new output formats, update both the data definition in `data/files.json` and any generation logic (currently beyond this repo).
+- When page-level components need reusable calculations or datasets, extract those helpers into `lib/utils.ts` and import them instead of defining inline.

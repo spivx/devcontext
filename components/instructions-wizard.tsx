@@ -642,7 +642,7 @@ export function InstructionsWizard({ onClose }: InstructionsWizardProps) {
       {onClose ? (
         <Button variant="ghost" onClick={onClose} className="self-start -ml-2">
           <ArrowLeft className="mr-2 h-4 w-4" />
-          Back
+          Start over
         </Button>
       ) : null}
 
