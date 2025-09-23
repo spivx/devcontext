@@ -2,7 +2,8 @@
 
 import { cn } from "@/lib/utils"
 import { Check, ExternalLink, Info } from "lucide-react"
-import type { ComponentPropsWithoutRef } from "react"
+import { useCallback, useState, type ComponentPropsWithoutRef, type MouseEvent } from "react"
+import { useWindowClickDismiss } from "@/hooks/use-window-click-dismiss"
 
 export type InstructionsAnswerCardProps = {
   label: string
@@ -32,6 +33,19 @@ export function InstructionsAnswerCard({
   onClick,
   ...buttonProps
 }: InstructionsAnswerCardProps) {
+  const [isTooltipOpen, setIsTooltipOpen] = useState(false)
+
+  const closeTooltip = useCallback(() => {
+    setIsTooltipOpen(false)
+  }, [])
+
+  useWindowClickDismiss(isTooltipOpen, closeTooltip)
+
+  const toggleTooltip = (event: MouseEvent<HTMLSpanElement>) => {
+    event.stopPropagation()
+    setIsTooltipOpen((prev) => !prev)
+  }
+
   return (
     <button
       type="button"
@@ -49,9 +63,24 @@ export function InstructionsAnswerCard({
         <div className="flex items-center gap-2">
           <span className="text-base font-medium text-foreground">{label}</span>
           {hasTooltipContent ? (
-            <span className="relative flex items-center group/icon">
+            <span
+              className={cn(
+                "relative flex items-center group/icon",
+                isTooltipOpen && "pointer-events-auto"
+              )}
+              onClick={toggleTooltip}
+            >
               <Info className="h-4 w-4 cursor-pointer text-muted-foreground transition-colors group-hover/icon:text-primary" />
-              <div className="pointer-events-none absolute left-0 top-full z-20 hidden w-60 rounded-xl border border-border/70 bg-popover p-3 text-xs leading-relaxed text-popover-foreground shadow-xl transition-all duration-150 ease-out group-hover/icon:flex group-hover/icon:flex-col group-hover/icon:pointer-events-auto group-hover/icon:opacity-100 group-hover/icon:translate-y-0 opacity-0 translate-y-2">
+              <div
+                className={cn(
+                  "pointer-events-none absolute left-0 top-full z-20 hidden w-60 rounded-xl border border-border/70 bg-popover p-3 text-xs leading-relaxed text-popover-foreground shadow-xl transition-all duration-150 ease-out md:left-1/2 md:-translate-x-1/2",
+                  (isTooltipOpen || undefined) &&
+                  "pointer-events-auto !flex !flex-col opacity-100 translate-y-0",
+                  !isTooltipOpen && "opacity-0 translate-y-2",
+                  "group-hover/icon:flex group-hover/icon:flex-col group-hover/icon:pointer-events-auto group-hover/icon:opacity-100 group-hover/icon:translate-y-0"
+                )}
+                onClick={(event) => event.stopPropagation()}
+              >
                 {infoLines?.map((line) => (
                   <span key={line} className="text-foreground">
                     {line}
