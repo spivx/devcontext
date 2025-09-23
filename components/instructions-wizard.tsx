@@ -3,12 +3,18 @@
 import { useMemo, useState } from "react"
 import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
-import { ArrowLeft, Check, ChevronRight, ExternalLink, Info } from "lucide-react"
+import { ArrowLeft, Check, ExternalLink, Info } from "lucide-react"
 import * as simpleIcons from "simple-icons"
 import type { SimpleIcon } from "simple-icons"
 
 import rawIdes from "@/data/ides.json"
 import rawFrameworks from "@/data/frameworks.json"
+import generalData from "@/data/general.json"
+import architectureData from "@/data/architecture.json"
+import performanceData from "@/data/performance.json"
+import securityData from "@/data/security.json"
+import commitsData from "@/data/commits.json"
+import filesData from "@/data/files.json"
 
 type IdeConfig = {
   id: string
@@ -27,21 +33,35 @@ type FrameworkConfig = {
   docs?: string
 }
 
-type FrameworkAnswerSource = {
+type DataAnswerSource = {
   value: string
   label: string
   icon?: string
   example?: string
+  docs?: string
   pros?: string[]
   cons?: string[]
-  docs?: string
+  tags?: string[]
+  isDefault?: boolean
+  disabled?: boolean
+  disabledLabel?: string
 }
 
-type FrameworkQuestionSource = {
+type DataQuestionSource = {
   id: string
   question: string
   allowMultiple?: boolean
-  answers: FrameworkAnswerSource[]
+  answers: DataAnswerSource[]
+}
+
+type FileOutputConfig = {
+  id: string
+  label: string
+  filename: string
+  format: string
+  enabled?: boolean
+  icon?: string
+  docs?: string
 }
 
 type WizardAnswer = {
@@ -173,6 +193,46 @@ const normalizeIconSlug = (raw?: string) => {
   return iconSlugOverrides[cleaned] ?? cleaned
 }
 
+const mapAnswerSourceToWizard = (answer: DataAnswerSource): WizardAnswer => {
+  const infoLines: string[] = []
+
+  if (answer.pros && answer.pros.length > 0) {
+    infoLines.push(`Pros: ${answer.pros.join(", ")}`)
+  }
+
+  if (answer.cons && answer.cons.length > 0) {
+    infoLines.push(`Cons: ${answer.cons.join(", ")}`)
+  }
+
+  return {
+    value: answer.value,
+    label: answer.label,
+    icon: answer.icon,
+    example: answer.example,
+    infoLines: infoLines.length > 0 ? infoLines : undefined,
+    docs: answer.docs,
+    tags: answer.tags,
+    isDefault: answer.isDefault,
+    disabled: answer.disabled,
+    disabledLabel: answer.disabledLabel,
+  }
+}
+
+const buildStepFromQuestionSet = (
+  id: string,
+  title: string,
+  questions: DataQuestionSource[]
+): WizardStep => ({
+  id,
+  title,
+  questions: questions.map((question) => ({
+    id: question.id,
+    question: question.question,
+    allowMultiple: question.allowMultiple,
+    answers: question.answers.map(mapAnswerSourceToWizard),
+  })),
+})
+
 const idesStep: WizardStep = {
   id: "ides",
   title: "Choose Your IDE",
@@ -219,17 +279,90 @@ const frameworksStep: WizardStep = {
   ],
 }
 
+const generalStep = buildStepFromQuestionSet(
+  "general",
+  "Project Foundations",
+  generalData as DataQuestionSource[]
+)
+
+const architectureStep = buildStepFromQuestionSet(
+  "architecture",
+  "Architecture Practices",
+  architectureData as DataQuestionSource[]
+)
+
+const performanceStep = buildStepFromQuestionSet(
+  "performance",
+  "Performance Guidelines",
+  performanceData as DataQuestionSource[]
+)
+
+const securityStep = buildStepFromQuestionSet(
+  "security",
+  "Security & Compliance",
+  securityData as DataQuestionSource[]
+)
+
+const commitsStep = buildStepFromQuestionSet(
+  "commits",
+  "Collaboration & Version Control",
+  commitsData as DataQuestionSource[]
+)
+
+const filesStep: WizardStep = {
+  id: "files",
+  title: "Output Files",
+  questions: [
+    {
+      id: "outputFiles",
+      question: "Which instruction files should we generate?",
+      allowMultiple: true,
+      answers: (filesData as FileOutputConfig[]).map((file) => {
+        const infoLines: string[] = []
+        if (file.filename) {
+          infoLines.push(`Filename: ${file.filename}`)
+        }
+        if (file.format) {
+          infoLines.push(`Format: ${file.format}`)
+        }
+
+        return {
+          value: file.id,
+          label: file.label,
+          icon: file.icon,
+          infoLines: infoLines.length > 0 ? infoLines : undefined,
+          docs: file.docs,
+          tags: file.format ? [file.format] : undefined,
+          disabled: file.enabled === false,
+          disabledLabel: file.enabled === false ? "Soon" : undefined,
+        }
+      }),
+    },
+  ],
+}
+
+const preFrameworkSteps: WizardStep[] = [idesStep, frameworksStep]
+
+const postFrameworkSteps: WizardStep[] = [
+  generalStep,
+  architectureStep,
+  performanceStep,
+  securityStep,
+  commitsStep,
+  filesStep,
+]
+
 export function InstructionsWizard({ onClose }: InstructionsWizardProps) {
   const [currentStepIndex, setCurrentStepIndex] = useState(0)
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0)
   const [responses, setResponses] = useState<Responses>({})
   const [dynamicSteps, setDynamicSteps] = useState<WizardStep[]>([])
   const [isComplete, setIsComplete] = useState(false)
-  const [selectedFramework, setSelectedFramework] = useState<string | null>(null)
-  const [isLoadingFrameworkQuestions, setIsLoadingFrameworkQuestions] = useState(false)
 
-  const baseSteps = useMemo(() => [idesStep, frameworksStep], [])
-  const wizardSteps = useMemo(() => [...baseSteps, ...dynamicSteps], [baseSteps, dynamicSteps])
+  const wizardSteps = useMemo(
+    () => [...preFrameworkSteps, ...dynamicSteps, ...postFrameworkSteps],
+    [dynamicSteps]
+  )
 
   const currentStep = wizardSteps[currentStepIndex]
   const currentQuestion = currentStep?.questions[currentQuestionIndex]
@@ -268,27 +401,6 @@ export function InstructionsWizard({ onClose }: InstructionsWizardProps) {
     return currentAnswerValue === value
   }
 
-  const toggleAnswer = (value: string) => {
-    setResponses((prev) => {
-      const previousValue = prev[currentQuestion.id]
-
-      if (currentQuestion.allowMultiple) {
-        const values = Array.isArray(previousValue) ? previousValue : []
-        const exists = values.includes(value)
-        const nextValues = exists ? values.filter((item) => item !== value) : [...values, value]
-        return {
-          ...prev,
-          [currentQuestion.id]: nextValues,
-        }
-      }
-
-      return {
-        ...prev,
-        [currentQuestion.id]: previousValue === value ? undefined : value,
-      }
-    })
-  }
-
   const advanceToNextQuestion = () => {
     const isLastQuestionInStep = currentQuestionIndex === currentStep.questions.length - 1
     const isLastStep = currentStepIndex === wizardSteps.length - 1
@@ -305,18 +417,6 @@ export function InstructionsWizard({ onClose }: InstructionsWizardProps) {
     }
 
     setCurrentQuestionIndex((prev) => prev + 1)
-  }
-
-  const goToNext = () => {
-    if (currentQuestion.allowMultiple) {
-      if (!Array.isArray(currentAnswerValue) || currentAnswerValue.length === 0) {
-        return
-      }
-    } else if (currentAnswerValue === undefined || currentAnswerValue === null) {
-      return
-    }
-
-    advanceToNextQuestion()
   }
 
   const goToPrevious = () => {
@@ -341,10 +441,9 @@ export function InstructionsWizard({ onClose }: InstructionsWizardProps) {
   }
 
   const loadFrameworkQuestions = async (frameworkId: string, frameworkLabel: string) => {
-    setIsLoadingFrameworkQuestions(true)
     try {
       const questionsModule = await import(`@/data/questions/${frameworkId}.json`)
-      const questionsData = (questionsModule.default ?? questionsModule) as FrameworkQuestionSource[]
+      const questionsData = (questionsModule.default ?? questionsModule) as DataQuestionSource[]
 
       const mappedQuestions: WizardQuestion[] = questionsData.map((question) => ({
         id: question.id,
@@ -386,16 +485,13 @@ export function InstructionsWizard({ onClose }: InstructionsWizardProps) {
         return next
       })
 
-      setSelectedFramework(frameworkId)
-      setCurrentStepIndex(baseSteps.length)
+      setCurrentStepIndex(preFrameworkSteps.length)
       setCurrentQuestionIndex(0)
       setIsComplete(false)
     } catch (error) {
       console.error(`Unable to load questions for framework "${frameworkId}"`, error)
       setDynamicSteps([])
-      setSelectedFramework(null)
     } finally {
-      setIsLoadingFrameworkQuestions(false)
     }
   }
 
@@ -404,19 +500,50 @@ export function InstructionsWizard({ onClose }: InstructionsWizardProps) {
       return
     }
 
-    if (!currentQuestion.allowMultiple && currentAnswerValue === answer.value) {
-      toggleAnswer(answer.value)
-      if (currentQuestion.id === FRAMEWORK_QUESTION_ID) {
-        setSelectedFramework(null)
-        setDynamicSteps([])
+    const previousValue = responses[currentQuestion.id]
+    let nextValue: Responses[keyof Responses]
+    let didAddSelection = false
+
+    if (currentQuestion.allowMultiple) {
+      const prevArray = Array.isArray(previousValue) ? previousValue : []
+      if (prevArray.includes(answer.value)) {
+        nextValue = prevArray.filter((item) => item !== answer.value)
+      } else {
+        nextValue = [...prevArray, answer.value]
+        didAddSelection = true
       }
-      return
+    } else {
+      if (previousValue === answer.value) {
+        nextValue = undefined
+      } else {
+        nextValue = answer.value
+        didAddSelection = true
+      }
     }
 
-    toggleAnswer(answer.value)
+    setResponses((prev) => ({
+      ...prev,
+      [currentQuestion.id]: nextValue,
+    }))
 
-    if (currentQuestion.id === FRAMEWORK_QUESTION_ID) {
-      await loadFrameworkQuestions(answer.value, answer.label)
+    const isFrameworkQuestion = currentQuestion.id === FRAMEWORK_QUESTION_ID
+    const shouldAutoAdvance =
+      !isFrameworkQuestion &&
+      ((currentQuestion.allowMultiple && Array.isArray(nextValue) && nextValue.length > 0 && didAddSelection) ||
+        (!currentQuestion.allowMultiple && nextValue !== undefined && nextValue !== null && didAddSelection))
+
+    if (shouldAutoAdvance) {
+      setTimeout(() => {
+        advanceToNextQuestion()
+      }, 0)
+    }
+
+    if (isFrameworkQuestion) {
+      if (nextValue === answer.value) {
+        await loadFrameworkQuestions(answer.value, answer.label)
+      } else {
+        setDynamicSteps([])
+      }
     }
   }
 
@@ -428,7 +555,6 @@ export function InstructionsWizard({ onClose }: InstructionsWizardProps) {
 
     if (currentQuestion.id === FRAMEWORK_QUESTION_ID) {
       setDynamicSteps([])
-      setSelectedFramework(null)
     }
 
     advanceToNextQuestion()
@@ -437,7 +563,6 @@ export function InstructionsWizard({ onClose }: InstructionsWizardProps) {
   const resetWizard = () => {
     setResponses({})
     setDynamicSteps([])
-    setSelectedFramework(null)
     setCurrentStepIndex(0)
     setCurrentQuestionIndex(0)
     setIsComplete(false)
@@ -500,11 +625,9 @@ export function InstructionsWizard({ onClose }: InstructionsWizardProps) {
           <Button variant="ghost" onClick={resetWizard}>
             Start Over
           </Button>
-          {onClose ? (
-            <Button onClick={onClose}>
-              Continue
-            </Button>
-          ) : null}
+          <Button onClick={() => onClose?.()}>
+            Generate My Instructions
+          </Button>
         </div>
       </div>
     )
@@ -513,22 +636,6 @@ export function InstructionsWizard({ onClose }: InstructionsWizardProps) {
   const questionNumber = wizardSteps
     .slice(0, currentStepIndex)
     .reduce((count, step) => count + step.questions.length, 0) + currentQuestionIndex + 1
-
-  const isNextDisabled = (() => {
-    if (isLoadingFrameworkQuestions) {
-      return true
-    }
-
-    if (currentQuestion.id === FRAMEWORK_QUESTION_ID && selectedFramework === null) {
-      return true
-    }
-
-    if (currentQuestion.allowMultiple) {
-      return !Array.isArray(currentAnswerValue) || currentAnswerValue.length === 0
-    }
-
-    return currentAnswerValue === undefined || currentAnswerValue === null
-  })()
 
   return (
     <div className="mx-auto flex w-full max-w-4xl flex-col gap-6">
@@ -679,10 +786,6 @@ export function InstructionsWizard({ onClose }: InstructionsWizardProps) {
               <div className="text-xs text-muted-foreground">
                 Question {questionNumber} of {totalQuestions} · {answeredQuestionsCount} answered
               </div>
-              <Button onClick={goToNext} disabled={isNextDisabled}>
-                Next
-                <ChevronRight className="ml-2 h-4 w-4" />
-              </Button>
             </div>
           </section>
         </>

@@ -50,26 +50,68 @@
         ]
     },
     {
-        "id": "naming",
-        "question": "What naming conventions should be applied?",
+        "id": "variableNaming",
+        "question": "What naming convention should be used for variables?",
         "answers": [
             {
                 "value": "camelCase",
                 "label": "camelCase",
-                "example": "function handleClick() {}",
+                "example": "const userName = 'john'",
+                "docs": "https://en.wikipedia.org/wiki/Camel_case"
+            },
+            {
+                "value": "snake_case",
+                "label": "snake_case",
+                "example": "const user_name = 'john'",
+                "docs": "https://en.wikipedia.org/wiki/Snake_case"
+            }
+        ]
+    },
+    {
+        "id": "fileNaming",
+        "question": "What naming convention should be used for file names?",
+        "answers": [
+            {
+                "value": "kebab-case",
+                "label": "kebab-case",
+                "example": "user-profile.tsx",
+                "docs": "https://en.wikipedia.org/wiki/Letter_case#Kebab_case"
+            },
+            {
+                "value": "camelCase",
+                "label": "camelCase",
+                "example": "userProfile.tsx",
                 "docs": "https://en.wikipedia.org/wiki/Camel_case"
             },
             {
                 "value": "PascalCase",
-                "label": "PascalCase for components",
-                "example": "export function LoginForm() {}",
+                "label": "PascalCase",
+                "example": "UserProfile.tsx",
                 "docs": "https://en.wikipedia.org/wiki/PascalCase"
             },
             {
                 "value": "snake_case",
                 "label": "snake_case",
-                "example": "const user_id = 123",
+                "example": "user_profile.tsx",
                 "docs": "https://en.wikipedia.org/wiki/Snake_case"
+            }
+        ]
+    },
+    {
+        "id": "componentNaming",
+        "question": "What naming convention should be used for component names?",
+        "answers": [
+            {
+                "value": "PascalCase",
+                "label": "PascalCase",
+                "example": "export function LoginForm() {}",
+                "docs": "https://en.wikipedia.org/wiki/PascalCase"
+            },
+            {
+                "value": "camelCase",
+                "label": "camelCase",
+                "example": "export function loginForm() {}",
+                "docs": "https://en.wikipedia.org/wiki/Camel_case"
             }
         ]
     },
