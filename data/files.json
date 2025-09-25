@@ -9,6 +9,15 @@
         "docs": "https://docs.github.com/en/copilot"
     },
     {
+        "id": "agents-md",
+        "label": "Agents Development Guide",
+        "filename": "agents.md",
+        "format": "markdown",
+        "enabled": true,
+        "icon": "markdown",
+        "docs": "https://docs.github.com/en/copilot"
+    },
+    {
         "id": "cursor-rules",
         "label": "Cursor Rules",
         "filename": ".cursor/rules",

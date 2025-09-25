@@ -2,7 +2,18 @@ import { NextRequest, NextResponse } from 'next/server'
 import { readFile } from 'fs/promises'
 import path from 'path'
 import type { WizardResponses } from '@/types/wizard'
-import { getTemplateConfig } from '@/lib/template-config'
+import { getTemplateConfig, type TemplateKey } from '@/lib/template-config'
+
+// Helper function to map output file types to template types
+function mapOutputFileToTemplateType(outputFile: string): string {
+    const mapping: Record<string, string> = {
+        'instructions-md': 'copilot-instructions',
+        'cursor-rules': 'cursor-rules',
+        'json-rules': 'json-rules',
+        'agents-md': 'agents'
+    }
+    return mapping[outputFile] || outputFile
+}
 
 export async function POST(
     request: NextRequest,
@@ -13,7 +24,24 @@ export async function POST(
         const body = await request.json()
         const responses: WizardResponses = body
 
-        const templateConfig = getTemplateConfig(fileName)
+        // Determine template configuration based on the request
+        let templateConfig
+
+        // Check if this is a combination-based request
+        if (responses.preferredIde && responses.outputFile) {
+            const templateKey: TemplateKey = {
+                ide: responses.preferredIde,
+                templateType: mapOutputFileToTemplateType(responses.outputFile),
+                framework: responses.frameworkSelection || undefined
+            }
+            templateConfig = getTemplateConfig(templateKey)
+        }
+
+        // Fallback to legacy fileName-based approach
+        if (!templateConfig) {
+            templateConfig = getTemplateConfig(fileName)
+        }
+
         if (!templateConfig) {
             return NextResponse.json(
                 { error: `Template not found for fileName: ${fileName}` },

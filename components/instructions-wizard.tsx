@@ -17,6 +17,9 @@ import commitsData from "@/data/commits.json"
 import filesData from "@/data/files.json"
 import { InstructionsAnswerCard } from "./instructions-answer-card"
 
+import { ANALYTICS_EVENTS } from "@/lib/analytics-events"
+import { track } from "@/lib/mixpanel"
+
 const FRAMEWORK_STEP_ID = "frameworks"
 const FRAMEWORK_QUESTION_ID = "frameworkSelection"
 
@@ -504,6 +507,7 @@ export function InstructionsWizard({ onClose }: InstructionsWizardProps) {
   }
 
   const generateInstructionsFile = async () => {
+    track(ANALYTICS_EVENTS.CREATE_INSTRUCTIONS_FILE)
     // Create a JSON object with question IDs as keys and their answers as values
     const questionsAndAnswers: WizardResponses = {
       preferredIde: null,
@@ -575,6 +579,14 @@ export function InstructionsWizard({ onClose }: InstructionsWizardProps) {
           questionsAndAnswers[key as keyof WizardResponses] = null
         }
       })
+    })
+
+    // Ensure we have the combination data for the API
+    // The API will now use preferredIde + outputFile + frameworkSelection to determine the template
+    console.log('Template combination data:', {
+      ide: questionsAndAnswers.preferredIde,
+      outputFile: questionsAndAnswers.outputFile,
+      framework: questionsAndAnswers.frameworkSelection
     })
 
     // console.log('Questions and Answers JSON:', JSON.stringify(questionsAndAnswers, null, 2))

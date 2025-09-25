@@ -1,94 +1,145 @@
-# Copilot Instructions
+---
+# Configuration for Copilot in this project
+applyTo: "**/*.{ts,tsx,js,jsx,md}"  # apply to all code files by default
+---
 
-These instructions define how GitHub Copilot should assist in this project.  
-They are tailored to our selected IDE, framework, and coding conventions, based on real developer practices.
+# Project Overview  
+These are the conventions and guardrails Copilot should follow when generating code, tests, commits, and PRs in our project.  
+They reflect the decisions we made (IDE, framework, language) and real-world best practices.
 
 ---
 
-## Environment
+## 1. Project Context & Priorities
 
-- **IDE**: {{preferredIde}}  
-- **Framework**: {{frameworkSelection}}  
-- **Build Tooling**: {{tooling}}  
-- **Language**: {{language}}
+- IDE: **{{preferredIde}}**  
+- Framework: **{{frameworkSelection}}**  
+- Build tooling: **{{tooling}}**  
+- Language: **{{language}}**  
 
----
+- Primary focus: **{{projectPriority}}**
 
-## Project Priorities
-
-- **Primary focus**: {{projectPriority}}  
-- **Code style**: {{codeStyle}}  
-- **Variable naming**: {{variableNaming}}  
-- **File naming**: {{fileNaming}}  
-- **Component naming**: {{componentNaming}}  
-- **Exports**: {{exports}}  
-- **Comments & documentation**: {{comments}}  
-- **Collaboration rules**: {{collaboration}}
+> Use this context — when Copilot needs to choose between simpler vs. more optimized code, prefer what aligns with **{{projectPriority}}**.
 
 ---
 
-## Architecture & Structure
+## 2. Naming, Style & Structure Rules
 
-- **Component structure**: {{fileStructure}}  
-- **Styling approach**: {{styling}}  
-- **State management**: {{stateManagement}}  
-- **API layer**: {{apiLayer}}  
-- **Folder structure**: {{folders}}
+### Naming & Exports
 
----
+- Variables, functions, object keys: **{{variableNaming}}**  
+- Files & modules: **{{fileNaming}}**  
+- Components, types: **{{componentNaming}}**  
+- Always use **{{exports}}** exports style  
+- Comments & documentation style: **{{comments}}**  
+- Code style: follow **{{codeStyle}}**  
 
-## Testing
+### File and Folder Structure
 
-- **Unit testing**: {{testingUT}}  
-- **End-to-End (E2E) testing**: {{testingE2E}}
+- Component / UI layout organization: **{{fileStructure}}**  
+- Styling approach: **{{styling}}**  
+- State management: adopt **{{stateManagement}}**  
+- API layer organization: put remote calls in **{{apiLayer}}**  
+- Folder strategy: **{{folders}}**  
 
----
-
-## Performance Guidelines
-
-- **Data fetching**: {{dataFetching}}  
-- **React performance**: {{reactPerf}}
-
----
-
-## Security Guidelines
-
-- **Authentication & secrets**: {{auth}}  
-- **Validation**: {{validation}}  
-- **Logging**: {{logging}}
+> Copilot should not generate code outside these structures or naming patterns.
 
 ---
 
-## Commits & Pull Requests
+## 3. Testing & Quality Assurance
 
-- **Commit style**: {{commitStyle}}  
-- **Pull request rules**: {{prRules}}
+- Unit tests: **{{testingUT}}**  
+- E2E / integration: **{{testingE2E}}**  
 
----
-
-## IDE-Specific Guidance
-
-For **VS Code**:  
-- Always include a `.editorconfig`.  
-- Enable **Prettier** and **ESLint** extensions.  
-- Turn on `editor.formatOnSave: true`.  
-- Suggested extensions:  
-  - `dbaeumer.vscode-eslint`  
-  - `esbenp.prettier-vscode`  
-  - `formulahendry.auto-rename-tag`
+**Rules**  
+- Use descriptive test names.  
+- Always include both “happy path” and edge cases.  
+- Avoid large tests that span too many modules.  
+- Tests should live alongside modules (or in designated `__tests__` folder per convention).
 
 ---
 
-## Copilot Usage Guidelines
+## 4. Performance & Data Loading
 
-- Use Copilot to generate **boilerplate**, but always review before committing.  
-- When writing tests, describe expected behavior clearly so Copilot can produce meaningful cases.  
-- Prefer completions aligned with **our conventions** (naming, structure, testing).  
-- Reject or edit Copilot suggestions that break the rules above.  
+- Data fetching approach: **{{dataFetching}}**  
+- React performance optimizations: **{{reactPerf}}**  
+
+**Do**  
+- Use pagination or limit responses.  
+- Memoize computations or components when data is large.  
+- Lazy-load modules/components that aren’t critical at startup.
+
+**Don’t**  
+- Fetch all data at once without constraints.  
+- Place heavy logic in render without memoization.
+
+---
+
+## 5. Security, Validation, Logging
+
+- Secrets / auth handling: **{{auth}}**  
+- Input validation: **{{validation}}**  
+- Logging style: **{{logging}}**
+
+**Rules**  
+- Never embed secrets in code; always use environment variables.  
+- Validate all incoming data (API or client side) using the chosen validation library.  
+- Logging messages should never reveal secrets or PII.  
+- Use structured or contextual logs (vs. free-form `console.log`) especially in production.
+
+---
+
+## 6. Commit & PR Conventions
+
+- Commit message style: **{{commitStyle}}**  
+- PR rules: **{{prRules}}**
+
+**Do**  
+- Write commit messages that follow the agreed style (e.g. `feat: add login`)  
+- Keep PRs small and focused  
+- Always link the issue or ticket  
+- If PR introduces new API or breaking change, update the documentation
+
+**Don’t**  
+- Use vague commit messages like “fix stuff”  
+- Combine unrelated changes in one commit or PR
+
+---
+
+## 7. Copilot Usage Guidance
+
+- Use Copilot to scaffold boilerplate (e.g. `useQuery`, component boilerplate), not to bypass core logic.  
+- When writing prompts/comments for Copilot, embed **context** (e.g. expected return shape, types).  
+- When Copilot suggests code that violates naming, structure, or validation rules – override or reject it.  
+- For ambiguous design choices, ask for clarification in comments (e.g. “// Should this go in services or hooks?”).  
+- Prefer completions that respect folder boundaries and import paths (don’t let Copilot propose imports from “wrong” layers).
+
+---
+
+## 8. IDE-Specific Rules & Settings
+
+For **VS Code**:
+
+- Use `.editorconfig` for consistent indent / line endings  
+- Enable **Prettier** and **ESLint**, synced to our style rules  
+- Set `editor.formatOnSave = true`  
+- Suggested extensions: `dbaeumer.vscode-eslint`, `esbenp.prettier-vscode`, `formulahendry.auto-rename-tag`  
+- Avoid conflicting formatters or duplicated rules  
+
+> These help Copilot suggestions align more closely with how your code will be formatted and linted.
+
+---
+
+## 9. Caveats & Overrides
+
+- If a feature is experimental or out-of-scope, document it in comments.  
+- In rare cases, exceptions may be allowed — but always document why.  
+- Always run linters and tests on generated code before merging.
 
 ---
 
 ## Notes
 
-- This file is auto-generated by **DevContext**.  
-- Regenerate this file whenever project priorities, frameworks, or rules change.  
+- This instructions file was **auto-generated** based on your chosen configuration.  
+- Regenerate it whenever your JSON configuration changes (framework, naming, testing, etc.).  
+- You may also split this file into domain-specific `.instructions.md` files using `applyTo` frontmatter if your project grows.
+

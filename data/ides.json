@@ -6,7 +6,8 @@
         "enabled": true,
         "docs": "https://code.visualstudio.com/docs",
         "outputFiles": [
-            "instructions-md"
+            "instructions-md",
+            "agents-md"
         ]
     },
     {
