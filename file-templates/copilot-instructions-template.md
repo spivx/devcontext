@@ -3,43 +3,41 @@
 applyTo: "**/*.{ts,tsx,js,jsx,md}"  # apply to all code files by default
 ---
 
-# Project Overview  
-These are the conventions and guardrails Copilot should follow when generating code, tests, commits, and PRs in our project.  
-They reflect the decisions we made (IDE, framework, language) and real-world best practices.
+# Copilot Instructions
+
+⚠️ This file is **auto-generated**. Do not edit manually unless overriding defaults.  
+Regenerate whenever your JSON configuration changes (framework, naming, testing, etc.).
 
 ---
 
 ## 1. Project Context & Priorities
 
-- IDE: **{{preferredIde}}**  
 - Framework: **{{frameworkSelection}}**  
 - Build tooling: **{{tooling}}**  
 - Language: **{{language}}**  
 
 - Primary focus: **{{projectPriority}}**
 
-> Use this context — when Copilot needs to choose between simpler vs. more optimized code, prefer what aligns with **{{projectPriority}}**.
+> Use this context when Copilot suggests alternatives: prefer what aligns with **{{projectPriority}}**.
 
 ---
 
 ## 2. Naming, Style & Structure Rules
 
 ### Naming & Exports
-
 - Variables, functions, object keys: **{{variableNaming}}**  
 - Files & modules: **{{fileNaming}}**  
-- Components, types: **{{componentNaming}}**  
-- Always use **{{exports}}** exports style  
-- Comments & documentation style: **{{comments}}**  
+- Components & types: **{{componentNaming}}**  
+- Always use **{{exports}}** export style  
+- Comments/documentation style: **{{comments}}**  
 - Code style: follow **{{codeStyle}}**  
 
 ### File and Folder Structure
-
-- Component / UI layout organization: **{{fileStructure}}**  
+- Component / UI layout: **{{fileStructure}}**  
 - Styling approach: **{{styling}}**  
-- State management: adopt **{{stateManagement}}**  
-- API layer organization: put remote calls in **{{apiLayer}}**  
-- Folder strategy: **{{folders}}**  
+- State management: **{{stateManagement}}**  
+- API layer organization: **{{apiLayer}}**  
+- Folder strategy: **{{folders}}**
 
 > Copilot should not generate code outside these structures or naming patterns.
 
@@ -48,98 +46,96 @@ They reflect the decisions we made (IDE, framework, language) and real-world bes
 ## 3. Testing & Quality Assurance
 
 - Unit tests: **{{testingUT}}**  
-- E2E / integration: **{{testingE2E}}**  
+- E2E / integration: **{{testingE2E}}**
 
-**Rules**  
+**Rules**
 - Use descriptive test names.  
-- Always include both “happy path” and edge cases.  
-- Avoid large tests that span too many modules.  
-- Tests should live alongside modules (or in designated `__tests__` folder per convention).
+- Cover both “happy path” and edge cases.  
+- Keep tests focused and avoid spanning unrelated modules.  
+- Place tests alongside modules or in designated `__tests__` folders.  
 
 ---
 
 ## 4. Performance & Data Loading
 
-- Data fetching approach: **{{dataFetching}}**  
-- React performance optimizations: **{{reactPerf}}**  
+- Data fetching: **{{dataFetching}}**  
+- React performance optimizations: **{{reactPerf}}**
 
-**Do**  
-- Use pagination or limit responses.  
-- Memoize computations or components when data is large.  
-- Lazy-load modules/components that aren’t critical at startup.
+**Do**
+- Use pagination or limit queries.  
+- Memoize expensive computations.  
+- Lazy-load non-critical modules.  
 
-**Don’t**  
-- Fetch all data at once without constraints.  
-- Place heavy logic in render without memoization.
+**Don’t**
+- Fetch all data at once.  
+- Put heavy logic in render without memoization.  
 
 ---
 
 ## 5. Security, Validation, Logging
 
-- Secrets / auth handling: **{{auth}}**  
+- Secrets/auth handling: **{{auth}}**  
 - Input validation: **{{validation}}**  
-- Logging style: **{{logging}}**
+- Logging: **{{logging}}**
 
-**Rules**  
-- Never embed secrets in code; always use environment variables.  
-- Validate all incoming data (API or client side) using the chosen validation library.  
-- Logging messages should never reveal secrets or PII.  
-- Use structured or contextual logs (vs. free-form `console.log`) especially in production.
+**Rules**
+- Never commit secrets; use environment variables.  
+- Validate all incoming data (API and client).  
+- Do not log secrets or PII.  
+- Use structured/contextual logs instead of raw `console.log`.  
 
 ---
 
 ## 6. Commit & PR Conventions
 
-- Commit message style: **{{commitStyle}}**  
+- Commit style: **{{commitStyle}}**  
 - PR rules: **{{prRules}}**
 
-**Do**  
-- Write commit messages that follow the agreed style (e.g. `feat: add login`)  
-- Keep PRs small and focused  
-- Always link the issue or ticket  
-- If PR introduces new API or breaking change, update the documentation
+**Do**
+- Follow commit style (`feat: add login`, `fix: correct bug`).  
+- Keep PRs small and focused.  
+- Link issues/tickets.  
+- Update docs for new APIs or breaking changes.  
 
-**Don’t**  
-- Use vague commit messages like “fix stuff”  
-- Combine unrelated changes in one commit or PR
+**Don’t**
+- Use vague commit messages like “fix stuff”.  
+- Bundle unrelated changes.  
 
 ---
 
 ## 7. Copilot Usage Guidance
 
-- Use Copilot to scaffold boilerplate (e.g. `useQuery`, component boilerplate), not to bypass core logic.  
-- When writing prompts/comments for Copilot, embed **context** (e.g. expected return shape, types).  
-- When Copilot suggests code that violates naming, structure, or validation rules – override or reject it.  
-- For ambiguous design choices, ask for clarification in comments (e.g. “// Should this go in services or hooks?”).  
-- Prefer completions that respect folder boundaries and import paths (don’t let Copilot propose imports from “wrong” layers).
+- Use Copilot for boilerplate (hooks, component scaffolds).  
+- Provide context in comments/prompts.  
+- Reject completions that break naming, structure, or validation rules.  
+- Ask clarifying questions in comments (e.g., “// Should this live in services?”).  
+- Prefer completions that respect folder boundaries and import paths.  
+
+**Don’t rely on Copilot for**
+- Security-critical code (auth, encryption).  
+- Inferring business logic without requirements.  
+- Blindly accepting untyped/unsafe code.  
 
 ---
 
-## 8. IDE-Specific Rules & Settings
+## 8. Editor Setup
 
-For **VS Code**:
+Recommended editor configuration:
 
-- Use `.editorconfig` for consistent indent / line endings  
-- Enable **Prettier** and **ESLint**, synced to our style rules  
-- Set `editor.formatOnSave = true`  
-- Suggested extensions: `dbaeumer.vscode-eslint`, `esbenp.prettier-vscode`, `formulahendry.auto-rename-tag`  
-- Avoid conflicting formatters or duplicated rules  
-
-> These help Copilot suggestions align more closely with how your code will be formatted and linted.
+- Use `.editorconfig` for indentation/line endings.  
+- Enable linting/formatting (ESLint, Prettier, or Biome).  
+- Set `editor.formatOnSave = true`.  
+- Suggested integrations:
+  - VS Code: `dbaeumer.vscode-eslint`, `esbenp.prettier-vscode`  
+  - JetBrains: ESLint + Prettier plugins  
+  - Cursor: use built-in `.instructions.md` support  
 
 ---
 
 ## 9. Caveats & Overrides
 
-- If a feature is experimental or out-of-scope, document it in comments.  
-- In rare cases, exceptions may be allowed — but always document why.  
-- Always run linters and tests on generated code before merging.
+- Document exceptions with comments.  
+- Experimental features must be flagged.  
+- Always run linters and tests before merging Copilot-generated code.  
 
 ---
-
-## Notes
-
-- This instructions file was **auto-generated** based on your chosen configuration.  
-- Regenerate it whenever your JSON configuration changes (framework, naming, testing, etc.).  
-- You may also split this file into domain-specific `.instructions.md` files using `applyTo` frontmatter if your project grows.
-

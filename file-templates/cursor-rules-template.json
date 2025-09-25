@@ -1,0 +1,43 @@
+{
+    "project": {
+        "framework": "{{frameworkSelection}}",
+        "language": "{{language}}",
+        "tooling": "{{tooling}}",
+        "priority": "{{projectPriority}}"
+    },
+    "rules": {
+        "naming": {
+            "variables": "{{variableNaming}}",
+            "files": "{{fileNaming}}",
+            "components": "{{componentNaming}}"
+        },
+        "exports": "{{exports}}",
+        "comments": "{{comments}}",
+        "codeStyle": "{{codeStyle}}",
+        "structure": {
+            "fileStructure": "{{fileStructure}}",
+            "styling": "{{styling}}",
+            "stateManagement": "{{stateManagement}}",
+            "apiLayer": "{{apiLayer}}",
+            "folders": "{{folders}}"
+        },
+        "testing": {
+            "unit": "{{testingUT}}",
+            "e2e": "{{testingE2E}}"
+        },
+        "performance": {
+            "dataFetching": "{{dataFetching}}",
+            "reactOptimizations": "{{reactPerf}}"
+        },
+        "security": {
+            "auth": "{{auth}}",
+            "validation": "{{validation}}",
+            "logging": "{{logging}}"
+        },
+        "git": {
+            "commitStyle": "{{commitStyle}}",
+            "prRules": "{{prRules}}",
+            "collaboration": "{{collaboration}}"
+        }
+    }
+}

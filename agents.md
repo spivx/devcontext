@@ -7,7 +7,7 @@
 ## Core UI Flow
 - Entry point at `app/page.tsx` toggles between a marketing hero and the instructions wizard.
 - Wizard steps currently cover:
-  - IDE selection (`data/ides.json`).
+  - Instructions file selection (`data/files.json`).
   - Framework selection (`data/frameworks.json`) with branching into framework-specific question sets (e.g., `data/questions/react.json`).
   - Dynamic question sets loaded via `import()` based on the chosen framework.
 - User actions per question:
@@ -18,7 +18,7 @@
 ## Data Conventions
 - Every answer object may define: `value`, `label`, `icon`, `example`, `infoLines` (derived from `pros`/`cons`), `tags`, `isDefault`, `disabled`, `disabledLabel`, and `docs`.
 - JSON files in `data/` supply domain-specific options:
-  - `ides.json`, `frameworks.json`, `files.json`, `general.json`, `architecture.json`, `performance.json`, `security.json`, `commits.json`.
+  - `files.json`, `frameworks.json`, `general.json`, `architecture.json`, `performance.json`, `security.json`, `commits.json`.
   - Framework-specific questionnaires live in `data/questions/<framework>.json`.
 - Newly added `docs` fields should point to authoritative resources and are surfaced in tooltips as external links.
 

@@ -1,13 +1,3 @@
-export type IdeConfig = {
-    id: string
-    label: string
-    icon?: string
-    enabled?: boolean
-    outputFiles?: string[]
-    docs?: string
-    skippable?: boolean
-}
-
 export type FrameworkConfig = {
     id: string
     label: string
@@ -80,12 +70,12 @@ export type WizardStep = {
 }
 
 export type InstructionsWizardProps = {
+    selectedFileId?: string | null
     onClose?: () => void
 }
 
 export type Responses = Record<string, string | string[] | null | undefined>
 export interface WizardResponses {
-    preferredIde: string | null;
     frameworkSelection: string | null;
     tooling: string | null;
     language: string | null;
