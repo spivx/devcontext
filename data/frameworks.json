@@ -10,7 +10,7 @@
         "id": "nextjs",
         "label": "Next.js",
         "icon": "nextdotjs",
-        "enabled": false,
+        "enabled": true,
         "docs": "https://nextjs.org/docs"
     },
     {

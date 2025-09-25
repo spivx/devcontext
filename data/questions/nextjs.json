@@ -1,0 +1,483 @@
+[
+    {
+        "id": "tooling",
+        "question": "How do you scaffold or manage your Next.js project?",
+        "answers": [
+            {
+                "value": "create-next-app",
+                "label": "create-next-app",
+                "icon": "nextdotjs",
+                "docs": "https://nextjs.org/docs/app/api-reference/create-next-app",
+                "pros": [
+                    "Official Next.js defaults",
+                    "Instant App Router support"
+                ],
+                "cons": [
+                    "Less flexibility for monorepo workflows"
+                ],
+                "example": "npx create-next-app@latest my-app --ts"
+            },
+            {
+                "value": "turborepo",
+                "label": "Turborepo",
+                "icon": "vercel",
+                "docs": "https://turbo.build/repo/docs",
+                "pros": [
+                    "Monorepo-ready project structure",
+                    "Incremental builds with Turbo"
+                ],
+                "cons": [
+                    "Requires managing workspace tooling"
+                ],
+                "example": "npx create-turbo@latest"
+            },
+            {
+                "value": "custom-config",
+                "label": "Custom configuration",
+                "docs": "https://nextjs.org/docs/app/building-your-application/configuring",
+                "pros": [
+                    "Total control over build stack"
+                ],
+                "cons": [
+                    "More setup and maintenance upfront"
+                ],
+                "example": "npm install next react react-dom"
+            }
+        ],
+        "explanation": "Choose the tooling you rely on for bootstrapping and evolving the project."
+    },
+    {
+        "id": "fileStructure",
+        "question": "Which routing paradigm are you using?",
+        "answers": [
+            {
+                "value": "app-directory",
+                "label": "App Router (app/)",
+                "icon": "/icons/folder-tree.svg",
+                "docs": "https://nextjs.org/docs/app",
+                "pros": [
+                    "Server Components by default",
+                    "Layouts, loading, and error conventions"
+                ],
+                "cons": [
+                    "Requires new mental models for data fetching"
+                ],
+                "example": "app/dashboard/page.tsx"
+            },
+            {
+                "value": "pages-directory",
+                "label": "Pages Router (pages/)",
+                "icon": "/icons/folder-tree.svg",
+                "docs": "https://nextjs.org/docs/pages/building-your-application/routing",
+                "pros": [
+                    "Battle-tested file-system routing"
+                ],
+                "cons": [
+                    "Lacks Server Components primitives"
+                ],
+                "example": "pages/index.tsx"
+            },
+            {
+                "value": "hybrid-router",
+                "label": "Hybrid (app/ + pages/)",
+                "icon": "/icons/folder-tree.svg",
+                "docs": "https://nextjs.org/docs/app/building-your-application/routing/pages-and-app",
+                "pros": [
+                    "Incrementally adopt the App Router"
+                ],
+                "cons": [
+                    "Coordinate two routing paradigms"
+                ],
+                "example": "app/(marketing)/page.tsx + pages/api/health.ts"
+            }
+        ],
+        "explanation": "Routing choice impacts data fetching patterns, layouts, and deployment expectations."
+    },
+    {
+        "id": "language",
+        "question": "What language do you use?",
+        "answers": [
+            {
+                "value": "typescript",
+                "label": "TypeScript",
+                "icon": "/icons/typescript.svg",
+                "docs": "https://www.typescriptlang.org/docs/",
+                "pros": [
+                    "Static typing with IDE safety",
+                    "Better App Router DX"
+                ],
+                "cons": [
+                    "Slightly more boilerplate"
+                ],
+                "example": "npx create-next-app@latest my-app --ts"
+            },
+            {
+                "value": "javascript",
+                "label": "JavaScript",
+                "icon": "/icons/javascript.svg",
+                "docs": "https://developer.mozilla.org/en-US/docs/Web/JavaScript",
+                "pros": [
+                    "Less setup overhead"
+                ],
+                "cons": [
+                    "No static typing guarantees"
+                ],
+                "example": "npx create-next-app@latest my-app"
+            }
+        ],
+        "explanation": "Language choice impacts type safety, linting, and Copilot suggestions."
+    },
+    {
+        "id": "styling",
+        "question": "Which styling strategy do you rely on?",
+        "answers": [
+            {
+                "value": "tailwind",
+                "label": "Tailwind CSS",
+                "icon": "/icons/tailwindcss.svg",
+                "docs": "https://tailwindcss.com/docs",
+                "pros": [
+                    "Utility-first workflow",
+                    "Great dark mode primitives"
+                ],
+                "cons": [
+                    "Class-heavy JSX can impact readability"
+                ],
+                "example": "npx create-next-app@latest --example with-tailwindcss my-app"
+            },
+            {
+                "value": "cssmodules",
+                "label": "CSS Modules",
+                "icon": "/icons/css3.svg",
+                "docs": "https://github.com/css-modules/css-modules",
+                "pros": [
+                    "Scoped styles without runtime cost"
+                ],
+                "cons": [
+                    "Verbose import wiring"
+                ],
+                "example": "import styles from './button.module.css'"
+            },
+            {
+                "value": "styled-components",
+                "label": "Styled Components",
+                "icon": "styledcomponents",
+                "docs": "https://styled-components.com/docs/basics#installation",
+                "pros": [
+                    "Component-scoped styles with theming",
+                    "SSR friendly with Next.js plugin"
+                ],
+                "cons": [
+                    "Adds runtime and Babel plugin"
+                ],
+                "example": "npm install styled-components"
+            }
+        ],
+        "explanation": "Styling stack influences rendering performance and component ergonomics."
+    },
+    {
+        "id": "stateManagement",
+        "question": "How do you handle client-side state?",
+        "answers": [
+            {
+                "value": "zustand",
+                "label": "Zustand",
+                "docs": "https://docs.pmnd.rs/zustand/getting-started/introduction",
+                "pros": [
+                    "Minimal boilerplate",
+                    "Works with Server Components boundaries"
+                ],
+                "cons": [
+                    "Must wire your own middleware for persisting"
+                ],
+                "example": "npm install zustand"
+            },
+            {
+                "value": "redux",
+                "label": "Redux Toolkit",
+                "icon": "redux",
+                "docs": "https://redux-toolkit.js.org/introduction/getting-started",
+                "pros": [
+                    "Predictable state layer",
+                    "Great devtools ecosystem"
+                ],
+                "cons": [
+                    "More setup compared to lightweight stores"
+                ],
+                "example": "npm install @reduxjs/toolkit react-redux"
+            },
+            {
+                "value": "context-hooks",
+                "label": "React Context + hooks",
+                "icon": "react",
+                "docs": "https://react.dev/learn/passing-data-deeply-with-context",
+                "pros": [
+                    "Built into React",
+                    "No extra dependencies"
+                ],
+                "cons": [
+                    "Can trigger extra re-renders without memoization"
+                ],
+                "example": "const ThemeContext = createContext('light')"
+            }
+        ],
+        "explanation": "State tooling guides component structure and cross-page coordination."
+    },
+    {
+        "id": "dataFetching",
+        "question": "What is your primary data fetching approach?",
+        "answers": [
+            {
+                "value": "server-components",
+                "label": "Server Components + fetch",
+                "icon": "nextdotjs",
+                "docs": "https://nextjs.org/docs/app/building-your-application/data-fetching/fetching",
+                "pros": [
+                    "Runs on the server by default",
+                    "Automatic caching and revalidation hooks"
+                ],
+                "cons": [
+                    "Requires careful server/client component boundaries"
+                ],
+                "example": "export default async function Page(){ const data = await fetch(apiUrl).then(r => r.json()) }"
+            },
+            {
+                "value": "swr",
+                "label": "SWR hooks",
+                "icon": "vercel",
+                "docs": "https://swr.vercel.app/docs/getting-started",
+                "pros": [
+                    "Lightweight client caching",
+                    "Focus on remote data"
+                ],
+                "cons": [
+                    "Adds client-side bundle weight"
+                ],
+                "example": "const { data } = useSWR('/api/profile')"
+            },
+            {
+                "value": "react-query",
+                "label": "TanStack Query",
+                "docs": "https://tanstack.com/query/latest/docs/react/overview",
+                "pros": [
+                    "Powerful cache and background updates",
+                    "Great devtools support"
+                ],
+                "cons": [
+                    "More setup for SSR and hydration"
+                ],
+                "example": "const queryClient = new QueryClient()"
+            }
+        ],
+        "explanation": "Data strategy shapes caching, hydration, and API integration patterns."
+    },
+    {
+        "id": "auth",
+        "question": "How do you handle authentication?",
+        "answers": [
+            {
+                "value": "next-auth",
+                "label": "Auth.js (NextAuth)",
+                "docs": "https://authjs.dev/reference/nextjs",
+                "pros": [
+                    "Session handling across App Router",
+                    "Providers for OAuth, email, and credentials"
+                ],
+                "cons": [
+                    "Requires database adapter for persistence"
+                ],
+                "example": "npm install next-auth"
+            },
+            {
+                "value": "clerk",
+                "label": "Clerk",
+                "icon": "clerk",
+                "docs": "https://clerk.com/docs",
+                "pros": [
+                    "Hosted widgets for sign-in",
+                    "MFA and org management out of the box"
+                ],
+                "cons": [
+                    "Recurring cost past free tier"
+                ],
+                "example": "npm install @clerk/nextjs"
+            },
+            {
+                "value": "custom-auth",
+                "label": "Custom implementation",
+                "docs": "https://nextjs.org/docs/app/building-your-application/authentication",
+                "pros": [
+                    "Full control over auth flows"
+                ],
+                "cons": [
+                    "You own the security surface area"
+                ],
+                "example": "async function authorize(credentials) { /* validate */ }"
+            }
+        ],
+        "explanation": "Auth strategy drives session handling, middleware, and deployment needs."
+    },
+    {
+        "id": "validation",
+        "question": "What do you use for schema validation?",
+        "answers": [
+            {
+                "value": "zod",
+                "label": "Zod",
+                "icon": "zod",
+                "docs": "https://zod.dev/?id=basic-usage",
+                "pros": [
+                    "Type-safe inference",
+                    "Pairs well with Server Actions"
+                ],
+                "cons": [
+                    "Adds runtime parsing cost"
+                ],
+                "example": "const schema = z.object({ email: z.string().email() })"
+            },
+            {
+                "value": "yup",
+                "label": "Yup",
+                "docs": "https://github.com/jquense/yup",
+                "pros": [
+                    "Declarative schemas",
+                    "Broad ecosystem"
+                ],
+                "cons": [
+                    "No TypeScript inference by default"
+                ],
+                "example": "const schema = yup.object({ email: yup.string().email().required() })"
+            },
+            {
+                "value": "custom-validation",
+                "label": "Custom validators",
+                "docs": "https://nextjs.org/docs/app/building-your-application/data-fetching/forms-and-mutations#validation",
+                "pros": [
+                    "Only ship what you need"
+                ],
+                "cons": [
+                    "Higher effort to cover edge cases"
+                ],
+                "example": "if (!emailRegex.test(payload.email)) throw new Error('Invalid email')"
+            }
+        ],
+        "explanation": "Validation approach affects reliability of Server Actions and API routes."
+    },
+    {
+        "id": "logging",
+        "question": "How do you capture logs and runtime signals?",
+        "answers": [
+            {
+                "value": "vercel-observability",
+                "label": "Vercel Observability",
+                "icon": "vercel",
+                "docs": "https://vercel.com/docs/observability/quickstart",
+                "pros": [
+                    "Zero-config for Vercel deployments",
+                    "Unified traces, metrics, and logs"
+                ],
+                "cons": [
+                    "Tied to Vercel hosting"
+                ],
+                "example": "npx vercel observability link"
+            },
+            {
+                "value": "sentry",
+                "label": "Sentry",
+                "icon": "sentry",
+                "docs": "https://docs.sentry.io/platforms/javascript/guides/nextjs/",
+                "pros": [
+                    "Full-stack error tracking",
+                    "Performance profiling add-ons"
+                ],
+                "cons": [
+                    "Hosted service pricing"
+                ],
+                "example": "npx @sentry/wizard@latest -i nextjs"
+            },
+            {
+                "value": "custom-logging",
+                "label": "Custom logging pipeline",
+                "docs": "https://nextjs.org/docs/app/building-your-application/optimizing/logging",
+                "pros": [
+                    "Use any log aggregation stack"
+                ],
+                "cons": [
+                    "You maintain transports and retention"
+                ],
+                "example": "import pino from 'pino'"
+            }
+        ],
+        "explanation": "Logging strategy determines observability and incident response workflows."
+    },
+    {
+        "id": "testingUT",
+        "question": "Which framework do you use for unit testing?",
+        "answers": [
+            {
+                "value": "jest",
+                "label": "Jest",
+                "icon": "/icons/jest.svg",
+                "docs": "https://nextjs.org/docs/pages/building-your-application/testing/jest",
+                "pros": [
+                    "Official Next.js testing preset",
+                    "Snapshot testing support"
+                ],
+                "cons": [
+                    "Slower start-up time on large suites"
+                ],
+                "example": "npm install --save-dev jest @testing-library/react next/jest"
+            },
+            {
+                "value": "vitest",
+                "label": "Vitest",
+                "icon": "/icons/vitest.svg",
+                "docs": "https://vitest.dev/guide/integrations/next",
+                "pros": [
+                    "Fast watch mode",
+                    "Jest-compatible APIs"
+                ],
+                "cons": [
+                    "Requires manual setup for Next aliasing"
+                ],
+                "example": "npm install --save-dev vitest @testing-library/react"
+            }
+        ],
+        "explanation": "Unit testing ensures components and helpers behave correctly in isolation."
+    },
+    {
+        "id": "testingE2E",
+        "question": "Which framework do you use for end-to-end (E2E) testing?",
+        "answers": [
+            {
+                "value": "playwright",
+                "label": "Playwright",
+                "icon": "/icons/playwright.svg",
+                "docs": "https://playwright.dev/docs/tutorials/nextjs",
+                "pros": [
+                    "Multi-browser coverage",
+                    "Powerful tracing tools"
+                ],
+                "cons": [
+                    "Learning curve for advanced fixtures"
+                ],
+                "example": "npm install --save-dev @playwright/test"
+            },
+            {
+                "value": "cypress",
+                "label": "Cypress",
+                "icon": "/icons/cypress.svg",
+                "docs": "https://docs.cypress.io/guides/end-to-end-testing/nextjs",
+                "pros": [
+                    "Interactive runner",
+                    "Great DX for authoring tests"
+                ],
+                "cons": [
+                    "Heavier runtime footprint"
+                ],
+                "example": "npm install --save-dev cypress"
+            }
+        ],
+        "explanation": "E2E coverage validates full Next.js flows from routing to data."
+    }
+]
