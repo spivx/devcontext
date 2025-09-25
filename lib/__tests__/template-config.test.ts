@@ -5,7 +5,7 @@ describe('template-config', () => {
     describe('getTemplateConfig', () => {
         describe('with string key (legacy support)', () => {
             it('should return correct config for existing string key', () => {
-                const result = getTemplateConfig('vscode-copilot-instructions')
+                const result = getTemplateConfig('copilot-instructions')
                 expect(result).toEqual({
                     template: 'copilot-instructions-template.md',
                     outputFileName: 'copilot-instructions.md'
@@ -13,7 +13,7 @@ describe('template-config', () => {
             })
 
             it('should return correct config for agents template', () => {
-                const result = getTemplateConfig('vscode-agents')
+                const result = getTemplateConfig('agents')
                 expect(result).toEqual({
                     template: 'agents-template.md',
                     outputFileName: 'agents.md'
@@ -21,10 +21,10 @@ describe('template-config', () => {
             })
 
             it('should return correct config for cursor rules', () => {
-                const result = getTemplateConfig('cursor-cursor-rules')
+                const result = getTemplateConfig('cursor-rules')
                 expect(result).toEqual({
-                    template: 'copilot-instructions-template.md',
-                    outputFileName: '.cursorrules'
+                    template: 'cursor-rules-template.json',
+                    outputFileName: '.cursor/rules'
                 })
             })
 
@@ -50,85 +50,67 @@ describe('template-config', () => {
         describe('with TemplateKey object', () => {
             it('should return config for specific framework combination', () => {
                 const key: TemplateKey = {
-                    ide: 'vscode',
                     templateType: 'agents',
-                    framework: 'python'
+                    framework: 'python',
                 }
                 const result = getTemplateConfig(key)
                 expect(result).toEqual({
                     template: 'agents-template.md',
-                    outputFileName: 'agents.md'
+                    outputFileName: 'agents.md',
                 })
             })
 
             it('should return config for specific react combination', () => {
                 const key: TemplateKey = {
-                    ide: 'vscode',
                     templateType: 'agents',
-                    framework: 'react'
+                    framework: 'react',
                 }
                 const result = getTemplateConfig(key)
                 expect(result).toEqual({
                     template: 'agents-template.md',
-                    outputFileName: 'agents.md'
+                    outputFileName: 'agents.md',
                 })
             })
 
             it('should fallback to general combination when specific framework not found', () => {
                 const key: TemplateKey = {
-                    ide: 'vscode',
                     templateType: 'copilot-instructions',
-                    framework: 'nonexistent-framework'
+                    framework: 'nonexistent-framework',
                 }
                 const result = getTemplateConfig(key)
                 expect(result).toEqual({
                     template: 'copilot-instructions-template.md',
-                    outputFileName: 'copilot-instructions.md'
+                    outputFileName: 'copilot-instructions.md',
                 })
             })
 
             it('should return general combination when no framework specified', () => {
                 const key: TemplateKey = {
-                    ide: 'vscode',
-                    templateType: 'copilot-instructions'
+                    templateType: 'copilot-instructions',
                 }
                 const result = getTemplateConfig(key)
                 expect(result).toEqual({
                     template: 'copilot-instructions-template.md',
-                    outputFileName: 'copilot-instructions.md'
-                })
-            })
-
-            it('should fallback to template type only when ide-template combination not found', () => {
-                const key: TemplateKey = {
-                    ide: 'nonexistent-ide',
-                    templateType: 'instructions-md'
-                }
-                const result = getTemplateConfig(key)
-                expect(result).toEqual({
-                    template: 'copilot-instructions-template.md',
-                    outputFileName: 'copilot-instructions.md'
+                    outputFileName: 'copilot-instructions.md',
                 })
             })
 
             it('should return null when no matching configuration found', () => {
                 const key: TemplateKey = {
-                    ide: 'nonexistent-ide',
-                    templateType: 'nonexistent-template'
+                    templateType: 'nonexistent-template',
                 }
                 const result = getTemplateConfig(key)
                 expect(result).toBeNull()
             })
 
-            it('should handle cursor IDE with rules template', () => {
+            it('should support cursor rules template type', () => {
                 const key: TemplateKey = {
-                    ide: 'cursor',
-                    templateType: 'cursor-rules'
+                    templateType: 'cursor-rules',
                 }
                 const result = getTemplateConfig(key)
                 expect(result).toEqual({
-                    template: 'copilot-instructions-template.md',
-                    outputFileName: '.cursorrules'
+                    template: 'cursor-rules-template.json',
+                    outputFileName: '.cursor/rules',
                 })
             })
         })
@@ -136,11 +118,14 @@ describe('template-config', () => {
         describe('templateCombinations object', () => {
             it('should contain all expected template combinations', () => {
                 const expectedKeys = [
-                    'vscode-copilot-instructions',
-                    'vscode-agents',
-                    'vscode-agents-python',
-                    'vscode-agents-react',
-                    'cursor-cursor-rules',
+                    'copilot-instructions',
+                    'copilot-instructions-react',
+                    'copilot-instructions-nextjs',
+                    'agents',
+                    'agents-react',
+                    'agents-python',
+                    'cursor-rules',
+                    'json-rules',
                     'instructions-md'
                 ]
 

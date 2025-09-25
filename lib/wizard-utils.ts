@@ -25,6 +25,7 @@ export const mapAnswerSourceToWizard = (answer: DataAnswerSource): WizardAnswer 
         isDefault: answer.isDefault,
         disabled: answer.disabled,
         disabledLabel: answer.disabledLabel,
+        skippable: answer.skippable,
     }
 }
 
@@ -43,5 +44,40 @@ export const buildStepFromQuestionSet = (
         question: question.question,
         allowMultiple: question.allowMultiple,
         answers: question.answers.map(mapAnswerSourceToWizard),
+        skippable: question.skippable,
     })),
 })
+
+const formatLabelMap: Record<string, string> = {
+    markdown: "Markdown",
+    json: "JSON",
+    "cursor-rules-json": "JSON",
+}
+
+const formatMimeTypeMap: Record<string, string> = {
+    markdown: "text/markdown",
+    json: "application/json",
+    "cursor-rules-json": "application/json",
+}
+
+/**
+ * Converts a stored format identifier into a human-friendly label
+ */
+export const getFormatLabel = (format?: string) => {
+    if (!format) {
+        return null
+    }
+
+    return formatLabelMap[format] ?? format
+}
+
+/**
+ * Returns the browser mime-type associated with a stored format identifier
+ */
+export const getMimeTypeForFormat = (format?: string) => {
+    if (!format) {
+        return "text/plain"
+    }
+
+    return formatMimeTypeMap[format] ?? "text/plain"
+}

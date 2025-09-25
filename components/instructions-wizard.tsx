@@ -6,8 +6,7 @@ import { ArrowLeft } from "lucide-react"
 import * as simpleIcons from "simple-icons"
 import type { SimpleIcon } from "simple-icons"
 
-import rawIdes from "@/data/ides.json"
-import type { DataAnswerSource, DataQuestionSource, FileOutputConfig, FrameworkConfig, IdeConfig, InstructionsWizardProps, Responses, WizardAnswer, WizardQuestion, WizardResponses, WizardStep } from "@/types/wizard"
+import type { DataQuestionSource, FileOutputConfig, FrameworkConfig, InstructionsWizardProps, Responses, WizardAnswer, WizardQuestion, WizardResponses, WizardStep } from "@/types/wizard"
 import rawFrameworks from "@/data/frameworks.json"
 import generalData from "@/data/general.json"
 import architectureData from "@/data/architecture.json"
@@ -19,6 +18,10 @@ import { InstructionsAnswerCard } from "./instructions-answer-card"
 
 import { ANALYTICS_EVENTS } from "@/lib/analytics-events"
 import { track } from "@/lib/mixpanel"
+import { buildStepFromQuestionSet, getFormatLabel, getMimeTypeForFormat, mapAnswerSourceToWizard } from "@/lib/wizard-utils"
+
+const fileOptions = filesData as FileOutputConfig[]
+const defaultFileOption = fileOptions.find((file) => file.enabled !== false) ?? fileOptions[0] ?? null
 
 const FRAMEWORK_STEP_ID = "frameworks"
 const FRAMEWORK_QUESTION_ID = "frameworkSelection"
@@ -117,77 +120,6 @@ const normalizeIconSlug = (raw?: string) => {
   return iconSlugOverrides[cleaned] ?? cleaned
 }
 
-const mapAnswerSourceToWizard = (answer: DataAnswerSource): WizardAnswer => {
-  const infoLines: string[] = []
-
-  if (answer.pros && answer.pros.length > 0) {
-    infoLines.push(`Pros: ${answer.pros.join(", ")}`)
-  }
-
-  if (answer.cons && answer.cons.length > 0) {
-    infoLines.push(`Cons: ${answer.cons.join(", ")}`)
-  }
-
-  return {
-    value: answer.value,
-    label: answer.label,
-    icon: answer.icon,
-    example: answer.example,
-    infoLines: infoLines.length > 0 ? infoLines : undefined,
-    docs: answer.docs,
-    tags: answer.tags,
-    isDefault: answer.isDefault,
-    disabled: answer.disabled,
-    disabledLabel: answer.disabledLabel,
-    skippable: answer.skippable,
-  }
-}
-
-const buildStepFromQuestionSet = (
-  id: string,
-  title: string,
-  questions: DataQuestionSource[]
-): WizardStep => ({
-  id,
-  title,
-  questions: questions.map((question) => ({
-    id: question.id,
-    question: question.question,
-    allowMultiple: question.allowMultiple,
-    answers: question.answers.map(mapAnswerSourceToWizard),
-    skippable: question.skippable,
-  })),
-})
-
-const idesStep: WizardStep = {
-  id: "ides",
-  title: "Choose Your IDE",
-  questions: [
-    {
-      id: "preferredIdes",
-      question: "Which IDEs should we prepare instructions for?",
-      allowMultiple: true,
-      skippable: false,
-      answers: (rawIdes as IdeConfig[]).map((ide) => ({
-        value: ide.id,
-        label: ide.label,
-        icon: ide.icon,
-        example:
-          ide.outputFiles && ide.outputFiles.length > 0
-            ? `We'll generate: ${ide.outputFiles.join(", ")}`
-            : undefined,
-        infoLines: ide.enabled ? ["Enabled by default"] : undefined,
-        tags: ide.outputFiles,
-        isDefault: ide.enabled,
-        disabled: ide.enabled === false,
-        disabledLabel: ide.enabled === false ? "Soon" : undefined,
-        docs: ide.docs,
-        skippable: ide.skippable,
-      })),
-    },
-  ],
-}
-
 const frameworksStep: WizardStep = {
   id: FRAMEWORK_STEP_ID,
   title: "Choose Your Framework",
@@ -239,52 +171,15 @@ const commitsStep = buildStepFromQuestionSet(
   commitsData as DataQuestionSource[]
 )
 
-const filesStep: WizardStep = {
-  id: "files",
-  title: "Output Files",
-  questions: [
-    {
-      id: "outputFiles",
-      question: "Which instruction files should we generate?",
-      allowMultiple: true,
-      skippable: false,
-      answers: (filesData as FileOutputConfig[]).map((file) => {
-        const infoLines: string[] = []
-        if (file.filename) {
-          infoLines.push(`Filename: ${file.filename}`)
-        }
-        if (file.format) {
-          infoLines.push(`Format: ${file.format}`)
-        }
-
-        return {
-          value: file.id,
-          label: file.label,
-          icon: file.icon,
-          infoLines: infoLines.length > 0 ? infoLines : undefined,
-          docs: file.docs,
-          tags: file.format ? [file.format] : undefined,
-          disabled: file.enabled === false,
-          disabledLabel: file.enabled === false ? "Soon" : undefined,
-          skippable: file.skippable,
-        }
-      }),
-    },
-  ],
-}
-
-const preFrameworkSteps: WizardStep[] = [idesStep, frameworksStep]
-
-const postFrameworkSteps: WizardStep[] = [
+const suffixSteps: WizardStep[] = [
   generalStep,
   architectureStep,
   performanceStep,
   securityStep,
   commitsStep,
-  filesStep,
 ]
 
-export function InstructionsWizard({ onClose }: InstructionsWizardProps) {
+export function InstructionsWizard({ onClose, selectedFileId }: InstructionsWizardProps) {
   const [currentStepIndex, setCurrentStepIndex] = useState(0)
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0)
   const [responses, setResponses] = useState<Responses>({})
@@ -292,8 +187,24 @@ export function InstructionsWizard({ onClose }: InstructionsWizardProps) {
   const [isComplete, setIsComplete] = useState(false)
   const [showResetConfirm, setShowResetConfirm] = useState(false)
 
+  const selectedFile = useMemo(() => {
+    if (selectedFileId) {
+      const matchedFile = fileOptions.find((file) => file.id === selectedFileId)
+      if (matchedFile) {
+        return matchedFile
+      }
+    }
+
+    return defaultFileOption
+  }, [selectedFileId])
+
+  const selectedFileFormatLabel = useMemo(
+    () => (selectedFile ? getFormatLabel(selectedFile.format) : null),
+    [selectedFile]
+  )
+
   const wizardSteps = useMemo(
-    () => [...preFrameworkSteps, ...dynamicSteps, ...postFrameworkSteps],
+    () => [frameworksStep, ...dynamicSteps, ...suffixSteps],
     [dynamicSteps]
   )
 
@@ -304,21 +215,6 @@ export function InstructionsWizard({ onClose }: InstructionsWizardProps) {
     () => wizardSteps.reduce((count, step) => count + step.questions.length, 0),
     [wizardSteps]
   )
-
-  const answeredQuestionsCount = useMemo(() => {
-    return wizardSteps.reduce((count, step) => {
-      return (
-        count +
-        step.questions.filter((question) => {
-          const value = responses[question.id]
-          if (question.allowMultiple) {
-            return Array.isArray(value) && value.length > 0
-          }
-          return value !== undefined && value !== null
-        }).length
-      )
-    }, 0)
-  }, [responses, wizardSteps])
 
   if (!currentStep || !currentQuestion) {
     return null
@@ -383,25 +279,7 @@ export function InstructionsWizard({ onClose }: InstructionsWizardProps) {
         question: question.question,
         allowMultiple: question.allowMultiple,
         skippable: question.skippable,
-        answers: question.answers.map((answer) => {
-          const infoLines: string[] = []
-          if (answer.pros && answer.pros.length > 0) {
-            infoLines.push(`Pros: ${answer.pros.join(", ")}`)
-          }
-          if (answer.cons && answer.cons.length > 0) {
-            infoLines.push(`Cons: ${answer.cons.join(", ")}`)
-          }
-
-          return {
-            value: answer.value,
-            label: answer.label,
-            icon: answer.icon,
-            example: answer.example,
-            infoLines: infoLines.length > 0 ? infoLines : undefined,
-            docs: answer.docs,
-            skippable: answer.skippable,
-          }
-        }),
+        answers: question.answers.map(mapAnswerSourceToWizard),
       }))
 
       setDynamicSteps([
@@ -420,7 +298,7 @@ export function InstructionsWizard({ onClose }: InstructionsWizardProps) {
         return next
       })
 
-      setCurrentStepIndex(preFrameworkSteps.length)
+      setCurrentStepIndex(1)
       setCurrentQuestionIndex(0)
       setIsComplete(false)
     } catch (error) {
@@ -521,10 +399,17 @@ export function InstructionsWizard({ onClose }: InstructionsWizardProps) {
   }
 
   const generateInstructionsFile = async () => {
-    track(ANALYTICS_EVENTS.CREATE_INSTRUCTIONS_FILE)
+    const outputFileId = selectedFile?.id ?? null
+    if (!outputFileId) {
+      console.error("No instructions file selected. Cannot generate output.")
+      return
+    }
+
+    track(ANALYTICS_EVENTS.CREATE_INSTRUCTIONS_FILE, {
+      outputFile: outputFileId,
+    })
     // Create a JSON object with question IDs as keys and their answers as values
     const questionsAndAnswers: WizardResponses = {
-      preferredIde: null,
       frameworkSelection: null,
       tooling: null,
       language: null,
@@ -555,30 +440,8 @@ export function InstructionsWizard({ onClose }: InstructionsWizardProps) {
 
     wizardSteps.forEach((step) => {
       step.questions.forEach((question) => {
-        let key = question.id
-        let answer = responses[question.id]
-
-        // Special handling for preferredIdes and outputFiles
-        if (key === "preferredIdes") {
-          key = "preferredIde"
-          if (Array.isArray(answer) && answer.length > 0) {
-            answer = answer[0]
-          } else if (typeof answer === "string") {
-            // already a string
-          } else {
-            answer = null
-          }
-        }
-        if (key === "outputFiles") {
-          key = "outputFile"
-          if (Array.isArray(answer) && answer.length > 0) {
-            answer = answer[0]
-          } else if (typeof answer === "string") {
-            // already a string
-          } else {
-            answer = null
-          }
-        }
+        const key = question.id
+        const answer = responses[question.id]
 
         if (answer !== null && answer !== undefined) {
           if (question.allowMultiple && Array.isArray(answer)) {
@@ -595,10 +458,11 @@ export function InstructionsWizard({ onClose }: InstructionsWizardProps) {
       })
     })
 
+    questionsAndAnswers.outputFile = outputFileId
+
     // Ensure we have the combination data for the API
-    // The API will now use preferredIde + outputFile + frameworkSelection to determine the template
+    // The API will now use outputFile + frameworkSelection to determine the template
     console.log('Template combination data:', {
-      ide: questionsAndAnswers.preferredIde,
       outputFile: questionsAndAnswers.outputFile,
       framework: questionsAndAnswers.frameworkSelection
     })
@@ -607,13 +471,12 @@ export function InstructionsWizard({ onClose }: InstructionsWizardProps) {
 
     // Call the API to generate the instructions file
     if (questionsAndAnswers.outputFile) {
-      const ideSegment = questionsAndAnswers.preferredIde ?? 'unknown'
       const frameworkSegment = questionsAndAnswers.frameworkSelection ?? 'general'
       const fileNameSegment = questionsAndAnswers.outputFile
 
       try {
         const response = await fetch(
-          `/api/generate/${encodeURIComponent(ideSegment)}/${encodeURIComponent(frameworkSegment)}/${encodeURIComponent(fileNameSegment)}`,
+          `/api/generate/${encodeURIComponent(frameworkSegment)}/${encodeURIComponent(fileNameSegment)}`,
           {
             method: 'POST',
             headers: {
@@ -625,9 +488,11 @@ export function InstructionsWizard({ onClose }: InstructionsWizardProps) {
 
         if (response.ok) {
           const data = await response.json()
+          const fileConfig = fileOptions.find((file) => file.id === questionsAndAnswers.outputFile)
+          const mimeType = getMimeTypeForFormat(fileConfig?.format)
 
           // Create a downloadable file
-          const blob = new Blob([data.content], { type: 'text/markdown' })
+          const blob = new Blob([data.content], { type: mimeType })
           const url = URL.createObjectURL(blob)
           const a = document.createElement('a')
           a.href = url
@@ -648,28 +513,45 @@ export function InstructionsWizard({ onClose }: InstructionsWizardProps) {
   }
 
   const renderCompletion = () => {
-    const summary = wizardSteps.flatMap((step) =>
-      step.questions.map((question) => {
-        const value = responses[question.id]
-        const selectedAnswers = question.answers.filter((answer) => {
-          if (value === null) {
-            return false
+    const summary = [
+      selectedFile
+        ? {
+            question: "Instructions file",
+            skipped: false,
+            answers: [
+              selectedFile.label,
+              selectedFile.filename ? `Filename: ${selectedFile.filename}` : null,
+              selectedFileFormatLabel ? `Format: ${selectedFileFormatLabel}` : null,
+            ].filter((entry): entry is string => Boolean(entry)),
           }
+        : {
+            question: "Instructions file",
+            skipped: true,
+            answers: [],
+          },
+      ...wizardSteps.flatMap((step) =>
+        step.questions.map((question) => {
+          const value = responses[question.id]
+          const selectedAnswers = question.answers.filter((answer) => {
+            if (value === null) {
+              return false
+            }
 
-          if (Array.isArray(value)) {
-            return value.includes(answer.value)
+            if (Array.isArray(value)) {
+              return value.includes(answer.value)
+            }
+
+            return value === answer.value
+          })
+
+          return {
+            question: question.question,
+            skipped: value === null,
+            answers: selectedAnswers.map((answer) => answer.label),
           }
-
-          return value === answer.value
         })
-
-        return {
-          question: question.question,
-          skipped: value === null,
-          answers: selectedAnswers.map((answer) => answer.label),
-        }
-      })
-    )
+      ),
+    ]
 
     return (
       <div className="space-y-6 rounded-3xl border border-border/80 bg-card/95 p-8 shadow-lg">
@@ -726,6 +608,32 @@ export function InstructionsWizard({ onClose }: InstructionsWizardProps) {
           <ArrowLeft className="mr-2 h-4 w-4" />
           Start over
         </Button>
+      ) : null}
+
+      {selectedFile ? (
+        <section className="rounded-3xl border border-border/70 bg-secondary/20 p-5 shadow-sm">
+          <div className="flex flex-wrap items-start justify-between gap-4">
+            <div>
+              <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Instructions file</p>
+              <p className="mt-1 text-lg font-semibold text-foreground">{selectedFile.label}</p>
+              {selectedFile.filename ? (
+                <p className="text-sm text-muted-foreground">{selectedFile.filename}</p>
+              ) : null}
+            </div>
+            <div className="flex flex-wrap items-center gap-3">
+              {selectedFileFormatLabel ? (
+                <span className="inline-flex items-center rounded-full bg-primary/10 px-3 py-1 text-xs font-medium text-primary">
+                  {selectedFileFormatLabel} format
+                </span>
+              ) : null}
+              {onClose ? (
+                <Button variant="outline" size="sm" onClick={onClose}>
+                  Change file
+                </Button>
+              ) : null}
+            </div>
+          </div>
+        </section>
       ) : null}
 
       {isComplete ? (

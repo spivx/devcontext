@@ -23,19 +23,9 @@
         "id": "cursor-rules",
         "label": "Cursor Rules",
         "filename": ".cursor/rules",
-        "format": "cursor-rules",
-        "enabled": false,
-        "docs": "https://docs.cursor.com/workflows/rules",
-        "skippable": false
-    },
-    {
-        "id": "json-rules",
-        "label": "Generic JSON Config",
-        "filename": ".devcontext.json",
         "format": "json",
-        "enabled": false,
-        "icon": "json",
-        "docs": "https://json-schema.org/",
+        "enabled": true,
+        "docs": "https://docs.cursor.com/workflows/rules",
         "skippable": false
     }
 ]
