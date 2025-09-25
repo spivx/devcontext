@@ -503,6 +503,117 @@ export function InstructionsWizard({ onClose }: InstructionsWizardProps) {
     setShowResetConfirm(false)
   }
 
+  const generateInstructionsFile = async () => {
+    // Create a JSON object with question IDs as keys and their answers as values
+    const questionsAndAnswers: WizardResponses = {
+      preferredIde: null,
+      frameworkSelection: null,
+      tooling: null,
+      language: null,
+      fileStructure: null,
+      styling: null,
+      testingUT: null,
+      testingE2E: null,
+      projectPriority: null,
+      codeStyle: null,
+      variableNaming: null,
+      fileNaming: null,
+      componentNaming: null,
+      exports: null,
+      comments: null,
+      collaboration: null,
+      stateManagement: null,
+      apiLayer: null,
+      folders: null,
+      dataFetching: null,
+      reactPerf: null,
+      auth: null,
+      validation: null,
+      logging: null,
+      commitStyle: null,
+      prRules: null,
+      outputFile: null,
+    }
+
+    wizardSteps.forEach((step) => {
+      step.questions.forEach((question) => {
+        let key = question.id
+        let answer = responses[question.id]
+
+        // Special handling for preferredIdes and outputFiles
+        if (key === "preferredIdes") {
+          key = "preferredIde"
+          if (Array.isArray(answer) && answer.length > 0) {
+            answer = answer[0]
+          } else if (typeof answer === "string") {
+            // already a string
+          } else {
+            answer = null
+          }
+        }
+        if (key === "outputFiles") {
+          key = "outputFile"
+          if (Array.isArray(answer) && answer.length > 0) {
+            answer = answer[0]
+          } else if (typeof answer === "string") {
+            // already a string
+          } else {
+            answer = null
+          }
+        }
+
+        if (answer !== null && answer !== undefined) {
+          if (question.allowMultiple && Array.isArray(answer)) {
+            // For all other multi-selects, keep as array
+            questionsAndAnswers[key as keyof WizardResponses] = Array.isArray(answer) ? answer.join(", ") : answer
+          } else if (!question.allowMultiple && typeof answer === 'string') {
+            questionsAndAnswers[key as keyof WizardResponses] = Array.isArray(answer) ? answer.join(", ") : answer
+          } else {
+            questionsAndAnswers[key as keyof WizardResponses] = Array.isArray(answer) ? answer.join(", ") : answer
+          }
+        } else {
+          questionsAndAnswers[key as keyof WizardResponses] = null
+        }
+      })
+    })
+
+    // console.log('Questions and Answers JSON:', JSON.stringify(questionsAndAnswers, null, 2))
+
+    // Call the API to generate the instructions file
+    if (questionsAndAnswers.outputFile) {
+      try {
+        const response = await fetch(`/api/generate/${questionsAndAnswers.outputFile}`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(questionsAndAnswers),
+        })
+
+        if (response.ok) {
+          const data = await response.json()
+
+          // Create a downloadable file
+          const blob = new Blob([data.content], { type: 'text/markdown' })
+          const url = URL.createObjectURL(blob)
+          const a = document.createElement('a')
+          a.href = url
+          a.download = data.fileName
+          document.body.appendChild(a)
+          a.click()
+          document.body.removeChild(a)
+          URL.revokeObjectURL(url)
+        } else {
+          console.error('Failed to generate file:', await response.text())
+        }
+      } catch (error) {
+        console.error('Error calling generate API:', error)
+      }
+    }
+
+    onClose?.()
+  }
+
   const renderCompletion = () => {
     const summary = wizardSteps.flatMap((step) =>
       step.questions.map((question) => {
@@ -563,83 +674,7 @@ export function InstructionsWizard({ onClose }: InstructionsWizardProps) {
           <Button variant="ghost" onClick={requestResetWizard}>
             Start Over
           </Button>
-          <Button onClick={() => {
-            // Create a JSON object with question IDs as keys and their answers as values
-            const questionsAndAnswers: WizardResponses = {
-              preferredIde: null,
-              frameworkSelection: null,
-              tooling: null,
-              language: null,
-              fileStructure: null,
-              styling: null,
-              testingUT: null,
-              testingE2E: null,
-              projectPriority: null,
-              codeStyle: null,
-              variableNaming: null,
-              fileNaming: null,
-              componentNaming: null,
-              exports: null,
-              comments: null,
-              collaboration: null,
-              stateManagement: null,
-              apiLayer: null,
-              folders: null,
-              dataFetching: null,
-              reactPerf: null,
-              auth: null,
-              validation: null,
-              logging: null,
-              commitStyle: null,
-              prRules: null,
-              outputFile: null,
-            }
-
-            wizardSteps.forEach((step) => {
-              step.questions.forEach((question) => {
-                let key = question.id
-                let answer = responses[question.id]
-
-                // Special handling for preferredIdes and outputFiles
-                if (key === "preferredIdes") {
-                  key = "preferredIde"
-                  if (Array.isArray(answer) && answer.length > 0) {
-                    answer = answer[0]
-                  } else if (typeof answer === "string") {
-                    // already a string
-                  } else {
-                    answer = null
-                  }
-                }
-                if (key === "outputFiles") {
-                  key = "outputFile"
-                  if (Array.isArray(answer) && answer.length > 0) {
-                    answer = answer[0]
-                  } else if (typeof answer === "string") {
-                    // already a string
-                  } else {
-                    answer = null
-                  }
-                }
-
-                if (answer !== null && answer !== undefined) {
-                  if (question.allowMultiple && Array.isArray(answer)) {
-                    // For all other multi-selects, keep as array
-                    questionsAndAnswers[key as keyof WizardResponses] = Array.isArray(answer) ? answer.join(", ") : answer
-                  } else if (!question.allowMultiple && typeof answer === 'string') {
-                    questionsAndAnswers[key as keyof WizardResponses] = Array.isArray(answer) ? answer.join(", ") : answer
-                  } else {
-                    questionsAndAnswers[key as keyof WizardResponses] = Array.isArray(answer) ? answer.join(", ") : answer
-                  }
-                } else {
-                  questionsAndAnswers[key as keyof WizardResponses] = null
-                }
-              })
-            })
-
-            console.log('Questions and Answers JSON:', JSON.stringify(questionsAndAnswers, null, 2))
-            onClose?.()
-          }}>
+          <Button onClick={() => void generateInstructionsFile()}>
             Generate My Instructions
           </Button>
         </div>
