@@ -139,6 +139,7 @@ const mapAnswerSourceToWizard = (answer: DataAnswerSource): WizardAnswer => {
     isDefault: answer.isDefault,
     disabled: answer.disabled,
     disabledLabel: answer.disabledLabel,
+    skippable: answer.skippable,
   }
 }
 
@@ -154,6 +155,7 @@ const buildStepFromQuestionSet = (
     question: question.question,
     allowMultiple: question.allowMultiple,
     answers: question.answers.map(mapAnswerSourceToWizard),
+    skippable: question.skippable,
   })),
 })
 
@@ -165,6 +167,7 @@ const idesStep: WizardStep = {
       id: "preferredIdes",
       question: "Which IDEs should we prepare instructions for?",
       allowMultiple: true,
+      skippable: false,
       answers: (rawIdes as IdeConfig[]).map((ide) => ({
         value: ide.id,
         label: ide.label,
@@ -179,6 +182,7 @@ const idesStep: WizardStep = {
         disabled: ide.enabled === false,
         disabledLabel: ide.enabled === false ? "Soon" : undefined,
         docs: ide.docs,
+        skippable: ide.skippable,
       })),
     },
   ],
@@ -191,6 +195,7 @@ const frameworksStep: WizardStep = {
     {
       id: FRAMEWORK_QUESTION_ID,
       question: "Which framework are you working with?",
+      skippable: false,
       answers: (rawFrameworks as FrameworkConfig[]).map((framework) => ({
         value: framework.id,
         label: framework.label,
@@ -198,6 +203,7 @@ const frameworksStep: WizardStep = {
         disabled: framework.enabled === false,
         disabledLabel: framework.enabled === false ? "Soon" : undefined,
         docs: framework.docs,
+        skippable: framework.skippable,
       })),
     },
   ],
@@ -241,6 +247,7 @@ const filesStep: WizardStep = {
       id: "outputFiles",
       question: "Which instruction files should we generate?",
       allowMultiple: true,
+      skippable: false,
       answers: (filesData as FileOutputConfig[]).map((file) => {
         const infoLines: string[] = []
         if (file.filename) {
@@ -259,6 +266,7 @@ const filesStep: WizardStep = {
           tags: file.format ? [file.format] : undefined,
           disabled: file.enabled === false,
           disabledLabel: file.enabled === false ? "Soon" : undefined,
+          skippable: file.skippable,
         }
       }),
     },
@@ -374,6 +382,7 @@ export function InstructionsWizard({ onClose }: InstructionsWizardProps) {
         id: question.id,
         question: question.question,
         allowMultiple: question.allowMultiple,
+        skippable: question.skippable,
         answers: question.answers.map((answer) => {
           const infoLines: string[] = []
           if (answer.pros && answer.pros.length > 0) {
@@ -390,6 +399,7 @@ export function InstructionsWizard({ onClose }: InstructionsWizardProps) {
             example: answer.example,
             infoLines: infoLines.length > 0 ? infoLines : undefined,
             docs: answer.docs,
+            skippable: answer.skippable,
           }
         }),
       }))
@@ -473,6 +483,10 @@ export function InstructionsWizard({ onClose }: InstructionsWizardProps) {
   }
 
   const skipQuestion = () => {
+    if (currentQuestion.skippable === false) {
+      return
+    }
+
     setResponses((prev) => ({
       ...prev,
       [currentQuestion.id]: null,
@@ -722,9 +736,11 @@ export function InstructionsWizard({ onClose }: InstructionsWizardProps) {
             <h1 className="text-3xl font-semibold text-foreground">
               {currentQuestion.question}
             </h1>
-            <Button variant="ghost" onClick={skipQuestion} className="shrink-0">
-              Skip
-            </Button>
+            {currentQuestion.skippable !== false ? (
+              <Button variant="ghost" onClick={skipQuestion} className="shrink-0">
+                Skip
+              </Button>
+            ) : null}
           </header>
 
           <section className="rounded-3xl border border-border/80 bg-card/95 p-6 shadow-md">

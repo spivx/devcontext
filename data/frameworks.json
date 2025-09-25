@@ -4,20 +4,23 @@
         "label": "React",
         "icon": "react",
         "enabled": true,
-        "docs": "https://react.dev/learn"
+        "docs": "https://react.dev/learn",
+        "skippable": false
     },
     {
         "id": "nextjs",
         "label": "Next.js",
         "icon": "nextdotjs",
         "enabled": true,
-        "docs": "https://nextjs.org/docs"
+        "docs": "https://nextjs.org/docs",
+        "skippable": false
     },
     {
         "id": "angular",
         "label": "Angular",
         "icon": "angular",
         "enabled": false,
-        "docs": "https://angular.io/docs"
+        "docs": "https://angular.io/docs",
+        "skippable": false
     }
 ]
