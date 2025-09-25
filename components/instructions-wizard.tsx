@@ -593,14 +593,21 @@ export function InstructionsWizard({ onClose }: InstructionsWizardProps) {
 
     // Call the API to generate the instructions file
     if (questionsAndAnswers.outputFile) {
+      const ideSegment = questionsAndAnswers.preferredIde ?? 'unknown'
+      const frameworkSegment = questionsAndAnswers.frameworkSelection ?? 'general'
+      const fileNameSegment = questionsAndAnswers.outputFile
+
       try {
-        const response = await fetch(`/api/generate/${questionsAndAnswers.outputFile}`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify(questionsAndAnswers),
-        })
+        const response = await fetch(
+          `/api/generate/${encodeURIComponent(ideSegment)}/${encodeURIComponent(frameworkSegment)}/${encodeURIComponent(fileNameSegment)}`,
+          {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(questionsAndAnswers),
+          }
+        )
 
         if (response.ok) {
           const data = await response.json()

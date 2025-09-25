@@ -17,18 +17,31 @@ function mapOutputFileToTemplateType(outputFile: string): string {
 
 export async function POST(
     request: NextRequest,
-    { params }: { params: Promise<{ fileName: string }> }
+    { params }: { params: { ide: string; framework: string; fileName: string } }
 ) {
     try {
-        const { fileName } = await params
+        const { ide, framework, fileName } = params
         const body = await request.json()
         const responses: WizardResponses = body
 
         // Determine template configuration based on the request
         let templateConfig
 
+        const frameworkFromPath = framework && !['general', 'none', 'undefined'].includes(framework)
+            ? framework
+            : undefined
+
+        if (ide) {
+            const templateKeyFromParams: TemplateKey = {
+                ide,
+                templateType: mapOutputFileToTemplateType(fileName),
+                framework: frameworkFromPath
+            }
+            templateConfig = getTemplateConfig(templateKeyFromParams)
+        }
+
         // Check if this is a combination-based request
-        if (responses.preferredIde && responses.outputFile) {
+        if (!templateConfig && responses.preferredIde && responses.outputFile) {
             const templateKey: TemplateKey = {
                 ide: responses.preferredIde,
                 templateType: mapOutputFileToTemplateType(responses.outputFile),
