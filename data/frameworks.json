@@ -19,7 +19,7 @@
         "id": "angular",
         "label": "Angular",
         "icon": "angular",
-        "enabled": false,
+        "enabled": true,
         "docs": "https://angular.io/docs",
         "skippable": false
     }

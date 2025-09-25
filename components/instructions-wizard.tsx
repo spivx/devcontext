@@ -31,6 +31,11 @@ const iconSlugOverrides: Record<string, string> = {
   visualstudiocode: "microsoft",
 }
 
+const iconColorOverrides: Record<string, string> = {
+  nextdotjs: "#0070F3",
+  angular: "#DD0031",
+}
+
 const simpleIconBySlug = (() => {
   const map = new Map<string, SimpleIcon>()
   const isSimpleIcon = (icon: unknown): icon is SimpleIcon =>
@@ -658,6 +663,8 @@ export function InstructionsWizard({ onClose, selectedFileId }: InstructionsWiza
                 const simpleIconData = normalizedIconSlug
                   ? simpleIconBySlug.get(normalizedIconSlug) ?? null
                   : null
+                const iconColor = (normalizedIconSlug && iconColorOverrides[normalizedIconSlug])
+                  ?? (simpleIconData ? getAccessibleIconColor(simpleIconData.hex) : undefined)
                 const fallbackInitials = answer.label
                   .split(" ")
                   .map((part) => part.charAt(0))
@@ -671,8 +678,8 @@ export function InstructionsWizard({ onClose, selectedFileId }: InstructionsWiza
                     className="flex h-10 w-10 items-center justify-center rounded-xl bg-secondary/40 text-muted-foreground ring-1 ring-border/40"
                   >
                     <span
-                      className="inline-flex h-6 w-6 items-center justify-center text-current [&>svg]:h-full [&>svg]:w-full"
-                      style={{ color: getAccessibleIconColor(simpleIconData.hex) }}
+                    className="inline-flex h-6 w-6 items-center justify-center text-current [&>svg]:h-full [&>svg]:w-full"
+                      style={{ color: iconColor }}
                       dangerouslySetInnerHTML={{ __html: getSimpleIconMarkup(simpleIconData) }}
                     />
                   </span>

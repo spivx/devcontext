@@ -1,0 +1,463 @@
+[
+    {
+        "id": "tooling",
+        "question": "How do you scaffold or manage your Angular project?",
+        "answers": [
+            {
+                "value": "angular-cli",
+                "label": "Angular CLI",
+                "icon": "angular",
+                "docs": "https://angular.io/cli",
+                "pros": [
+                    "Official schematics and generators",
+                    "Best for single-app repositories"
+                ],
+                "cons": [
+                    "Opinionated build pipeline"
+                ],
+                "example": "ng new my-app --standalone"
+            },
+            {
+                "value": "nx",
+                "label": "Nx",
+                "icon": "nx",
+                "docs": "https://nx.dev/getting-started/angular",
+                "pros": [
+                    "Monorepo-ready workflow",
+                    "Powerful graph-aware caching"
+                ],
+                "cons": [
+                    "Requires workspace configuration upfront"
+                ],
+                "example": "npx create-nx-workspace@latest --preset=angular-standalone"
+            },
+            {
+                "value": "custom-build",
+                "label": "Custom builder",
+                "docs": "https://angular.dev/guide/angular-architects",
+                "pros": [
+                    "Tailored build pipeline"
+                ],
+                "cons": [
+                    "You own maintenance of webpack/esbuild config"
+                ],
+                "example": "ng add @angular-builders/custom-webpack"
+            }
+        ]
+    },
+    {
+        "id": "language",
+        "question": "What language mode do you target?",
+        "answers": [
+            {
+                "value": "typescript-strict",
+                "label": "TypeScript (strict mode)",
+                "icon": "/icons/typescript.svg",
+                "docs": "https://angular.io/guide/typescript-configuration",
+                "pros": [
+                    "Maximum type safety",
+                    "Aligns with Angular style guide"
+                ],
+                "cons": [
+                    "Requires extra typings for legacy packages"
+                ],
+                "example": "tsconfig.json with \"strict\": true"
+            },
+            {
+                "value": "typescript-default",
+                "label": "TypeScript (default)",
+                "icon": "/icons/typescript.svg",
+                "docs": "https://www.typescriptlang.org/tsconfig",
+                "pros": [
+                    "Less friction adopting third-party libs"
+                ],
+                "cons": [
+                    "Fewer compile-time guarantees"
+                ],
+                "example": "tsconfig.json with Angular CLI defaults"
+            },
+            {
+                "value": "javascript",
+                "label": "JavaScript",
+                "icon": "/icons/javascript.svg",
+                "docs": "https://angular.io/guide/quickstart",
+                "pros": [
+                    "Simpler onboarding for JS devs"
+                ],
+                "cons": [
+                    "Angular tooling expects TypeScript"
+                ],
+                "example": "ng new my-app --no-standalone --defaults"
+            }
+        ]
+    },
+    {
+        "id": "fileStructure",
+        "question": "How do you organize Angular features?",
+        "answers": [
+            {
+                "value": "standalone-first",
+                "label": "Standalone components by feature",
+                "icon": "/icons/folder-tree.svg",
+                "docs": "https://angular.dev/guide/standalone-components",
+                "pros": [
+                    "Lightweight tree-shakable modules",
+                    "Simpler lazy loading"
+                ],
+                "cons": [
+                    "Requires Angular 17+ patterns"
+                ],
+                "example": "src/app/(dashboard)/+page.component.ts"
+            },
+            {
+                "value": "ng-modules",
+                "label": "NgModule per domain",
+                "icon": "/icons/layout.svg",
+                "docs": "https://angular.io/guide/ngmodules",
+                "pros": [
+                    "Clear dependency boundaries",
+                    "Works with older Angular versions"
+                ],
+                "cons": [
+                    "Extra boilerplate and declarations"
+                ],
+                "example": "src/app/dashboard/dashboard.module.ts"
+            },
+            {
+                "value": "nx-libraries",
+                "label": "Nx libraries by slice",
+                "icon": "nx",
+                "docs": "https://nx.dev/concepts/libs-and-apps",
+                "pros": [
+                    "Enforces consistent APIs",
+                    "Great for design system reuse"
+                ],
+                "cons": [
+                    "Cross-library coupling needs governance"
+                ],
+                "example": "libs/dashboard/ui/src/lib/widget.component.ts"
+            }
+        ]
+    },
+    {
+        "id": "styling",
+        "question": "Which styling approach do you prefer?",
+        "answers": [
+            {
+                "value": "scss",
+                "label": "SCSS",
+                "icon": "sass",
+                "docs": "https://angular.io/guide/workspace-config#style-file-options",
+                "pros": [
+                    "Powerful nesting and mixins"
+                ],
+                "cons": [
+                    "Requires Sass build step"
+                ],
+                "example": "ng config schematics.@schematics/angular:component style=scss"
+            },
+            {
+                "value": "tailwind",
+                "label": "Tailwind CSS",
+                "icon": "/icons/tailwindcss.svg",
+                "docs": "https://tailwindcss.com/docs/guides/angular",
+                "pros": [
+                    "Utility-first composition",
+                    "Great DX with Angular templates"
+                ],
+                "cons": [
+                    "Large config file for theming"
+                ],
+                "example": "ng add ngx-tailwind"
+            },
+            {
+                "value": "angular-material",
+                "label": "Angular Material",
+                "icon": "materialui",
+                "docs": "https://material.angular.io/guide/getting-started",
+                "pros": [
+                    "Accessible components out of the box"
+                ],
+                "cons": [
+                    "Theme overrides can be verbose"
+                ],
+                "example": "ng add @angular/material"
+            }
+        ]
+    },
+    {
+        "id": "stateManagement",
+        "question": "How do you manage application state?",
+        "answers": [
+            {
+                "value": "ngrx-store",
+                "label": "NgRx Store",
+                "icon": "ngrx",
+                "docs": "https://ngrx.io/guide/store",
+                "pros": [
+                    "Redux-style predictability",
+                    "Great DevTools support"
+                ],
+                "cons": [
+                    "Boilerplate for actions and reducers"
+                ],
+                "example": "ng generate store State --module app.module.ts"
+            },
+            {
+                "value": "signals-services",
+                "label": "Angular signals + services",
+                "icon": "angular",
+                "docs": "https://angular.dev/guide/signals",
+                "pros": [
+                    "Colocated reactive logic",
+                    "Minimal boilerplate"
+                ],
+                "cons": [
+                    "Evolving best practices"
+                ],
+                "example": "export const userState = signal<User | null>(null)"
+            },
+            {
+                "value": "rxjs-services",
+                "label": "RxJS-powered services",
+                "icon": "rxjs",
+                "docs": "https://angular.io/guide/observables",
+                "pros": [
+                    "Flexible push-based flows"
+                ],
+                "cons": [
+                    "Manual subscription management"
+                ],
+                "example": "userService.user$.pipe(map(user => !!user))"
+            }
+        ]
+    },
+    {
+        "id": "apiLayer",
+        "question": "How do you access backend data?",
+        "answers": [
+            {
+                "value": "httpclient",
+                "label": "HttpClient services",
+                "icon": "angular",
+                "docs": "https://angular.io/guide/http",
+                "pros": [
+                    "Built-in observables and interceptors"
+                ],
+                "cons": [
+                    "Manual typing for REST endpoints"
+                ],
+                "example": "this.http.get<User[]>('/api/users')"
+            },
+            {
+                "value": "apollo-angular",
+                "label": "Apollo Angular",
+                "icon": "apollographql",
+                "docs": "https://www.apollographql.com/docs/angular/",
+                "pros": [
+                    "GraphQL cache management",
+                    "Codegen integration"
+                ],
+                "cons": [
+                    "Requires schema orchestration"
+                ],
+                "example": "apollo.watchQuery({ query: GET_USERS })"
+            },
+            {
+                "value": "openapi-codegen",
+                "label": "OpenAPI codegen",
+                "icon": "swagger",
+                "docs": "https://angular.io/guide/http#using-generator-services",
+                "pros": [
+                    "Generates typed clients automatically"
+                ],
+                "cons": [
+                    "Regeneration required after schema updates"
+                ],
+                "example": "ng-openapi-gen --config openapi.json"
+            }
+        ]
+    },
+    {
+        "id": "validation",
+        "question": "How do you validate user input?",
+        "answers": [
+            {
+                "value": "reactive-forms",
+                "label": "Reactive Forms",
+                "icon": "angular",
+                "docs": "https://angular.io/guide/reactive-forms",
+                "pros": [
+                    "Strong typing with FormGroup",
+                    "Async validator support"
+                ],
+                "cons": [
+                    "Verbose form builders"
+                ],
+                "example": "this.form = fb.group({ email: ['', [Validators.required]] })"
+            },
+            {
+                "value": "template-forms",
+                "label": "Template-driven Forms",
+                "docs": "https://angular.io/guide/forms",
+                "pros": [
+                    "Declarative template syntax"
+                ],
+                "cons": [
+                    "Harder to unit test"
+                ],
+                "example": "<form #heroForm=\"ngForm\">"
+            },
+            {
+                "value": "schema-validators",
+                "label": "Schema validators",
+                "docs": "https://zod.dev/",
+                "pros": [
+                    "Reusable across services",
+                    "Runtime safety"
+                ],
+                "cons": [
+                    "Needs adapters for Angular forms"
+                ],
+                "example": "const schema = z.object({ email: z.string().email() })"
+            }
+        ]
+    },
+    {
+        "id": "logging",
+        "question": "How do you capture logs and telemetry?",
+        "answers": [
+            {
+                "value": "sentry",
+                "label": "Sentry",
+                "icon": "sentry",
+                "docs": "https://docs.sentry.io/platforms/javascript/guides/angular/",
+                "pros": [
+                    "Automatic Angular error instrumentation"
+                ],
+                "cons": [
+                    "Hosted service pricing"
+                ],
+                "example": "Sentry.init({ dsn: 'https://...' })"
+            },
+            {
+                "value": "azure-app-insights",
+                "label": "Azure Application Insights",
+                "icon": "microsoftazure",
+                "docs": "https://learn.microsoft.com/azure/azure-monitor/app/javascript-angular-plugin",
+                "pros": [
+                    "Deep Azure ecosystem integration"
+                ],
+                "cons": [
+                    "Requires Azure subscription"
+                ],
+                "example": "appInsights.loadAppInsights()"
+            },
+            {
+                "value": "custom-logger",
+                "label": "Custom logging pipeline",
+                "docs": "https://angular.io/guide/logging",
+                "pros": [
+                    "Use any observability stack"
+                ],
+                "cons": [
+                    "You own batching and retention"
+                ],
+                "example": "this.logger.info('User created', payload)"
+            }
+        ]
+    },
+    {
+        "id": "testingUT",
+        "question": "Which framework powers your unit tests?",
+        "answers": [
+            {
+                "value": "jasmine-karma",
+                "label": "Jasmine + Karma",
+                "icon": "jasmine",
+                "docs": "https://angular.io/guide/testing",
+                "pros": [
+                    "Angular CLI default",
+                    "Great integration with TestBed"
+                ],
+                "cons": [
+                    "Browser runner adds overhead"
+                ],
+                "example": "ng test"
+            },
+            {
+                "value": "jest",
+                "label": "Jest",
+                "icon": "/icons/jest.svg",
+                "docs": "https://nx.dev/executors/jest",
+                "pros": [
+                    "Fast node-based runner",
+                    "Snapshot testing"
+                ],
+                "cons": [
+                    "Requires setup with Jest preset"
+                ],
+                "example": "ng add @briebug/jest-schematic"
+            },
+            {
+                "value": "vitest",
+                "label": "Vitest",
+                "icon": "/icons/vitest.svg",
+                "docs": "https://vitest.dev/guide/angular",
+                "pros": [
+                    "ESM-first fast runner"
+                ],
+                "cons": [
+                    "Community adapters still evolving"
+                ],
+                "example": "npm install --save-dev vitest @nx/vite"
+            }
+        ]
+    },
+    {
+        "id": "testingE2E",
+        "question": "How do you run end-to-end tests?",
+        "answers": [
+            {
+                "value": "cypress",
+                "label": "Cypress",
+                "icon": "/icons/cypress.svg",
+                "docs": "https://docs.cypress.io/guides/end-to-end-testing/angular",
+                "pros": [
+                    "Interactive runner and time travel"
+                ],
+                "cons": [
+                    "Higher resource usage"
+                ],
+                "example": "ng e2e"
+            },
+            {
+                "value": "playwright",
+                "label": "Playwright",
+                "icon": "/icons/playwright.svg",
+                "docs": "https://playwright.dev/docs/test-components#angular",
+                "pros": [
+                    "Multi-browser coverage",
+                    "Powerful fixtures"
+                ],
+                "cons": [
+                    "More setup for component harnesses"
+                ],
+                "example": "npx playwright test"
+            },
+            {
+                "value": "webdriverio",
+                "label": "WebdriverIO",
+                "icon": "webdriverio",
+                "docs": "https://webdriver.io/docs/angular",
+                "pros": [
+                    "WebDriver compatibility"
+                ],
+                "cons": [
+                    "Slower than headless runners"
+                ],
+                "example": "npx wdio run wdio.conf.ts"
+            }
+        ]
+    }
+]

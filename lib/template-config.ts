@@ -25,6 +25,11 @@ export const templateCombinations: Record<string, TemplateConfig> = {
         template: 'copilot-instructions-template.md',
         outputFileName: 'copilot-instructions.md',
     },
+    // Copilot Instructions + Angular (specific combination)
+    'copilot-instructions-angular': {
+        template: 'copilot-instructions-template.md',
+        outputFileName: 'copilot-instructions.md',
+    },
     // Agents guide (general)
     agents: {
         template: 'agents-template.md',
@@ -37,6 +42,11 @@ export const templateCombinations: Record<string, TemplateConfig> = {
     },
     // Agents guide + Python (specific combination)
     'agents-python': {
+        template: 'agents-template.md',
+        outputFileName: 'agents.md',
+    },
+    // Agents guide + Angular (specific combination)
+    'agents-angular': {
         template: 'agents-template.md',
         outputFileName: 'agents.md',
     },
