@@ -5,6 +5,7 @@ export type IdeConfig = {
     enabled?: boolean
     outputFiles?: string[]
     docs?: string
+    skippable?: boolean
 }
 
 export type FrameworkConfig = {
@@ -13,6 +14,7 @@ export type FrameworkConfig = {
     icon?: string
     enabled?: boolean
     docs?: string
+    skippable?: boolean
 }
 
 export type DataAnswerSource = {
@@ -27,6 +29,7 @@ export type DataAnswerSource = {
     isDefault?: boolean
     disabled?: boolean
     disabledLabel?: string
+    skippable?: boolean
 }
 
 export type DataQuestionSource = {
@@ -34,6 +37,7 @@ export type DataQuestionSource = {
     question: string
     allowMultiple?: boolean
     answers: DataAnswerSource[]
+    skippable?: boolean
 }
 
 export type FileOutputConfig = {
@@ -44,6 +48,7 @@ export type FileOutputConfig = {
     enabled?: boolean
     icon?: string
     docs?: string
+    skippable?: boolean
 }
 
 export type WizardAnswer = {
@@ -57,6 +62,7 @@ export type WizardAnswer = {
     disabled?: boolean
     disabledLabel?: string
     docs?: string
+    skippable?: boolean
 }
 
 export type WizardQuestion = {
@@ -64,6 +70,7 @@ export type WizardQuestion = {
     question: string
     allowMultiple?: boolean
     answers: WizardAnswer[]
+    skippable?: boolean
 }
 
 export type WizardStep = {
