@@ -7,6 +7,7 @@ import * as simpleIcons from "simple-icons"
 import type { SimpleIcon } from "simple-icons"
 
 import rawIdes from "@/data/ides.json"
+import type { DataAnswerSource, DataQuestionSource, FileOutputConfig, FrameworkConfig, IdeConfig, InstructionsWizardProps, Responses, WizardAnswer, WizardQuestion, WizardResponses, WizardStep } from "@/types/wizard"
 import rawFrameworks from "@/data/frameworks.json"
 import generalData from "@/data/general.json"
 import architectureData from "@/data/architecture.json"
@@ -15,86 +16,6 @@ import securityData from "@/data/security.json"
 import commitsData from "@/data/commits.json"
 import filesData from "@/data/files.json"
 import { InstructionsAnswerCard } from "./instructions-answer-card"
-
-type IdeConfig = {
-  id: string
-  label: string
-  icon?: string
-  enabled?: boolean
-  outputFiles?: string[]
-  docs?: string
-}
-
-type FrameworkConfig = {
-  id: string
-  label: string
-  icon?: string
-  enabled?: boolean
-  docs?: string
-}
-
-type DataAnswerSource = {
-  value: string
-  label: string
-  icon?: string
-  example?: string
-  docs?: string
-  pros?: string[]
-  cons?: string[]
-  tags?: string[]
-  isDefault?: boolean
-  disabled?: boolean
-  disabledLabel?: string
-}
-
-type DataQuestionSource = {
-  id: string
-  question: string
-  allowMultiple?: boolean
-  answers: DataAnswerSource[]
-}
-
-type FileOutputConfig = {
-  id: string
-  label: string
-  filename: string
-  format: string
-  enabled?: boolean
-  icon?: string
-  docs?: string
-}
-
-type WizardAnswer = {
-  value: string
-  label: string
-  icon?: string
-  example?: string
-  infoLines?: string[]
-  tags?: string[]
-  isDefault?: boolean
-  disabled?: boolean
-  disabledLabel?: string
-  docs?: string
-}
-
-type WizardQuestion = {
-  id: string
-  question: string
-  allowMultiple?: boolean
-  answers: WizardAnswer[]
-}
-
-type WizardStep = {
-  id: string
-  title: string
-  questions: WizardQuestion[]
-}
-
-type InstructionsWizardProps = {
-  onClose?: () => void
-}
-
-type Responses = Record<string, string | string[] | null | undefined>
 
 const FRAMEWORK_STEP_ID = "frameworks"
 const FRAMEWORK_QUESTION_ID = "frameworkSelection"
@@ -642,7 +563,83 @@ export function InstructionsWizard({ onClose }: InstructionsWizardProps) {
           <Button variant="ghost" onClick={requestResetWizard}>
             Start Over
           </Button>
-          <Button onClick={() => onClose?.()}>
+          <Button onClick={() => {
+            // Create a JSON object with question IDs as keys and their answers as values
+            const questionsAndAnswers: WizardResponses = {
+              preferredIde: null,
+              frameworkSelection: null,
+              tooling: null,
+              language: null,
+              fileStructure: null,
+              styling: null,
+              testingUT: null,
+              testingE2E: null,
+              projectPriority: null,
+              codeStyle: null,
+              variableNaming: null,
+              fileNaming: null,
+              componentNaming: null,
+              exports: null,
+              comments: null,
+              collaboration: null,
+              stateManagement: null,
+              apiLayer: null,
+              folders: null,
+              dataFetching: null,
+              reactPerf: null,
+              auth: null,
+              validation: null,
+              logging: null,
+              commitStyle: null,
+              prRules: null,
+              outputFile: null,
+            }
+
+            wizardSteps.forEach((step) => {
+              step.questions.forEach((question) => {
+                let key = question.id
+                let answer = responses[question.id]
+
+                // Special handling for preferredIdes and outputFiles
+                if (key === "preferredIdes") {
+                  key = "preferredIde"
+                  if (Array.isArray(answer) && answer.length > 0) {
+                    answer = answer[0]
+                  } else if (typeof answer === "string") {
+                    // already a string
+                  } else {
+                    answer = null
+                  }
+                }
+                if (key === "outputFiles") {
+                  key = "outputFile"
+                  if (Array.isArray(answer) && answer.length > 0) {
+                    answer = answer[0]
+                  } else if (typeof answer === "string") {
+                    // already a string
+                  } else {
+                    answer = null
+                  }
+                }
+
+                if (answer !== null && answer !== undefined) {
+                  if (question.allowMultiple && Array.isArray(answer)) {
+                    // For all other multi-selects, keep as array
+                    questionsAndAnswers[key as keyof WizardResponses] = Array.isArray(answer) ? answer.join(", ") : answer
+                  } else if (!question.allowMultiple && typeof answer === 'string') {
+                    questionsAndAnswers[key as keyof WizardResponses] = Array.isArray(answer) ? answer.join(", ") : answer
+                  } else {
+                    questionsAndAnswers[key as keyof WizardResponses] = Array.isArray(answer) ? answer.join(", ") : answer
+                  }
+                } else {
+                  questionsAndAnswers[key as keyof WizardResponses] = null
+                }
+              })
+            })
+
+            console.log('Questions and Answers JSON:', JSON.stringify(questionsAndAnswers, null, 2))
+            onClose?.()
+          }}>
             Generate My Instructions
           </Button>
         </div>

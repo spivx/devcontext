@@ -35,16 +35,8 @@
 3. The wizard automatically consumes new questions when they follow the existing schema.
 
 ## Development Workflow
-- Lint with `npm run lint` (already part of standard checks).
-- When editing, maintain ASCII files, Tailwind utility classes, and ShadCN UI conventions.
-- Tests are lint-only at present; consider adding React Testing Library coverage if the wizard logic expands.
+  
+- **Always move TypeScript types and interfaces to a dedicated file (e.g., `types/wizard.ts`) instead of declaring them inside components.**
 
-## Notes for Agents
-- Respect the "enabled" flag semantics: `false` means the option renders disabled with a "Soon" badge.
-- When adding tooltip content, prefer concise prose and keep hover cards scannable.
-- Keep documentation links trustworthy; avoid marketing splash pages when direct references exist.
-- If adding new output formats, update both the data definition in `data/files.json` and any generation logic (currently beyond this repo).
-- When page-level components need reusable calculations or datasets, extract those helpers into `lib/utils.ts` and import them instead of defining inline.
-- For complex UI blocks reused across the wizard, lift them into dedicated components (e.g., `components/instructions-answer-card.tsx`) and consume them in the wizard instead of duplicating markup.
-- Create new components under `components/MyComponentName/MyComponentName.tsx` with an accompanying `index.tsx` that default-exports the component.
+
 - When you identify reusable effect logic, wrap it in a custom hook under `hooks/` (e.g., `use-window-click-dismiss.ts`) and consume that hook rather than repeating `useEffect` blocks.
