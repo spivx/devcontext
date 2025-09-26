@@ -2,7 +2,6 @@
 
 import { useMemo, useState } from "react"
 import { Button } from "@/components/ui/button"
-import { ArrowLeft } from "lucide-react"
 import * as simpleIcons from "simple-icons"
 import type { SimpleIcon } from "simple-icons"
 
@@ -15,25 +14,50 @@ import securityData from "@/data/security.json"
 import commitsData from "@/data/commits.json"
 import filesData from "@/data/files.json"
 import { InstructionsAnswerCard } from "./instructions-answer-card"
+import FinalOutputView from "./final-output-view"
 
 import { ANALYTICS_EVENTS } from "@/lib/analytics-events"
 import { track } from "@/lib/mixpanel"
 import { buildStepFromQuestionSet, getFormatLabel, getMimeTypeForFormat, mapAnswerSourceToWizard } from "@/lib/wizard-utils"
+import type { GeneratedFileResult } from "@/types/output"
 
 const fileOptions = filesData as FileOutputConfig[]
 const defaultFileOption = fileOptions.find((file) => file.enabled !== false) ?? fileOptions[0] ?? null
 
 const FRAMEWORK_STEP_ID = "frameworks"
 const FRAMEWORK_QUESTION_ID = "frameworkSelection"
+const DEVCONTEXT_ROOT_URL = "https://devcontext.xyz/"
 
 const iconSlugOverrides: Record<string, string> = {
   vscode: "microsoft",
   visualstudiocode: "microsoft",
+  css3: "css",
+  materialui: "mui",
+  rxjs: "reactivex",
 }
 
 const iconColorOverrides: Record<string, string> = {
   nextdotjs: "#0070F3",
   angular: "#DD0031",
+}
+
+const customIconBySlug: Record<string, { svg: string; hex: string }> = {
+  "folder-tree": {
+    hex: "#6366F1",
+    svg: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h5l2 2h11a1 1 0 0 1 1 1v2" /><path d="M3 6v12a1 1 0 0 0 1 1h7" /><path d="M12 13h6" /><path d="M16 9v8" /></svg>',
+  },
+  layout: {
+    hex: "#F97316",
+    svg: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="2" /><path d="M9 4v16" /><path d="M3 10h6" /></svg>',
+  },
+  microsoftazure: {
+    hex: "#0078D4",
+    svg: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M10.6 3.2 3.1 20.8a.6.6 0 0 0 .55.84h5.26a.8.8 0 0 0 .68-.39l2.44-4.12h5.28l-2.1 4.94a.6.6 0 0 0 .55.84h4.84a.6.6 0 0 0 .57-.38L21 17.5a.8.8 0 0 0-.74-1.09h-5.33l3.36-7.62a.6.6 0 0 0-.56-.83h-6.23l1.06-2.57a.6.6 0 0 0-.56-.79h-1.01a.8.8 0 0 0-.73.5Z" /></svg>',
+  },
+  playwright: {
+    hex: "#2AC866",
+    svg: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M6.84 3.85a2.4 2.4 0 0 1 2.18-.29l12.37 4.09c1.7.56 2.13 2.74.75 3.92l-7.45 6.43a2.4 2.4 0 0 1-2.44.38l-11.01-4.34C.5 13.31.19 11.15 1.7 10l5.14-4.12Zm6 1.62L3.82 6.8a1.2 1.2 0 0 0-.8 1.99l8.82 8.78a1.2 1.2 0 0 0 1.65.02l7.14-6.18a1.2 1.2 0 0 0-.34-2.03l-7.45-2.93Zm1.21 2.72c1.76 0 3.18 1.51 3.18 3.38s-1.42 3.39-3.18 3.39c-1.76 0-3.18-1.52-3.18-3.39s1.42-3.38 3.18-3.38Zm0 1.8c-.8 0-1.44.72-1.44 1.58 0 .87.65 1.59 1.44 1.59.8 0 1.45-.72 1.45-1.59 0-.86-.65-1.58-1.45-1.58Z" /></svg>',
+  },
 }
 
 const simpleIconBySlug = (() => {
@@ -125,6 +149,56 @@ const normalizeIconSlug = (raw?: string) => {
   return iconSlugOverrides[cleaned] ?? cleaned
 }
 
+type IconDescriptor = {
+  slug: string
+  markup: string
+  hex: string
+}
+
+const getIconDescriptor = (raw?: string): IconDescriptor | null => {
+  const normalized = normalizeIconSlug(raw)
+  if (!normalized) {
+    return null
+  }
+
+  const customIcon = customIconBySlug[normalized]
+  if (customIcon) {
+    return {
+      slug: normalized,
+      markup: customIcon.svg,
+      hex: customIcon.hex,
+    }
+  }
+
+  const simpleIcon = simpleIconBySlug.get(normalized)
+  if (simpleIcon) {
+    return {
+      slug: simpleIcon.slug,
+      markup: getSimpleIconMarkup(simpleIcon),
+      hex: simpleIcon.hex,
+    }
+  }
+
+  return null
+}
+
+const clamp = (value: number, min: number, max: number) => Math.min(Math.max(value, min), max)
+
+const hexToRgba = (hex: string, alpha: number) => {
+  const normalized = normalizeHex(hex)
+  const r = parseInt(normalized.slice(0, 2), 16)
+  const g = parseInt(normalized.slice(2, 4), 16)
+  const b = parseInt(normalized.slice(4, 6), 16)
+
+  if ([r, g, b].some((component) => Number.isNaN(component))) {
+    return null
+  }
+
+  const clampedAlpha = clamp(alpha, 0, 1)
+
+  return `rgba(${r}, ${g}, ${b}, ${clampedAlpha})`
+}
+
 const frameworksStep: WizardStep = {
   id: FRAMEWORK_STEP_ID,
   title: "Choose Your Framework",
@@ -191,6 +265,8 @@ export function InstructionsWizard({ onClose, selectedFileId }: InstructionsWiza
   const [dynamicSteps, setDynamicSteps] = useState<WizardStep[]>([])
   const [isComplete, setIsComplete] = useState(false)
   const [pendingConfirmation, setPendingConfirmation] = useState<WizardConfirmationIntent | null>(null)
+  const [generatedFile, setGeneratedFile] = useState<GeneratedFileResult | null>(null)
+  const [isGenerating, setIsGenerating] = useState(false)
 
   const selectedFile = useMemo(() => {
     if (selectedFileId) {
@@ -276,6 +352,8 @@ export function InstructionsWizard({ onClose, selectedFileId }: InstructionsWiza
 
   const loadFrameworkQuestions = async (frameworkId: string, frameworkLabel: string) => {
     try {
+      setGeneratedFile(null)
+
       const questionsModule = await import(`@/data/questions/${frameworkId}.json`)
       const questionsData = (questionsModule.default ?? questionsModule) as DataQuestionSource[]
 
@@ -317,6 +395,8 @@ export function InstructionsWizard({ onClose, selectedFileId }: InstructionsWiza
     if (answer.disabled) {
       return
     }
+
+    setGeneratedFile(null)
 
     const previousValue = responses[currentQuestion.id]
     let nextValue: Responses[keyof Responses]
@@ -370,6 +450,8 @@ export function InstructionsWizard({ onClose, selectedFileId }: InstructionsWiza
       return
     }
 
+    setGeneratedFile(null)
+
     setResponses((prev) => ({
       ...prev,
       [currentQuestion.id]: null,
@@ -388,6 +470,8 @@ export function InstructionsWizard({ onClose, selectedFileId }: InstructionsWiza
     setCurrentStepIndex(0)
     setCurrentQuestionIndex(0)
     setIsComplete(false)
+    setGeneratedFile(null)
+    setIsGenerating(false)
   }
 
   const requestResetWizard = () => {
@@ -395,7 +479,9 @@ export function InstructionsWizard({ onClose, selectedFileId }: InstructionsWiza
   }
 
   const requestChangeFile = () => {
-    setPendingConfirmation("change-file")
+    if (typeof window !== "undefined") {
+      window.location.assign(DEVCONTEXT_ROOT_URL)
+    }
   }
 
   const confirmPendingConfirmation = () => {
@@ -408,6 +494,10 @@ export function InstructionsWizard({ onClose, selectedFileId }: InstructionsWiza
     }
 
     if (pendingConfirmation === "change-file") {
+      if (typeof window !== "undefined") {
+        window.location.assign(DEVCONTEXT_ROOT_URL)
+        return
+      }
       resetWizard()
       onClose?.()
     }
@@ -420,17 +510,25 @@ export function InstructionsWizard({ onClose, selectedFileId }: InstructionsWiza
   }
 
   const generateInstructionsFile = async () => {
+    if (isGenerating) {
+      return
+    }
+
     const outputFileId = selectedFile?.id ?? null
     if (!outputFileId) {
       console.error("No instructions file selected. Cannot generate output.")
       return
     }
 
-    track(ANALYTICS_EVENTS.CREATE_INSTRUCTIONS_FILE, {
-      outputFile: outputFileId,
-    })
-    // Create a JSON object with question IDs as keys and their answers as values
-    const questionsAndAnswers: WizardResponses = {
+    setIsGenerating(true)
+    setGeneratedFile(null)
+
+    try {
+      track(ANALYTICS_EVENTS.CREATE_INSTRUCTIONS_FILE, {
+        outputFile: outputFileId,
+      })
+      // Create a JSON object with question IDs as keys and their answers as values
+      const questionsAndAnswers: WizardResponses = {
       frameworkSelection: null,
       tooling: null,
       language: null,
@@ -479,58 +577,54 @@ export function InstructionsWizard({ onClose, selectedFileId }: InstructionsWiza
       })
     })
 
-    questionsAndAnswers.outputFile = outputFileId
+      questionsAndAnswers.outputFile = outputFileId
 
-    // Ensure we have the combination data for the API
-    // The API will now use outputFile + frameworkSelection to determine the template
-    console.log('Template combination data:', {
-      outputFile: questionsAndAnswers.outputFile,
-      framework: questionsAndAnswers.frameworkSelection
-    })
+      // Ensure we have the combination data for the API
+      // The API will now use outputFile + frameworkSelection to determine the template
+      console.log('Template combination data:', {
+        outputFile: questionsAndAnswers.outputFile,
+        framework: questionsAndAnswers.frameworkSelection
+      })
 
-    // console.log('Questions and Answers JSON:', JSON.stringify(questionsAndAnswers, null, 2))
+      // console.log('Questions and Answers JSON:', JSON.stringify(questionsAndAnswers, null, 2))
 
-    // Call the API to generate the instructions file
-    if (questionsAndAnswers.outputFile) {
-      const frameworkSegment = questionsAndAnswers.frameworkSelection ?? 'general'
-      const fileNameSegment = questionsAndAnswers.outputFile
+      // Call the API to generate the instructions file
+      if (questionsAndAnswers.outputFile) {
+        const frameworkSegment = questionsAndAnswers.frameworkSelection ?? 'general'
+        const fileNameSegment = questionsAndAnswers.outputFile
 
-      try {
-        const response = await fetch(
-          `/api/generate/${encodeURIComponent(frameworkSegment)}/${encodeURIComponent(fileNameSegment)}`,
-          {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(questionsAndAnswers),
+        try {
+          const response = await fetch(
+            `/api/generate/${encodeURIComponent(frameworkSegment)}/${encodeURIComponent(fileNameSegment)}`,
+            {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify(questionsAndAnswers),
+            }
+          )
+
+          if (response.ok) {
+            const data = await response.json()
+            const fileConfig = fileOptions.find((file) => file.id === questionsAndAnswers.outputFile)
+            const mimeType = getMimeTypeForFormat(fileConfig?.format)
+
+            setGeneratedFile({
+              fileName: data.fileName,
+              fileContent: data.content,
+              mimeType: mimeType ?? null,
+            })
+          } else {
+            console.error('Failed to generate file:', await response.text())
           }
-        )
-
-        if (response.ok) {
-          const data = await response.json()
-          const fileConfig = fileOptions.find((file) => file.id === questionsAndAnswers.outputFile)
-          const mimeType = getMimeTypeForFormat(fileConfig?.format)
-
-          // Create a downloadable file
-          const blob = new Blob([data.content], { type: mimeType })
-          const url = URL.createObjectURL(blob)
-          const a = document.createElement('a')
-          a.href = url
-          a.download = data.fileName
-          document.body.appendChild(a)
-          a.click()
-          document.body.removeChild(a)
-          URL.revokeObjectURL(url)
-        } else {
-          console.error('Failed to generate file:', await response.text())
+        } catch (error) {
+          console.error('Error calling generate API:', error)
         }
-      } catch (error) {
-        console.error('Error calling generate API:', error)
       }
+    } finally {
+      setIsGenerating(false)
     }
-
-    onClose?.()
   }
 
   const renderCompletion = () => {
@@ -607,11 +701,8 @@ export function InstructionsWizard({ onClose, selectedFileId }: InstructionsWiza
           <Button variant="outline" onClick={goToPrevious}>
             Back to questions
           </Button>
-          <Button variant="ghost" onClick={requestResetWizard}>
-            Start Over
-          </Button>
-          <Button onClick={() => void generateInstructionsFile()}>
-            Generate My Instructions
+          <Button onClick={() => void generateInstructionsFile()} disabled={isGenerating}>
+            {isGenerating ? 'Generating...' : 'Generate My Instructions'}
           </Button>
         </div>
       </div>
@@ -629,15 +720,53 @@ export function InstructionsWizard({ onClose, selectedFileId }: InstructionsWiza
     : "This will clear all of your current selections. Are you sure you want to continue?"
   const confirmationConfirmLabel = isChangeFileConfirmation ? "Change File" : "Reset Wizard"
 
-  return (
-    <div className="mx-auto flex w-full max-w-4xl flex-col gap-6">
-      {onClose ? (
-        <Button variant="ghost" onClick={requestResetWizard} className="self-start -ml-2">
-          <ArrowLeft className="mr-2 h-4 w-4" />
-          Start over
-        </Button>
-      ) : null}
+  const isAtFirstQuestion = currentStepIndex === 0 && currentQuestionIndex === 0
+  const backDisabled = isAtFirstQuestion && !isComplete
+  const canSkipCurrentQuestion = !isComplete && currentQuestion.skippable !== false
+  const showChangeFile = Boolean(onClose && selectedFile)
 
+  const actionBar = (
+    <section className="rounded-2xl border border-border/70 bg-background/90 p-4 shadow-sm">
+      <div className="flex flex-wrap items-center gap-3">
+        <div className="flex flex-wrap gap-2">
+          <Button
+            variant="outline"
+            onClick={goToPrevious}
+            disabled={backDisabled}
+          >
+            Back
+          </Button>
+          <Button
+            variant="ghost"
+            onClick={skipQuestion}
+            disabled={!canSkipCurrentQuestion}
+            title={
+              canSkipCurrentQuestion
+                ? undefined
+                : isComplete
+                  ? "Questions complete"
+                  : "This question must be answered"
+            }
+          >
+            Skip
+          </Button>
+        </div>
+        <div className="ml-auto flex flex-wrap justify-end gap-2">
+          <Button variant="destructive" onClick={requestResetWizard}>
+            Start Over
+          </Button>
+          {showChangeFile ? (
+            <Button variant="secondary" onClick={requestChangeFile}>
+              Change File
+            </Button>
+          ) : null}
+        </div>
+      </div>
+    </section>
+  )
+
+  const wizardLayout = (
+    <div className="mx-auto flex w-full max-w-4xl flex-col gap-6">
       {selectedFile ? (
         <section className="rounded-3xl border border-border/70 bg-secondary/20 p-5 shadow-sm">
           <div className="flex flex-wrap items-start justify-between gap-4">
@@ -648,17 +777,11 @@ export function InstructionsWizard({ onClose, selectedFileId }: InstructionsWiza
                 <p className="text-sm text-muted-foreground">{selectedFile.filename}</p>
               ) : null}
             </div>
-            <div className="flex flex-wrap items-center gap-3">
-
-              {onClose ? (
-                <Button variant="outline" size="sm" onClick={requestChangeFile}>
-                  Change file
-                </Button>
-              ) : null}
-            </div>
           </div>
         </section>
       ) : null}
+
+      {actionBar}
 
       {isComplete ? (
         renderCompletion()
@@ -668,38 +791,38 @@ export function InstructionsWizard({ onClose, selectedFileId }: InstructionsWiza
             <h1 className="text-3xl font-semibold text-foreground">
               {currentQuestion.question}
             </h1>
-            {currentQuestion.skippable !== false ? (
-              <Button variant="ghost" onClick={skipQuestion} className="shrink-0">
-                Skip
-              </Button>
-            ) : null}
           </header>
 
           <section className="rounded-3xl border border-border/80 bg-card/95 p-6 shadow-md">
             <div className="grid gap-3 sm:grid-cols-2">
               {currentQuestion.answers.map((answer) => {
-                const normalizedIconSlug = normalizeIconSlug(answer.icon ?? answer.value)
-                const simpleIconData = normalizedIconSlug
-                  ? simpleIconBySlug.get(normalizedIconSlug) ?? null
-                  : null
-                const iconColor = (normalizedIconSlug && iconColorOverrides[normalizedIconSlug])
-                  ?? (simpleIconData ? getAccessibleIconColor(simpleIconData.hex) : undefined)
+                const iconDescriptor = getIconDescriptor(answer.icon ?? answer.value)
+                const iconHex = iconDescriptor
+                  ? iconColorOverrides[iconDescriptor.slug] ?? iconDescriptor.hex
+                  : undefined
+                const iconColor = iconHex ? getAccessibleIconColor(iconHex) : undefined
+                const iconBackgroundColor = iconColor ? hexToRgba(iconColor, 0.18) : null
+                const iconRingColor = iconColor ? hexToRgba(iconColor, 0.32) : null
                 const fallbackInitials = answer.label
                   .split(" ")
                   .map((part) => part.charAt(0))
                   .join("")
                   .slice(0, 2)
                   .toUpperCase()
-
-                const iconElement = simpleIconData ? (
+                const iconElement = iconDescriptor ? (
                   <span
                     aria-hidden
-                    className="flex h-10 w-10 items-center justify-center rounded-xl bg-secondary/40 text-muted-foreground ring-1 ring-border/40"
+                    className={`flex h-10 w-10 items-center justify-center rounded-xl text-muted-foreground ring-1 ring-border/40${iconColor ? "" : " bg-secondary/40"}`}
+                    style={{
+                      color: iconColor,
+                      backgroundColor: iconBackgroundColor ?? undefined,
+                      boxShadow: iconRingColor ? `inset 0 0 0 1px ${iconRingColor}` : undefined,
+                    }}
                   >
                     <span
                       className="inline-flex h-6 w-6 items-center justify-center text-current [&>svg]:h-full [&>svg]:w-full"
                       style={{ color: iconColor }}
-                      dangerouslySetInnerHTML={{ __html: getSimpleIconMarkup(simpleIconData) }}
+                      dangerouslySetInnerHTML={{ __html: iconDescriptor.markup }}
                     />
                   </span>
                 ) : (
@@ -736,14 +859,7 @@ export function InstructionsWizard({ onClose, selectedFileId }: InstructionsWiza
               })}
             </div>
 
-            <div className="mt-6 flex items-center justify-between gap-3">
-              <Button
-                variant="ghost"
-                onClick={goToPrevious}
-                disabled={currentStepIndex === 0 && currentQuestionIndex === 0}
-              >
-                Back
-              </Button>
+            <div className="mt-6 flex items-center justify-end">
               <div className="text-xs text-muted-foreground">
                 Question {questionNumber} of {totalQuestions}
               </div>
@@ -771,5 +887,19 @@ export function InstructionsWizard({ onClose, selectedFileId }: InstructionsWiza
         </div>
       ) : null}
     </div>
+  )
+
+  return (
+    <>
+      {wizardLayout}
+      {generatedFile ? (
+        <FinalOutputView
+          fileName={generatedFile.fileName}
+          fileContent={generatedFile.fileContent}
+          mimeType={generatedFile.mimeType}
+          onClose={() => setGeneratedFile(null)}
+        />
+      ) : null}
+    </>
   )
 }
