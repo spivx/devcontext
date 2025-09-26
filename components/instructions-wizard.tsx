@@ -6,7 +6,7 @@ import { ArrowLeft } from "lucide-react"
 import * as simpleIcons from "simple-icons"
 import type { SimpleIcon } from "simple-icons"
 
-import type { DataQuestionSource, FileOutputConfig, FrameworkConfig, InstructionsWizardProps, Responses, WizardAnswer, WizardQuestion, WizardResponses, WizardStep } from "@/types/wizard"
+import type { DataQuestionSource, FileOutputConfig, FrameworkConfig, InstructionsWizardProps, Responses, WizardAnswer, WizardConfirmationIntent, WizardQuestion, WizardResponses, WizardStep } from "@/types/wizard"
 import rawFrameworks from "@/data/frameworks.json"
 import generalData from "@/data/general.json"
 import architectureData from "@/data/architecture.json"
@@ -190,7 +190,7 @@ export function InstructionsWizard({ onClose, selectedFileId }: InstructionsWiza
   const [responses, setResponses] = useState<Responses>({})
   const [dynamicSteps, setDynamicSteps] = useState<WizardStep[]>([])
   const [isComplete, setIsComplete] = useState(false)
-  const [showResetConfirm, setShowResetConfirm] = useState(false)
+  const [pendingConfirmation, setPendingConfirmation] = useState<WizardConfirmationIntent | null>(null)
 
   const selectedFile = useMemo(() => {
     if (selectedFileId) {
@@ -391,16 +391,32 @@ export function InstructionsWizard({ onClose, selectedFileId }: InstructionsWiza
   }
 
   const requestResetWizard = () => {
-    setShowResetConfirm(true)
+    setPendingConfirmation("reset")
   }
 
-  const confirmResetWizard = () => {
-    resetWizard()
-    setShowResetConfirm(false)
+  const requestChangeFile = () => {
+    setPendingConfirmation("change-file")
   }
 
-  const cancelResetWizard = () => {
-    setShowResetConfirm(false)
+  const confirmPendingConfirmation = () => {
+    if (!pendingConfirmation) {
+      return
+    }
+
+    if (pendingConfirmation === "reset") {
+      resetWizard()
+    }
+
+    if (pendingConfirmation === "change-file") {
+      resetWizard()
+      onClose?.()
+    }
+
+    setPendingConfirmation(null)
+  }
+
+  const cancelPendingConfirmation = () => {
+    setPendingConfirmation(null)
   }
 
   const generateInstructionsFile = async () => {
@@ -521,19 +537,19 @@ export function InstructionsWizard({ onClose, selectedFileId }: InstructionsWiza
     const summary = [
       selectedFile
         ? {
-            question: "Instructions file",
-            skipped: false,
-            answers: [
-              selectedFile.label,
-              selectedFile.filename ? `Filename: ${selectedFile.filename}` : null,
-              selectedFileFormatLabel ? `Format: ${selectedFileFormatLabel}` : null,
-            ].filter((entry): entry is string => Boolean(entry)),
-          }
+          question: "Instructions file",
+          skipped: false,
+          answers: [
+            selectedFile.label,
+            selectedFile.filename ? `Filename: ${selectedFile.filename}` : null,
+            selectedFileFormatLabel ? `Format: ${selectedFileFormatLabel}` : null,
+          ].filter((entry): entry is string => Boolean(entry)),
+        }
         : {
-            question: "Instructions file",
-            skipped: true,
-            answers: [],
-          },
+          question: "Instructions file",
+          skipped: true,
+          answers: [],
+        },
       ...wizardSteps.flatMap((step) =>
         step.questions.map((question) => {
           const value = responses[question.id]
@@ -606,6 +622,13 @@ export function InstructionsWizard({ onClose, selectedFileId }: InstructionsWiza
     .slice(0, currentStepIndex)
     .reduce((count, step) => count + step.questions.length, 0) + currentQuestionIndex + 1
 
+  const isChangeFileConfirmation = pendingConfirmation === "change-file"
+  const confirmationTitle = isChangeFileConfirmation ? "Change file?" : "Start over?"
+  const confirmationDescription = isChangeFileConfirmation
+    ? "Switching files will clear all of your current selections. Are you sure you want to continue?"
+    : "This will clear all of your current selections. Are you sure you want to continue?"
+  const confirmationConfirmLabel = isChangeFileConfirmation ? "Change File" : "Reset Wizard"
+
   return (
     <div className="mx-auto flex w-full max-w-4xl flex-col gap-6">
       {onClose ? (
@@ -626,13 +649,9 @@ export function InstructionsWizard({ onClose, selectedFileId }: InstructionsWiza
               ) : null}
             </div>
             <div className="flex flex-wrap items-center gap-3">
-              {selectedFileFormatLabel ? (
-                <span className="inline-flex items-center rounded-full bg-primary/10 px-3 py-1 text-xs font-medium text-primary">
-                  {selectedFileFormatLabel} format
-                </span>
-              ) : null}
+
               {onClose ? (
-                <Button variant="outline" size="sm" onClick={onClose}>
+                <Button variant="outline" size="sm" onClick={requestChangeFile}>
                   Change file
                 </Button>
               ) : null}
@@ -678,7 +697,7 @@ export function InstructionsWizard({ onClose, selectedFileId }: InstructionsWiza
                     className="flex h-10 w-10 items-center justify-center rounded-xl bg-secondary/40 text-muted-foreground ring-1 ring-border/40"
                   >
                     <span
-                    className="inline-flex h-6 w-6 items-center justify-center text-current [&>svg]:h-full [&>svg]:w-full"
+                      className="inline-flex h-6 w-6 items-center justify-center text-current [&>svg]:h-full [&>svg]:w-full"
                       style={{ color: iconColor }}
                       dangerouslySetInnerHTML={{ __html: getSimpleIconMarkup(simpleIconData) }}
                     />
@@ -733,21 +752,19 @@ export function InstructionsWizard({ onClose, selectedFileId }: InstructionsWiza
         </>
       )}
 
-      {showResetConfirm ? (
+      {pendingConfirmation ? (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-background/80 p-4 backdrop-blur-sm">
           <div className="w-full max-w-md space-y-4 rounded-2xl border border-border/70 bg-card/95 p-6 shadow-2xl">
             <div className="space-y-2">
-              <h3 className="text-lg font-semibold text-foreground">Start over?</h3>
-              <p className="text-sm text-muted-foreground">
-                This will clear all of your current selections. Are you sure you want to continue?
-              </p>
+              <h3 className="text-lg font-semibold text-foreground">{confirmationTitle}</h3>
+              <p className="text-sm text-muted-foreground">{confirmationDescription}</p>
             </div>
             <div className="flex flex-wrap justify-end gap-2">
-              <Button variant="ghost" onClick={cancelResetWizard}>
+              <Button variant="ghost" onClick={cancelPendingConfirmation}>
                 Keep My Answers
               </Button>
-              <Button variant="destructive" onClick={confirmResetWizard}>
-                Reset Wizard
+              <Button variant="destructive" onClick={confirmPendingConfirmation}>
+                {confirmationConfirmLabel}
               </Button>
             </div>
           </div>

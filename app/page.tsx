@@ -60,13 +60,17 @@ export default function Home() {
               <Logo />
 
               {/* Headline */}
-              <h2 className="max-w-4xl text-3xl font-bold">
-                AI Coding Instructions, Backed by Real Developer Experience
-              </h2>
+              <h1 className="max-w-4xl text-3xl font-bold">
+                Assemble Tailored AI Coding Playbooks With a Guided Wizard
+              </h1>
 
               {/* Subheadline */}
               <p className="max-w-xl text-lg leading-relaxed text-muted-foreground">
-                Turn developer best practices into ready-to-use AI instructions.
+                Move from curated best practices to sharable files like Copilot instructions, Cursor rules, and agents.md playbooks in just a few guided steps.
+              </p>
+
+              <p className="max-w-xl text-sm text-muted-foreground/80">
+                Use the wizard to generate Copilot instruction files, agents files, comprehensive instruction sets, and Cursor rules without starting from a blank page.
               </p>
 
               {/* File type CTAs */}

@@ -69,6 +69,8 @@ export type WizardStep = {
     questions: WizardQuestion[]
 }
 
+export type WizardConfirmationIntent = "change-file" | "reset"
+
 export type InstructionsWizardProps = {
     selectedFileId?: string | null
     onClose?: () => void

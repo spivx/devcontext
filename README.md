@@ -1,51 +1,47 @@
 ![devcontext logo](public/logo.png)
 
-## Generate the perfect context file for your development workflow**
+# devcontext
 
-A tool that helps developers create optimized context files based on their IDE, framework, and coding conventions.
+Build high-signal agent and instruction files from community-proven best practices.
 
----
+## What devcontext does
+- Transforms curated community knowledge into ready-to-use instructions for agents, coding copilots, and repo guides.
+- Guides you through a multi-step wizard that selects files, frameworks, and scenario-specific topics.
+- Surfaces examples, trade-offs, and documentation links so every choice is backed by trusted references.
 
-## What is devcontext?
+## How the wizard works
+1. Launch the app and switch from the landing hero to the Instructions Wizard.
+2. Pick the instruction file you want to assemble (from templates defined in `data/files.json`).
+3. Choose your framework and automatically load its follow-up question set (dynamic imports from `data/questions/<framework>.json`).
+4. Answer or skip topic prompts across general, architecture, performance, security, commits, and more.
+5. Review a completion summary that highlights which best practices made it into your file and which were skipped for later.
 
-devcontext helps you generate customized context files that work perfectly with your development setup. Whether you're using VS Code with React, IntelliJ with Spring Boot, or any other combination, devcontext creates context files tailored to your specific environment and preferences.
+## Community knowledge base
+- Every topic originates from the developer community—playbooks, real-world retrospectives, and shared tooling habits.
+- JSON entries in `data/` capture those insights: each answer carries labels, examples, pros/cons, tags, and authoritative `docs` links.
+- Disabled options mark ideas that the community is still refining; they stay visible so contributors can track demand.
+- Icon choices use Simple Icons with automatic contrast adjustments for readability across themes.
 
-## How it works
+## Key interaction details
+- Tooltips open from the info icon, letting you explore examples, pros/cons, tags, and external docs without losing your place.
+- Multi-select questions support skipping (recorded as `null`) so uncertain topics never block progress.
+- Progress indicators keep a running count of answered versus skipped items, making gaps obvious before export.
 
-1. **Select your IDE** - VS Code, IntelliJ, Vim, Sublime Text, etc.
-2. **Choose your framework** - React, Vue, Angular, Spring, Django, etc.
-3. **Set your preferences** - Coding style, file structure, naming conventions
-4. **Generate context** - Get a perfectly tailored context file for your workflow
-
-## Why use devcontext?
-
-- **Better AI assistance** - Context files optimized for your specific setup improve AI code suggestions
-- **Faster onboarding** - New team members get the right context immediately
-- **Consistent workflow** - Standardize context across your team and projects
-- **Time-saving** - No more manually creating context files for each project
-
-## Getting Started
-
-Visit [https://www.devcontext.xyz/](https://www.devcontext.xyz/) to start generating your context files.
-
-### For Developers
-
-If you want to contribute to the project or run it locally:
-
+## Run devcontext locally
 ```bash
 git clone https://github.com/spivx/devcontext.git
 cd devcontext
 npm install
 npm run dev
 ```
+Then open the printed local URL in your browser to explore the wizard.
 
-## Contributing
+## Contribute back to the community
+- Add or improve topics in `data/*.json` with clear labels, examples, and `docs` links.
+- Propose new framework questionnaires under `data/questions/`, keeping the schema consistent.
+- Share hooks, utilities, or UI refinements that make the wizard easier to reason about for first-time contributors.
 
-Help us improve devcontext by:
-- Adding support for new IDEs and frameworks
-- Improving context file templates
-- Reporting bugs or suggesting features
+Every addition helps the community build better instruction files faster.
 
 ## License
-
-MIT License - see [LICENSE](LICENSE) for details.
+MIT License — see [`LICENSE`](LICENSE) for the full text.

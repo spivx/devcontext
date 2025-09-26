@@ -1,0 +1,22 @@
+{
+  "name": "DevContext",
+  "short_name": "DevContext",
+  "description": "Generate tailored AI coding instructions, Copilot configs, Cursor rules, and IDE-ready documentation with a guided wizard.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#09090b",
+  "theme_color": "#09090b",
+  "icons": [
+    {
+      "src": "/icon-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "/icon-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
