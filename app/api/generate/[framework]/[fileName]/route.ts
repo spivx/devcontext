@@ -18,10 +18,10 @@ function mapOutputFileToTemplateType(outputFile: string): string {
 
 export async function POST(
     request: NextRequest,
-    { params }: { params: { framework: string; fileName: string } },
+    context: { params: Promise<{ framework: string; fileName: string }> },
 ) {
     try {
-        const { framework, fileName } = params
+        const { framework, fileName } = await context.params
         const responses = (await request.json()) as WizardResponses
 
         const frameworkFromPath =
