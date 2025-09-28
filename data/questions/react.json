@@ -1,7 +1,8 @@
 [
     {
-        "id": "tooling",
+        "id": "react-tooling",
         "question": "What build tooling do you use?",
+        "responseKey": "tooling",
         "answers": [
             {
                 "value": "vite",
@@ -15,7 +16,8 @@
                 "cons": [
                     "Less official docs compared to CRA"
                 ],
-                "example": "npx create-vite@latest my-app --template react"
+                "example": "npx create-vite@latest my-app --template react",
+                "isDefault": true
             },
             {
                 "value": "cra",
@@ -33,11 +35,12 @@
                 "example": "npx create-react-app my-app"
             }
         ],
-        "explanation": "Choose the build tool / project scaffolder you’re using."
+        "explanation": "Choose the build tool / project scaffolder you\u2019re using."
     },
     {
-        "id": "language",
+        "id": "react-language",
         "question": "What language do you use?",
+        "responseKey": "language",
         "answers": [
             {
                 "value": "typescript",
@@ -51,7 +54,8 @@
                 "cons": [
                     "Slightly more boilerplate"
                 ],
-                "example": "npx create-vite@latest my-app --template react-ts"
+                "example": "npx create-vite@latest my-app --template react-ts",
+                "isDefault": true
             },
             {
                 "value": "javascript",
@@ -71,8 +75,9 @@
         "explanation": "Language choice impacts type safety and Copilot suggestions."
     },
     {
-        "id": "fileStructure",
+        "id": "react-fileStructure",
         "question": "How do you prefer to organize your components?",
+        "responseKey": "fileStructure",
         "answers": [
             {
                 "value": "flat",
@@ -97,7 +102,8 @@
                 "cons": [
                     "Overhead for small projects"
                 ],
-                "example": "src/features/auth/components/LoginForm.tsx"
+                "example": "src/features/auth/components/LoginForm.tsx",
+                "isDefault": true
             },
             {
                 "value": "component-directories",
@@ -116,8 +122,9 @@
         "explanation": "Component organization affects maintainability as the project grows."
     },
     {
-        "id": "styling",
+        "id": "react-styling",
         "question": "Which styling approach do you use?",
+        "responseKey": "styling",
         "answers": [
             {
                 "value": "tailwind",
@@ -131,7 +138,8 @@
                 "cons": [
                     "HTML can get cluttered with classes"
                 ],
-                "example": "<button class='bg-blue-500 text-white p-2 rounded'>Click</button>"
+                "example": "<button class='bg-blue-500 text-white p-2 rounded'>Click</button>",
+                "isDefault": true
             },
             {
                 "value": "cssmodules",
@@ -151,8 +159,9 @@
         "explanation": "Styling choice impacts developer experience and bundle size."
     },
     {
-        "id": "testingUT",
+        "id": "react-testingUT",
         "question": "Which framework do you use for unit testing?",
+        "responseKey": "testingUT",
         "answers": [
             {
                 "value": "jest",
@@ -166,7 +175,8 @@
                 "cons": [
                     "Slower for large projects"
                 ],
-                "example": "npm install --save-dev jest @testing-library/react"
+                "example": "npm install --save-dev jest @testing-library/react",
+                "isDefault": true
             },
             {
                 "value": "vitest",
@@ -186,8 +196,9 @@
         "explanation": "Unit testing ensures components work as expected in isolation."
     },
     {
-        "id": "testingE2E",
+        "id": "react-testingE2E",
         "question": "Which framework do you use for end-to-end (E2E) testing?",
+        "responseKey": "testingE2E",
         "answers": [
             {
                 "value": "cypress",
@@ -201,7 +212,8 @@
                 "cons": [
                     "More resource-heavy"
                 ],
-                "example": "npm install --save-dev cypress"
+                "example": "npm install --save-dev cypress",
+                "isDefault": true
             },
             {
                 "value": "playwright",

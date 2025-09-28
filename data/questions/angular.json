@@ -1,7 +1,8 @@
 [
     {
-        "id": "tooling",
+        "id": "angular-tooling",
         "question": "How do you scaffold or manage your Angular project?",
+        "responseKey": "tooling",
         "answers": [
             {
                 "value": "angular-cli",
@@ -15,7 +16,8 @@
                 "cons": [
                     "Opinionated build pipeline"
                 ],
-                "example": "ng new my-app --standalone"
+                "example": "ng new my-app --standalone",
+                "isDefault": true
             },
             {
                 "value": "nx",
@@ -46,8 +48,9 @@
         ]
     },
     {
-        "id": "language",
+        "id": "angular-language",
         "question": "What language mode do you target?",
+        "responseKey": "language",
         "answers": [
             {
                 "value": "typescript-strict",
@@ -61,7 +64,8 @@
                 "cons": [
                     "Requires extra typings for legacy packages"
                 ],
-                "example": "tsconfig.json with \"strict\": true"
+                "example": "tsconfig.json with \"strict\": true",
+                "isDefault": true
             },
             {
                 "value": "typescript-default",
@@ -92,8 +96,9 @@
         ]
     },
     {
-        "id": "fileStructure",
+        "id": "angular-fileStructure",
         "question": "How do you organize Angular features?",
+        "responseKey": "fileStructure",
         "answers": [
             {
                 "value": "standalone-first",
@@ -107,7 +112,8 @@
                 "cons": [
                     "Requires Angular 17+ patterns"
                 ],
-                "example": "src/app/(dashboard)/+page.component.ts"
+                "example": "src/app/(dashboard)/+page.component.ts",
+                "isDefault": true
             },
             {
                 "value": "ng-modules",
@@ -140,8 +146,9 @@
         ]
     },
     {
-        "id": "styling",
+        "id": "angular-styling",
         "question": "Which styling approach do you prefer?",
+        "responseKey": "styling",
         "answers": [
             {
                 "value": "scss",
@@ -154,7 +161,8 @@
                 "cons": [
                     "Requires Sass build step"
                 ],
-                "example": "ng config schematics.@schematics/angular:component style=scss"
+                "example": "ng config schematics.@schematics/angular:component style=scss",
+                "isDefault": true
             },
             {
                 "value": "tailwind",
@@ -186,8 +194,9 @@
         ]
     },
     {
-        "id": "stateManagement",
+        "id": "angular-stateManagement",
         "question": "How do you manage application state?",
+        "responseKey": "stateManagement",
         "answers": [
             {
                 "value": "ngrx-store",
@@ -201,7 +210,8 @@
                 "cons": [
                     "Boilerplate for actions and reducers"
                 ],
-                "example": "ng generate store State --module app.module.ts"
+                "example": "ng generate store State --module app.module.ts",
+                "isDefault": true
             },
             {
                 "value": "signals-services",
@@ -233,8 +243,9 @@
         ]
     },
     {
-        "id": "apiLayer",
+        "id": "angular-apiLayer",
         "question": "How do you access backend data?",
+        "responseKey": "apiLayer",
         "answers": [
             {
                 "value": "httpclient",
@@ -247,7 +258,8 @@
                 "cons": [
                     "Manual typing for REST endpoints"
                 ],
-                "example": "this.http.get<User[]>('/api/users')"
+                "example": "this.http.get<User[]>('/api/users')",
+                "isDefault": true
             },
             {
                 "value": "apollo-angular",
@@ -279,8 +291,9 @@
         ]
     },
     {
-        "id": "validation",
+        "id": "angular-validation",
         "question": "How do you validate user input?",
+        "responseKey": "validation",
         "answers": [
             {
                 "value": "reactive-forms",
@@ -294,7 +307,8 @@
                 "cons": [
                     "Verbose form builders"
                 ],
-                "example": "this.form = fb.group({ email: ['', [Validators.required]] })"
+                "example": "this.form = fb.group({ email: ['', [Validators.required]] })",
+                "isDefault": true
             },
             {
                 "value": "template-forms",
@@ -324,8 +338,9 @@
         ]
     },
     {
-        "id": "logging",
+        "id": "angular-logging",
         "question": "How do you capture logs and telemetry?",
+        "responseKey": "logging",
         "answers": [
             {
                 "value": "sentry",
@@ -338,7 +353,8 @@
                 "cons": [
                     "Hosted service pricing"
                 ],
-                "example": "Sentry.init({ dsn: 'https://...' })"
+                "example": "Sentry.init({ dsn: 'https://...' })",
+                "isDefault": true
             },
             {
                 "value": "azure-app-insights",
@@ -368,8 +384,9 @@
         ]
     },
     {
-        "id": "testingUT",
+        "id": "angular-testingUT",
         "question": "Which framework powers your unit tests?",
+        "responseKey": "testingUT",
         "answers": [
             {
                 "value": "jasmine-karma",
@@ -383,7 +400,8 @@
                 "cons": [
                     "Browser runner adds overhead"
                 ],
-                "example": "ng test"
+                "example": "ng test",
+                "isDefault": true
             },
             {
                 "value": "jest",
@@ -415,8 +433,9 @@
         ]
     },
     {
-        "id": "testingE2E",
+        "id": "angular-testingE2E",
         "question": "How do you run end-to-end tests?",
+        "responseKey": "testingE2E",
         "answers": [
             {
                 "value": "cypress",
@@ -429,7 +448,8 @@
                 "cons": [
                     "Higher resource usage"
                 ],
-                "example": "ng e2e"
+                "example": "ng e2e",
+                "isDefault": true
             },
             {
                 "value": "playwright",

@@ -7,7 +7,8 @@
                 "value": "reactQuery",
                 "label": "React Query",
                 "example": "Use React Query for server state management",
-                "docs": "https://tanstack.com/query/latest/docs/react/overview"
+                "docs": "https://tanstack.com/query/latest/docs/react/overview",
+                "isDefault": true
             },
             {
                 "value": "reduxToolkit",
@@ -30,7 +31,8 @@
                 "value": "hooks",
                 "label": "Custom hooks",
                 "example": "Encapsulate API calls in useFetchSomething()",
-                "docs": "https://react.dev/learn/reusing-logic-with-custom-hooks"
+                "docs": "https://react.dev/learn/reusing-logic-with-custom-hooks",
+                "isDefault": true
             }
         ]
     },
@@ -41,7 +43,8 @@
             {
                 "value": "featureFolders",
                 "label": "Feature-based folders",
-                "example": "src/features/auth/LoginForm.tsx"
+                "example": "src/features/auth/LoginForm.tsx",
+                "isDefault": true
             },
             {
                 "value": "domainDriven",

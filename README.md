@@ -13,8 +13,8 @@ Build high-signal agent and instruction files from community-proven best practic
 1. Launch the app and switch from the landing hero to the Instructions Wizard.
 2. Pick the instruction file you want to assemble (from templates defined in `data/files.json`).
 3. Choose your framework and automatically load its follow-up question set (dynamic imports from `data/questions/<framework>.json`).
-4. Answer or skip topic prompts across general, architecture, performance, security, commits, and more.
-5. Review a completion summary that highlights which best practices made it into your file and which were skipped for later.
+4. Answer topic prompts across general, architecture, performance, security, commits, and more—or lean on the recommended defaults when you need a fast decision.
+5. Review a completion summary that highlights what made it into your file and which areas still need decisions.
 
 ## Community knowledge base
 - Every topic originates from the developer community—playbooks, real-world retrospectives, and shared tooling habits.
@@ -24,8 +24,8 @@ Build high-signal agent and instruction files from community-proven best practic
 
 ## Key interaction details
 - Tooltips open from the info icon, letting you explore examples, pros/cons, tags, and external docs without losing your place.
-- Multi-select questions support skipping (recorded as `null`) so uncertain topics never block progress.
-- Progress indicators keep a running count of answered versus skipped items, making gaps obvious before export.
+- Multi-select questions let you apply the curated default choice with a single click so momentum never stalls.
+- Progress indicators keep a running count of answered versus unanswered items, making gaps obvious before export.
 
 ## Run devcontext locally
 ```bash

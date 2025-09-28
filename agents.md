@@ -11,9 +11,9 @@
   - Framework selection (`data/frameworks.json`) with branching into framework-specific question sets (e.g., `data/questions/react.json`).
   - Dynamic question sets loaded via `import()` based on the chosen framework.
 - User actions per question:
-  - Select single or multiple answers (with skip support that records `null`).
+  - Select single or multiple answers, or apply the recommended default when unsure.
   - Review hover tooltips with examples, pros/cons, tags, and documentation links.
-  - Complete flow with a summary of answered vs skipped items.
+  - Complete flow with a summary of answered selections and remaining gaps.
 
 ## Data Conventions
 - Every answer object may define: `value`, `label`, `icon`, `example`, `infoLines` (derived from `pros`/`cons`), `tags`, `isDefault`, `disabled`, `disabledLabel`, and `docs`.

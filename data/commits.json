@@ -7,12 +7,13 @@
                 "value": "conventional",
                 "label": "Conventional Commits",
                 "example": "feat(auth): add login endpoint",
-                "docs": "https://www.conventionalcommits.org/en/v1.0.0/"
+                "docs": "https://www.conventionalcommits.org/en/v1.0.0/",
+                "isDefault": true
             },
             {
                 "value": "gitmoji",
                 "label": "Gitmoji",
-                "example": "✨ add login endpoint",
+                "example": "\u2728 add login endpoint",
                 "docs": "https://gitmoji.dev/"
             },
             {
@@ -34,7 +35,8 @@
             {
                 "value": "reviewRequired",
                 "label": "Require at least one review",
-                "example": "PRs must be approved by another team member."
+                "example": "PRs must be approved by another team member.",
+                "isDefault": true
             },
             {
                 "value": "changelog",

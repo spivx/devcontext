@@ -7,13 +7,15 @@
                 "value": "paginate",
                 "label": "Always paginate large queries",
                 "example": "Use ?limit=50&offset=0",
-                "docs": "https://restfulapi.net/pagination/"
+                "docs": "https://restfulapi.net/pagination/",
+                "isDefault": true
             },
             {
                 "value": "infiniteScroll",
                 "label": "Use infinite scroll for feeds",
                 "example": "Load more on scroll",
-                "docs": "https://web.dev/infinite-scroll-without-chaos/"
+                "docs": "https://web.dev/infinite-scroll-without-chaos/",
+                "isDefault": false
             }
         ]
     },
@@ -25,7 +27,8 @@
                 "value": "memoHooks",
                 "label": "Memoize heavy components",
                 "example": "useMemo/useCallback for expensive calculations",
-                "docs": "https://react.dev/learn/keeping-components-pure#optimize-re-rendering-with-memoization"
+                "docs": "https://react.dev/learn/keeping-components-pure#optimize-re-rendering-with-memoization",
+                "isDefault": true
             },
             {
                 "value": "dynamicImport",

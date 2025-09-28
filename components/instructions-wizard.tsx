@@ -22,7 +22,11 @@ import { buildStepFromQuestionSet, getFormatLabel, getMimeTypeForFormat, mapAnsw
 import type { GeneratedFileResult } from "@/types/output"
 
 const fileOptions = filesData as FileOutputConfig[]
-const defaultFileOption = fileOptions.find((file) => file.enabled !== false) ?? fileOptions[0] ?? null
+const defaultFileOption =
+  fileOptions.find((file) => file.isDefault) ??
+  fileOptions.find((file) => file.enabled !== false) ??
+  fileOptions[0] ??
+  null
 
 const FRAMEWORK_STEP_ID = "frameworks"
 const FRAMEWORK_QUESTION_ID = "frameworkSelection"
@@ -206,7 +210,6 @@ const frameworksStep: WizardStep = {
     {
       id: FRAMEWORK_QUESTION_ID,
       question: "Which framework are you working with?",
-      skippable: false,
       answers: (rawFrameworks as FrameworkConfig[]).map((framework) => ({
         value: framework.id,
         label: framework.label,
@@ -214,7 +217,7 @@ const frameworksStep: WizardStep = {
         disabled: framework.enabled === false,
         disabledLabel: framework.enabled === false ? "Soon" : undefined,
         docs: framework.docs,
-        skippable: framework.skippable,
+        isDefault: framework.isDefault,
       })),
     },
   ],
@@ -311,6 +314,34 @@ export function InstructionsWizard({ onClose, selectedFileId }: InstructionsWiza
     return currentAnswerValue === value
   }
 
+  const defaultAnswer = useMemo(
+    () => currentQuestion.answers.find((answer) => answer.isDefault),
+    [currentQuestion]
+  )
+
+  const isDefaultSelected = useMemo(() => {
+    if (!defaultAnswer) {
+      return false
+    }
+
+    if (currentQuestion.allowMultiple) {
+      return Array.isArray(currentAnswerValue) && currentAnswerValue.includes(defaultAnswer.value)
+    }
+
+    return currentAnswerValue === defaultAnswer.value
+  }, [currentAnswerValue, currentQuestion.allowMultiple, defaultAnswer])
+
+  const canUseDefault = Boolean(
+    !isComplete &&
+      defaultAnswer &&
+      !defaultAnswer.disabled &&
+      (!isDefaultSelected || currentQuestion.allowMultiple)
+  )
+
+  const defaultButtonLabel = defaultAnswer
+    ? `Use default (${defaultAnswer.label})`
+    : "Use default"
+
   const advanceToNextQuestion = () => {
     const isLastQuestionInStep = currentQuestionIndex === currentStep.questions.length - 1
     const isLastStep = currentStepIndex === wizardSteps.length - 1
@@ -361,7 +392,7 @@ export function InstructionsWizard({ onClose, selectedFileId }: InstructionsWiza
         id: question.id,
         question: question.question,
         allowMultiple: question.allowMultiple,
-        skippable: question.skippable,
+        responseKey: question.responseKey,
         answers: question.answers.map(mapAnswerSourceToWizard),
       }))
 
@@ -445,25 +476,33 @@ export function InstructionsWizard({ onClose, selectedFileId }: InstructionsWiza
     }
   }
 
-  const skipQuestion = () => {
-    if (currentQuestion.skippable === false) {
+  const applyDefaultAnswer = async () => {
+    if (!defaultAnswer || defaultAnswer.disabled) {
       return
     }
 
     setGeneratedFile(null)
 
+    const nextValue: Responses[keyof Responses] = currentQuestion.allowMultiple
+      ? [defaultAnswer.value]
+      : defaultAnswer.value
+
     setResponses((prev) => ({
       ...prev,
-      [currentQuestion.id]: null,
+      [currentQuestion.id]: nextValue,
     }))
 
-    if (currentQuestion.id === FRAMEWORK_QUESTION_ID) {
-      setDynamicSteps([])
+    const isFrameworkQuestion = currentQuestion.id === FRAMEWORK_QUESTION_ID
+
+    if (isFrameworkQuestion) {
+      await loadFrameworkQuestions(defaultAnswer.value, defaultAnswer.label)
+      return
     }
 
-    advanceToNextQuestion()
+    setTimeout(() => {
+      advanceToNextQuestion()
+    }, 0)
   }
-
   const resetWizard = () => {
     setResponses({})
     setDynamicSteps([])
@@ -559,20 +598,26 @@ export function InstructionsWizard({ onClose, selectedFileId }: InstructionsWiza
 
     wizardSteps.forEach((step) => {
       step.questions.forEach((question) => {
-        const key = question.id
+        const responseKey = question.responseKey ?? question.id
+
+        if (!(responseKey in questionsAndAnswers)) {
+          return
+        }
+
         const answer = responses[question.id]
+        const targetKey = responseKey as keyof WizardResponses
 
         if (answer !== null && answer !== undefined) {
           if (question.allowMultiple && Array.isArray(answer)) {
             // For all other multi-selects, keep as array
-            questionsAndAnswers[key as keyof WizardResponses] = Array.isArray(answer) ? answer.join(", ") : answer
+            questionsAndAnswers[targetKey] = answer.join(", ")
           } else if (!question.allowMultiple && typeof answer === 'string') {
-            questionsAndAnswers[key as keyof WizardResponses] = Array.isArray(answer) ? answer.join(", ") : answer
+            questionsAndAnswers[targetKey] = answer
           } else {
-            questionsAndAnswers[key as keyof WizardResponses] = Array.isArray(answer) ? answer.join(", ") : answer
+            questionsAndAnswers[targetKey] = Array.isArray(answer) ? answer.join(", ") : (answer as string)
           }
         } else {
-          questionsAndAnswers[key as keyof WizardResponses] = null
+          questionsAndAnswers[targetKey] = null
         }
       })
     })
@@ -632,7 +677,7 @@ export function InstructionsWizard({ onClose, selectedFileId }: InstructionsWiza
       selectedFile
         ? {
           question: "Instructions file",
-          skipped: false,
+          hasSelection: true,
           answers: [
             selectedFile.label,
             selectedFile.filename ? `Filename: ${selectedFile.filename}` : null,
@@ -641,14 +686,14 @@ export function InstructionsWizard({ onClose, selectedFileId }: InstructionsWiza
         }
         : {
           question: "Instructions file",
-          skipped: true,
+          hasSelection: false,
           answers: [],
         },
       ...wizardSteps.flatMap((step) =>
         step.questions.map((question) => {
           const value = responses[question.id]
           const selectedAnswers = question.answers.filter((answer) => {
-            if (value === null) {
+            if (value === null || value === undefined) {
               return false
             }
 
@@ -661,7 +706,7 @@ export function InstructionsWizard({ onClose, selectedFileId }: InstructionsWiza
 
           return {
             question: question.question,
-            skipped: value === null,
+            hasSelection: selectedAnswers.length > 0,
             answers: selectedAnswers.map((answer) => answer.label),
           }
         })
@@ -684,14 +729,14 @@ export function InstructionsWizard({ onClose, selectedFileId }: InstructionsWiza
               className="rounded-2xl border border-border/70 bg-background/90 p-5"
             >
               <p className="text-sm font-medium text-muted-foreground">{entry.question}</p>
-              {entry.skipped ? (
-                <p className="mt-2 text-base font-semibold text-foreground">Skipped</p>
-              ) : (
+              {entry.hasSelection ? (
                 <ul className="mt-2 list-disc space-y-1 pl-5 text-sm text-foreground">
                   {entry.answers.map((answer) => (
                     <li key={answer}>{answer}</li>
                   ))}
                 </ul>
+              ) : (
+                <p className="mt-2 text-base font-semibold text-foreground">No selection</p>
               )}
             </div>
           ))}
@@ -722,7 +767,17 @@ export function InstructionsWizard({ onClose, selectedFileId }: InstructionsWiza
 
   const isAtFirstQuestion = currentStepIndex === 0 && currentQuestionIndex === 0
   const backDisabled = isAtFirstQuestion && !isComplete
-  const canSkipCurrentQuestion = !isComplete && currentQuestion.skippable !== false
+  const defaultButtonTitle = !canUseDefault
+    ? isComplete
+      ? "Questions complete"
+      : defaultAnswer?.disabled
+        ? "Default option unavailable"
+        : isDefaultSelected && !currentQuestion.allowMultiple
+          ? "Default already selected"
+          : defaultAnswer
+            ? undefined
+            : "No default available"
+    : undefined
   const showChangeFile = Boolean(onClose && selectedFile)
 
   const actionBar = (
@@ -738,17 +793,11 @@ export function InstructionsWizard({ onClose, selectedFileId }: InstructionsWiza
           </Button>
           <Button
             variant="ghost"
-            onClick={skipQuestion}
-            disabled={!canSkipCurrentQuestion}
-            title={
-              canSkipCurrentQuestion
-                ? undefined
-                : isComplete
-                  ? "Questions complete"
-                  : "This question must be answered"
-            }
+            onClick={() => void applyDefaultAnswer()}
+            disabled={!canUseDefault}
+            title={defaultButtonTitle}
           >
-            Skip
+            {defaultButtonLabel}
           </Button>
         </div>
         <div className="ml-auto flex flex-wrap justify-end gap-2">

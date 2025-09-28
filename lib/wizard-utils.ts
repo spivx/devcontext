@@ -25,7 +25,6 @@ export const mapAnswerSourceToWizard = (answer: DataAnswerSource): WizardAnswer 
         isDefault: answer.isDefault,
         disabled: answer.disabled,
         disabledLabel: answer.disabledLabel,
-        skippable: answer.skippable,
     }
 }
 
@@ -37,15 +36,15 @@ export const buildStepFromQuestionSet = (
     title: string,
     questions: DataQuestionSource[]
 ): WizardStep => ({
-    id,
-    title,
-    questions: questions.map((question) => ({
-        id: question.id,
-        question: question.question,
-        allowMultiple: question.allowMultiple,
-        answers: question.answers.map(mapAnswerSourceToWizard),
-        skippable: question.skippable,
-    })),
+        id,
+        title,
+        questions: questions.map((question) => ({
+            id: question.id,
+            question: question.question,
+            allowMultiple: question.allowMultiple,
+            responseKey: question.responseKey,
+            answers: question.answers.map(mapAnswerSourceToWizard),
+        })),
 })
 
 const formatLabelMap: Record<string, string> = {

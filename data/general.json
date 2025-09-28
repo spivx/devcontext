@@ -6,7 +6,8 @@
             {
                 "value": "maintainability",
                 "label": "Maintainability",
-                "example": "Prefer clarity and modularity over speed."
+                "example": "Prefer clarity and modularity over speed.",
+                "isDefault": true
             },
             {
                 "value": "speed",
@@ -34,7 +35,8 @@
                 "value": "airbnb",
                 "label": "Airbnb JavaScript Style Guide",
                 "example": "Follow https://github.com/airbnb/javascript",
-                "docs": "https://github.com/airbnb/javascript"
+                "docs": "https://github.com/airbnb/javascript",
+                "isDefault": true
             },
             {
                 "value": "standardjs",
@@ -57,7 +59,8 @@
                 "value": "camelCase",
                 "label": "camelCase",
                 "example": "const userName = 'john'",
-                "docs": "https://en.wikipedia.org/wiki/Camel_case"
+                "docs": "https://en.wikipedia.org/wiki/Camel_case",
+                "isDefault": true
             },
             {
                 "value": "snake_case",
@@ -75,7 +78,8 @@
                 "value": "kebab-case",
                 "label": "kebab-case",
                 "example": "user-profile.tsx",
-                "docs": "https://en.wikipedia.org/wiki/Letter_case#Kebab_case"
+                "docs": "https://en.wikipedia.org/wiki/Letter_case#Kebab_case",
+                "isDefault": true
             },
             {
                 "value": "camelCase",
@@ -105,7 +109,8 @@
                 "value": "PascalCase",
                 "label": "PascalCase",
                 "example": "export function LoginForm() {}",
-                "docs": "https://en.wikipedia.org/wiki/PascalCase"
+                "docs": "https://en.wikipedia.org/wiki/PascalCase",
+                "isDefault": true
             },
             {
                 "value": "camelCase",
@@ -123,7 +128,8 @@
                 "value": "named",
                 "label": "Named exports",
                 "example": "export const Button = () => {}",
-                "docs": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/export#named_exports"
+                "docs": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/export#named_exports",
+                "isDefault": true
             },
             {
                 "value": "default",
@@ -140,7 +146,8 @@
             {
                 "value": "minimal",
                 "label": "Minimal comments",
-                "example": "// Explain complex logic only"
+                "example": "// Explain complex logic only",
+                "isDefault": true
             },
             {
                 "value": "jsdoc",
@@ -168,7 +175,8 @@
                 "value": "reviewBeforeMerge",
                 "label": "Require reviews before merging",
                 "example": "At least one approval is mandatory.",
-                "docs": "https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/reviewing-changes-in-pull-requests"
+                "docs": "https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/reviewing-changes-in-pull-requests",
+                "isDefault": true
             },
             {
                 "value": "docBeforeMerge",
