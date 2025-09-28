@@ -7,7 +7,8 @@
                 "value": "env",
                 "label": "Environment variables only",
                 "example": "API keys must come from process.env",
-                "docs": "https://12factor.net/config"
+                "docs": "https://12factor.net/config",
+                "isDefault": true
             },
             {
                 "value": "vault",
@@ -25,7 +26,8 @@
                 "value": "zod",
                 "label": "Zod schema validation",
                 "example": "Use Zod for all API input validation",
-                "docs": "https://zod.dev/?id=introduction"
+                "docs": "https://zod.dev/?id=introduction",
+                "isDefault": true
             },
             {
                 "value": "yup",
@@ -43,7 +45,8 @@
                 "value": "noSecrets",
                 "label": "Never log secrets",
                 "example": "Do not log tokens or passwords",
-                "docs": "https://cheatsheetseries.owasp.org/cheatsheets/Logging_Cheat_Sheet.html"
+                "docs": "https://cheatsheetseries.owasp.org/cheatsheets/Logging_Cheat_Sheet.html",
+                "isDefault": true
             },
             {
                 "value": "structured",

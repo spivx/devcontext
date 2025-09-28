@@ -5,22 +5,20 @@
         "icon": "react",
         "enabled": true,
         "docs": "https://react.dev/learn",
-        "skippable": false
+        "isDefault": true
     },
     {
         "id": "nextjs",
         "label": "Next.js",
         "icon": "nextdotjs",
         "enabled": true,
-        "docs": "https://nextjs.org/docs",
-        "skippable": false
+        "docs": "https://nextjs.org/docs"
     },
     {
         "id": "angular",
         "label": "Angular",
         "icon": "angular",
         "enabled": true,
-        "docs": "https://angular.io/docs",
-        "skippable": false
+        "docs": "https://angular.io/docs"
     }
 ]

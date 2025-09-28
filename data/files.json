@@ -7,7 +7,7 @@
         "enabled": true,
         "icon": "markdown",
         "docs": "https://docs.github.com/en/copilot",
-        "skippable": false
+        "isDefault": true
     },
     {
         "id": "agents-md",
@@ -16,8 +16,7 @@
         "format": "markdown",
         "enabled": true,
         "icon": "markdown",
-        "docs": "https://docs.github.com/en/copilot",
-        "skippable": false
+        "docs": "https://docs.github.com/en/copilot"
     },
     {
         "id": "cursor-rules",
@@ -25,7 +24,6 @@
         "filename": ".cursor/rules",
         "format": "json",
         "enabled": true,
-        "docs": "https://docs.cursor.com/workflows/rules",
-        "skippable": false
+        "docs": "https://docs.cursor.com/workflows/rules"
     }
 ]

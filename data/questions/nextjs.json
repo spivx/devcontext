@@ -1,7 +1,8 @@
 [
     {
-        "id": "tooling",
+        "id": "nextjs-tooling",
         "question": "How do you scaffold or manage your Next.js project?",
+        "responseKey": "tooling",
         "answers": [
             {
                 "value": "create-next-app",
@@ -15,7 +16,8 @@
                 "cons": [
                     "Less flexibility for monorepo workflows"
                 ],
-                "example": "npx create-next-app@latest my-app --ts"
+                "example": "npx create-next-app@latest my-app --ts",
+                "isDefault": true
             },
             {
                 "value": "turborepo",
@@ -47,8 +49,9 @@
         "explanation": "Choose the tooling you rely on for bootstrapping and evolving the project."
     },
     {
-        "id": "fileStructure",
+        "id": "nextjs-fileStructure",
         "question": "Which routing paradigm are you using?",
+        "responseKey": "fileStructure",
         "answers": [
             {
                 "value": "app-directory",
@@ -62,7 +65,8 @@
                 "cons": [
                     "Requires new mental models for data fetching"
                 ],
-                "example": "app/dashboard/page.tsx"
+                "example": "app/dashboard/page.tsx",
+                "isDefault": true
             },
             {
                 "value": "pages-directory",
@@ -94,8 +98,9 @@
         "explanation": "Routing choice impacts data fetching patterns, layouts, and deployment expectations."
     },
     {
-        "id": "language",
+        "id": "nextjs-language",
         "question": "What language do you use?",
+        "responseKey": "language",
         "answers": [
             {
                 "value": "typescript",
@@ -109,7 +114,8 @@
                 "cons": [
                     "Slightly more boilerplate"
                 ],
-                "example": "npx create-next-app@latest my-app --ts"
+                "example": "npx create-next-app@latest my-app --ts",
+                "isDefault": true
             },
             {
                 "value": "javascript",
@@ -128,8 +134,9 @@
         "explanation": "Language choice impacts type safety, linting, and Copilot suggestions."
     },
     {
-        "id": "styling",
+        "id": "nextjs-styling",
         "question": "Which styling strategy do you rely on?",
+        "responseKey": "styling",
         "answers": [
             {
                 "value": "tailwind",
@@ -143,7 +150,8 @@
                 "cons": [
                     "Class-heavy JSX can impact readability"
                 ],
-                "example": "npx create-next-app@latest --example with-tailwindcss my-app"
+                "example": "npx create-next-app@latest --example with-tailwindcss my-app",
+                "isDefault": true
             },
             {
                 "value": "cssmodules",
@@ -176,8 +184,9 @@
         "explanation": "Styling stack influences rendering performance and component ergonomics."
     },
     {
-        "id": "stateManagement",
+        "id": "nextjs-stateManagement",
         "question": "How do you handle client-side state?",
+        "responseKey": "stateManagement",
         "answers": [
             {
                 "value": "zustand",
@@ -190,7 +199,8 @@
                 "cons": [
                     "Must wire your own middleware for persisting"
                 ],
-                "example": "npm install zustand"
+                "example": "npm install zustand",
+                "isDefault": true
             },
             {
                 "value": "redux",
@@ -224,8 +234,9 @@
         "explanation": "State tooling guides component structure and cross-page coordination."
     },
     {
-        "id": "dataFetching",
+        "id": "nextjs-dataFetching",
         "question": "What is your primary data fetching approach?",
+        "responseKey": "dataFetching",
         "answers": [
             {
                 "value": "server-components",
@@ -239,7 +250,8 @@
                 "cons": [
                     "Requires careful server/client component boundaries"
                 ],
-                "example": "export default async function Page(){ const data = await fetch(apiUrl).then(r => r.json()) }"
+                "example": "export default async function Page(){ const data = await fetch(apiUrl).then(r => r.json()) }",
+                "isDefault": true
             },
             {
                 "value": "swr",
@@ -272,8 +284,9 @@
         "explanation": "Data strategy shapes caching, hydration, and API integration patterns."
     },
     {
-        "id": "auth",
+        "id": "nextjs-auth",
         "question": "How do you handle authentication?",
+        "responseKey": "auth",
         "answers": [
             {
                 "value": "next-auth",
@@ -286,7 +299,8 @@
                 "cons": [
                     "Requires database adapter for persistence"
                 ],
-                "example": "npm install next-auth"
+                "example": "npm install next-auth",
+                "isDefault": true
             },
             {
                 "value": "clerk",
@@ -318,8 +332,9 @@
         "explanation": "Auth strategy drives session handling, middleware, and deployment needs."
     },
     {
-        "id": "validation",
+        "id": "nextjs-validation",
         "question": "What do you use for schema validation?",
+        "responseKey": "validation",
         "answers": [
             {
                 "value": "zod",
@@ -333,7 +348,8 @@
                 "cons": [
                     "Adds runtime parsing cost"
                 ],
-                "example": "const schema = z.object({ email: z.string().email() })"
+                "example": "const schema = z.object({ email: z.string().email() })",
+                "isDefault": true
             },
             {
                 "value": "yup",
@@ -364,8 +380,9 @@
         "explanation": "Validation approach affects reliability of Server Actions and API routes."
     },
     {
-        "id": "logging",
+        "id": "nextjs-logging",
         "question": "How do you capture logs and runtime signals?",
+        "responseKey": "logging",
         "answers": [
             {
                 "value": "vercel-observability",
@@ -393,7 +410,8 @@
                 "cons": [
                     "Hosted service pricing"
                 ],
-                "example": "npx @sentry/wizard@latest -i nextjs"
+                "example": "npx @sentry/wizard@latest -i nextjs",
+                "isDefault": true
             },
             {
                 "value": "custom-logging",
@@ -426,7 +444,8 @@
                 "cons": [
                     "Slower start-up time on large suites"
                 ],
-                "example": "npm install --save-dev jest @testing-library/react next/jest"
+                "example": "npm install --save-dev jest @testing-library/react next/jest",
+                "isDefault": true
             },
             {
                 "value": "vitest",
@@ -461,7 +480,8 @@
                 "cons": [
                     "Learning curve for advanced fixtures"
                 ],
-                "example": "npm install --save-dev @playwright/test"
+                "example": "npm install --save-dev @playwright/test",
+                "isDefault": true
             },
             {
                 "value": "cypress",
