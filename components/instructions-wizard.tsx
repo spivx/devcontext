@@ -292,35 +292,23 @@ export function InstructionsWizard({ onClose, selectedFileId }: InstructionsWiza
     [dynamicSteps]
   )
 
-  const currentStep = wizardSteps[currentStepIndex]
-  const currentQuestion = currentStep?.questions[currentQuestionIndex]
+  const currentStep = wizardSteps[currentStepIndex] ?? null
+  const currentQuestion = currentStep?.questions[currentQuestionIndex] ?? null
 
   const totalQuestions = useMemo(
     () => wizardSteps.reduce((count, step) => count + step.questions.length, 0),
     [wizardSteps]
   )
 
-  if (!currentStep || !currentQuestion) {
-    return null
-  }
-
-  const currentAnswerValue = responses[currentQuestion.id]
-
-  const isAnswerSelected = (value: string) => {
-    if (currentQuestion.allowMultiple) {
-      return Array.isArray(currentAnswerValue) && currentAnswerValue.includes(value)
-    }
-
-    return currentAnswerValue === value
-  }
+  const currentAnswerValue = currentQuestion ? responses[currentQuestion.id] : undefined
 
   const defaultAnswer = useMemo(
-    () => currentQuestion.answers.find((answer) => answer.isDefault),
+    () => currentQuestion?.answers.find((answer) => answer.isDefault) ?? null,
     [currentQuestion]
   )
 
   const isDefaultSelected = useMemo(() => {
-    if (!defaultAnswer) {
+    if (!currentQuestion || !defaultAnswer) {
       return false
     }
 
@@ -329,10 +317,11 @@ export function InstructionsWizard({ onClose, selectedFileId }: InstructionsWiza
     }
 
     return currentAnswerValue === defaultAnswer.value
-  }, [currentAnswerValue, currentQuestion.allowMultiple, defaultAnswer])
+  }, [currentAnswerValue, currentQuestion, defaultAnswer])
 
   const canUseDefault = Boolean(
     !isComplete &&
+      currentQuestion &&
       defaultAnswer &&
       !defaultAnswer.disabled &&
       (!isDefaultSelected || currentQuestion.allowMultiple)
@@ -341,6 +330,18 @@ export function InstructionsWizard({ onClose, selectedFileId }: InstructionsWiza
   const defaultButtonLabel = defaultAnswer
     ? `Use default (${defaultAnswer.label})`
     : "Use default"
+
+  if (!currentStep || !currentQuestion) {
+    return null
+  }
+
+  const isAnswerSelected = (value: string) => {
+    if (currentQuestion.allowMultiple) {
+      return Array.isArray(currentAnswerValue) && currentAnswerValue.includes(value)
+    }
+
+    return currentAnswerValue === value
+  }
 
   const advanceToNextQuestion = () => {
     const isLastQuestionInStep = currentQuestionIndex === currentStep.questions.length - 1

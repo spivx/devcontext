@@ -137,7 +137,7 @@ describe('template-config', () => {
             })
 
             it('should have valid template and outputFileName for all combinations', () => {
-                Object.entries(templateCombinations).forEach(([key, config]) => {
+                Object.values(templateCombinations).forEach((config) => {
                     expect(config.template).toBeTruthy()
                     expect(config.outputFileName).toBeTruthy()
                     expect(typeof config.template).toBe('string')
