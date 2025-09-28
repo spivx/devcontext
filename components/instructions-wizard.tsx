@@ -2,6 +2,7 @@
 
 import { useMemo, useState } from "react"
 import { Button } from "@/components/ui/button"
+import { Undo2 } from "lucide-react"
 import * as simpleIcons from "simple-icons"
 import type { SimpleIcon } from "simple-icons"
 
@@ -504,7 +505,7 @@ export function InstructionsWizard({ onClose, selectedFileId }: InstructionsWiza
       advanceToNextQuestion()
     }, 0)
   }
-  const resetWizard = () => {
+  const resetWizardState = () => {
     setResponses({})
     setDynamicSteps([])
     setCurrentStepIndex(0)
@@ -512,6 +513,16 @@ export function InstructionsWizard({ onClose, selectedFileId }: InstructionsWiza
     setIsComplete(false)
     setGeneratedFile(null)
     setIsGenerating(false)
+  }
+
+  const resetWizard = () => {
+    if (onClose) {
+      resetWizardState()
+      onClose()
+      return
+    }
+
+    resetWizardState()
   }
 
   const requestResetWizard = () => {
@@ -781,75 +792,70 @@ export function InstructionsWizard({ onClose, selectedFileId }: InstructionsWiza
     : undefined
   const showChangeFile = Boolean(onClose && selectedFile)
 
-  const actionBar = (
-    <section className="rounded-2xl border border-border/70 bg-background/90 p-4 shadow-sm">
-      <div className="flex flex-wrap items-center gap-3">
-        <div className="flex flex-wrap gap-2">
-          <Button
-            variant="outline"
-            onClick={goToPrevious}
-            disabled={backDisabled}
-          >
-            Back
-          </Button>
-          <Button
-            variant="ghost"
-            onClick={() => void applyDefaultAnswer()}
-            disabled={!canUseDefault}
-            title={defaultButtonTitle}
-          >
-            {defaultButtonLabel}
-          </Button>
-        </div>
-        <div className="ml-auto flex flex-wrap justify-end gap-2">
-          <Button variant="destructive" onClick={requestResetWizard}>
-            Start Over
-          </Button>
-          {showChangeFile ? (
-            <Button variant="secondary" onClick={requestChangeFile}>
-              Change File
-            </Button>
-          ) : null}
-        </div>
-      </div>
-    </section>
-  )
-
   const wizardLayout = (
     <div className="mx-auto flex w-full max-w-4xl flex-col gap-6">
+      <Button
+        variant="destructive"
+        size="sm"
+        onClick={requestResetWizard}
+        className="fixed left-4 top-4 z-40"
+      >
+        Start Over
+      </Button>
+
       {selectedFile ? (
         <section className="rounded-3xl border border-border/70 bg-secondary/20 p-5 shadow-sm">
-          <div className="flex flex-wrap items-start justify-between gap-4">
+          <div className="flex flex-wrap items-center gap-3">
             <div>
-              <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Instructions file</p>
-              <p className="mt-1 text-lg font-semibold text-foreground">{selectedFile.label}</p>
-              {selectedFile.filename ? (
-                <p className="text-sm text-muted-foreground">{selectedFile.filename}</p>
-              ) : null}
+              <p className="text-lg font-semibold text-foreground">
+                {selectedFile.filename ?? selectedFile.label}
+              </p>
             </div>
+            {showChangeFile ? (
+              <Button variant="outline" size="sm" onClick={requestChangeFile}>
+                Change File
+              </Button>
+            ) : null}
           </div>
         </section>
       ) : null}
 
-      {actionBar}
-
       {isComplete ? (
         renderCompletion()
       ) : (
-        <>
-          <header className="flex items-start justify-between gap-4">
+        <section className="rounded-3xl border border-border/80 bg-card/95 p-6 shadow-lg">
+          <div className="flex flex-col gap-4">
+            <div className="flex flex-wrap items-center gap-2">
+              <Button
+                variant="secondary"
+                className="px-5"
+                onClick={goToPrevious}
+                disabled={backDisabled}
+              >
+                <Undo2 className="h-4 w-4" />
+                Back
+              </Button>
+              <Button
+                variant="outline"
+                onClick={() => void applyDefaultAnswer()}
+                disabled={!canUseDefault}
+                title={defaultButtonTitle}
+              >
+                {defaultButtonLabel}
+              </Button>
+            </div>
+
             <h1 className="text-3xl font-semibold text-foreground">
               {currentQuestion.question}
             </h1>
-          </header>
+          </div>
 
-          <section className="rounded-3xl border border-border/80 bg-card/95 p-6 shadow-md">
-            <div className="grid gap-3 sm:grid-cols-2">
-              {currentQuestion.answers.map((answer) => {
-                const iconDescriptor = getIconDescriptor(answer.icon ?? answer.value)
-                const iconHex = iconDescriptor
-                  ? iconColorOverrides[iconDescriptor.slug] ?? iconDescriptor.hex
-                  : undefined
+          <div className="mt-6 grid gap-3 sm:grid-cols-2">
+            {currentQuestion.answers.map((answer) => {
+              const iconDescriptor = getIconDescriptor(answer.icon ?? answer.value)
+              const iconHex = iconDescriptor
+                ? iconColorOverrides[iconDescriptor.slug] ?? iconDescriptor.hex
+                : undefined
                 const iconColor = iconHex ? getAccessibleIconColor(iconHex) : undefined
                 const iconBackgroundColor = iconColor ? hexToRgba(iconColor, 0.18) : null
                 const iconRingColor = iconColor ? hexToRgba(iconColor, 0.32) : null
@@ -907,15 +913,14 @@ export function InstructionsWizard({ onClose, selectedFileId }: InstructionsWiza
                   />
                 )
               })}
-            </div>
+          </div>
 
-            <div className="mt-6 flex items-center justify-end">
-              <div className="text-xs text-muted-foreground">
-                Question {questionNumber} of {totalQuestions}
-              </div>
+          <div className="mt-6 flex items-center justify-end">
+            <div className="text-xs text-muted-foreground">
+              Question {questionNumber} of {totalQuestions}
             </div>
-          </section>
-        </>
+          </div>
+        </section>
       )}
 
       {pendingConfirmation ? (
