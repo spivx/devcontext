@@ -23,7 +23,6 @@ export function AnimatedBackground() {
         animate={{ opacity: [0.5, 0.85, 0.65], rotate: [0, 2, -1, 0] }}
         transition={{ duration: 18, repeat: Infinity, ease: "easeInOut" }}
       />
-
       <motion.div
         className="absolute top-[-20%] left-[10%] h-[46rem] w-[46rem] rounded-full bg-primary/30 blur-3xl"
         initial={{ x: "0%", y: "0%", scale: 1 }}
