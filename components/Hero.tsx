@@ -4,6 +4,7 @@ import { motion } from "framer-motion"
 import { ArrowRight } from "lucide-react"
 import Link from "next/link"
 
+import Logo from "@/components/Logo"
 import { Button } from "@/components/ui/button"
 
 const containerVariants = {
@@ -28,6 +29,11 @@ export function Hero() {
       animate="show"
     >
       <motion.div className="space-y-10" variants={itemVariants}>
+        <motion.div className="mx-auto w-full max-w-[220px]" variants={itemVariants}>
+          <div className="origin-center scale-[1.18] md:scale-[1.25]">
+            <Logo width={220} height={220} />
+          </div>
+        </motion.div>
         <motion.span
           className="inline-flex items-center gap-2 rounded-full border border-border/60 bg-background/70 px-4 py-1 text-xs font-semibold uppercase tracking-wider text-muted-foreground shadow-sm backdrop-blur"
           variants={itemVariants}

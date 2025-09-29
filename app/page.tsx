@@ -10,10 +10,7 @@ export default function LandingPage() {
     <div className="relative min-h-screen overflow-hidden bg-background text-foreground">
       <AnimatedBackground />
       <div className="relative z-10 flex min-h-screen flex-col">
-        <header className="flex items-center justify-between px-6 py-6 lg:px-12 lg:py-8">
-          <Link href="/" className="text-lg font-semibold tracking-tight text-foreground md:text-xl">
-            DevContext
-          </Link>
+        <header className="flex items-center justify-end px-6 py-6 lg:px-12 lg:py-8">
           <div className="flex items-center gap-3">
             <Button asChild variant="ghost" size="sm" className="hidden sm:inline-flex">
               <Link href="/new">Launch wizard</Link>
@@ -31,9 +28,7 @@ export default function LandingPage() {
           <Hero />
         </main>
 
-        <footer className="px-6 pb-10 text-center text-xs text-muted-foreground lg:px-12">
-          Open-source and community built — keep shipping with more context than commits.
-        </footer>
+
       </div>
     </div>
   )

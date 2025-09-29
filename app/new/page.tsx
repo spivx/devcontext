@@ -4,15 +4,14 @@ import { useMemo, useState } from "react"
 
 import { Button } from "@/components/ui/button"
 import { InstructionsWizard } from "@/components/instructions-wizard"
+import { AnimatedBackground } from "@/components/AnimatedBackground"
 import { getHomeMainClasses } from "@/lib/utils"
-import { getFormatLabel } from "@/lib/wizard-utils"
 import { ANALYTICS_EVENTS } from "@/lib/analytics-events"
 import { track } from "@/lib/mixpanel"
 import type { FileOutputConfig } from "@/types/wizard"
 import { Github } from "lucide-react"
 import Link from "next/link"
 
-import Logo from "@/components/Logo"
 import filesData from "@/data/files.json"
 
 export default function NewInstructionsPage() {
@@ -38,86 +37,81 @@ export default function NewInstructionsPage() {
   }
 
   return (
-    <div className="min-h-screen bg-background text-foreground">
-      {/* Top utility bar */}
-      <div className="absolute top-4 right-4 z-10">
-        <Link href="https://github.com/spivx/devcontext" target="_blank">
-          <Button variant="outline" size="sm">
-            <Github className="mr-2 h-4 w-4" />
-            GitHub
-          </Button>
-        </Link>
-      </div>
+    <div className="relative min-h-screen overflow-hidden bg-background text-foreground">
+      <AnimatedBackground />
+      <div className="relative z-10 flex min-h-screen flex-col">
+        {/* Top utility bar */}
+        <div
+          className={`absolute inset-x-0 top-4 flex items-center px-6 sm:px-8 lg:px-12 ${showWizard ? "justify-end" : "justify-between"}`}
+        >
+          {!showWizard ? (
+            <>
+              <Link href="/" className="text-lg font-semibold tracking-tight text-foreground md:text-xl">
+                DevContext
+              </Link>
+              <Link href="https://github.com/spivx/devcontext" target="_blank">
+                <Button variant="outline" size="sm">
+                  <Github className="mr-2 h-4 w-4" />
+                  GitHub
+                </Button>
+              </Link>
+            </>
+          ) : (
+            <Link href="https://github.com/spivx/devcontext" target="_blank">
+              <Button variant="outline" size="sm">
+                <Github className="mr-2 h-4 w-4" />
+                GitHub
+              </Button>
+            </Link>
+          )}
+        </div>
 
-      {/* Hero Section */}
-      <main className={getHomeMainClasses(showWizard)}>
-        {showWizard && selectedFileId ? (
-          <InstructionsWizard selectedFileId={selectedFileId} onClose={handleWizardClose} />
-        ) : (
-          <>
-            <div className="space-y-6">
-              {/* Logo/Title */}
-              <Logo />
+        {/* Hero Section */}
+        <main className={getHomeMainClasses(showWizard)}>
+          {showWizard && selectedFileId ? (
+            <InstructionsWizard selectedFileId={selectedFileId} onClose={handleWizardClose} />
+          ) : (
+            <>
+              <div className="space-y-6">
+                <div className="space-y-4">
+                  <h1 className="text-3xl font-bold">Start a new instructions project</h1>
+                  <p className="mx-auto max-w-2xl text-base leading-relaxed text-muted-foreground md:text-lg">
+                    Choose the file preset that matches what you need. The wizard will open with targeted questions and save progress as you go.
+                  </p>
+                  <div className="mx-auto max-w-2xl text-left text-sm text-muted-foreground/90 md:text-base">
+                    <ul className="list-disc space-y-2 pl-5">
+                      <li>Pick a preset to load framework, architecture, and workflow prompts.</li>
+                      <li>Answer or skip questions — you can revisit any step before exporting.</li>
+                      <li>Download the generated file once every section shows as complete.</li>
+                    </ul>
+                  </div>
+                </div>
 
-              {/* Headline */}
-              <h1 className="max-w-4xl text-3xl font-bold">
-                Assemble Tailored AI Coding Playbooks With a Guided Wizard
-              </h1>
-
-              {/* Subheadline */}
-              <p className="max-w-xl text-lg leading-relaxed text-muted-foreground">
-                Move from curated best practices to sharable files like Copilot instructions, Cursor rules, and agents.md playbooks in just a few guided steps.
-              </p>
-
-              <p className="max-w-xl text-sm text-muted-foreground/80">
-                Use the wizard to generate Copilot instruction files, agents files, comprehensive instruction sets, and Cursor rules without starting from a blank page.
-              </p>
-
-              {/* File type CTAs */}
-              <div className="pt-6">
-                <div className="grid gap-4 md:grid-cols-2">
-                  {fileOptions.map((file) => {
-                    const formatLabel = getFormatLabel(file.format)
-                    return (
-                      <button
-                        key={file.id}
-                        type="button"
-                        className="group relative flex w-full flex-col items-start gap-3 rounded-3xl border border-border/60 bg-card/80 p-6 text-left shadow-sm ring-offset-background transition-all hover:-translate-y-1 hover:border-primary/60 hover:shadow-xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/80"
-                        onClick={() => handleFileCtaClick(file)}
-                        aria-label={`Create ${file.label}`}
-                      >
-                        <div className="flex items-center gap-2 rounded-full bg-secondary/60 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-secondary-foreground/80">
-                          <span className="inline-flex h-2 w-2 rounded-full bg-primary/70" aria-hidden />
-                          <span>Start with</span>
-                        </div>
-                        <div>
-                          <p className="text-xl font-semibold text-foreground transition-colors group-hover:text-primary">
-                            {file.label}
-                          </p>
-                          {file.filename ? (
-                            <p className="mt-1 text-sm text-muted-foreground">
-                              {file.filename}
-                            </p>
-                          ) : null}
-                        </div>
-                        {formatLabel ? (
-                          <span className="inline-flex items-center gap-2 rounded-full bg-primary/10 px-3 py-1 text-xs font-medium text-primary">
-                            {formatLabel} format
+                {/* File type CTAs */}
+                <div className="pt-6">
+                  <div className="flex flex-wrap items-center justify-center gap-5">
+                    {fileOptions.map((file) => {
+                      return (
+                        <button
+                          key={file.id}
+                          type="button"
+                          className="group inline-flex h-32 w-32 items-center justify-center rounded-full border border-border/60 bg-gradient-to-br from-card/95 via-card/90 to-card/80 px-6 text-sm font-medium text-foreground text-center shadow-sm ring-offset-background transition-all duration-200 hover:-translate-y-0.5 hover:border-primary/30 hover:shadow-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/80"
+                          onClick={() => handleFileCtaClick(file)}
+                          aria-label={`Create ${file.label}`}
+                        >
+                          <span className="break-words text-sm font-semibold leading-tight text-foreground transition-colors duration-200 group-hover:text-primary/90">
+                            {file.filename ?? file.label}
                           </span>
-                        ) : null}
-                        <span className="pointer-events-none absolute right-6 top-6 text-primary/60 transition-transform group-hover:translate-x-1">
-                          →
-                        </span>
-                      </button>
-                    )
-                  })}
+                        </button>
+                      )
+                    })}
+                  </div>
                 </div>
               </div>
-            </div>
-          </>
-        )}
-      </main>
-
+            </>
+          )}
+        </main>
+      </div>
     </div>
   )
 }
