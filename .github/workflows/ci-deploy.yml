@@ -44,6 +44,7 @@ jobs:
           working-directory: .
           vercel-args: '--prod'
 
+      # Create deployment entry in GitHub
       - name: Create GitHub deployment
         if: always()
         id: deployment
@@ -53,21 +54,20 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
           env: production
           ref: ${{ github.sha }}
-          override: false
 
+      # Update deployment status based on job result
       - name: Update deployment status
         if: always()
         uses: bobheadxi/deployments@v1
         with:
           step: finish
           token: ${{ secrets.GITHUB_TOKEN }}
-          status: ${{ steps.vercel_deploy.outcome == 'success' && 'success' || 'failure' }}
-          env: ${{ steps.deployment.outputs.env }}
+          status: ${{ job.status }}
+          env: production
           deployment_id: ${{ steps.deployment.outputs.deployment_id }}
           env_url: https://devcontext.xyz
-          override: false
-          auto_inactive: true
 
+      # Explicitly fail workflow if Vercel deploy failed
       - name: Fail job if deployment failed
         if: ${{ steps.vercel_deploy.outcome != 'success' }}
         run: exit 1
