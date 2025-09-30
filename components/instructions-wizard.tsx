@@ -1,6 +1,6 @@
 "use client"
 
-import { useMemo, useState } from "react"
+import { useCallback, useMemo, useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Undo2 } from "lucide-react"
 
@@ -101,6 +101,9 @@ export function InstructionsWizard({ onClose, selectedFileId }: InstructionsWiza
   const [pendingConfirmation, setPendingConfirmation] = useState<WizardConfirmationIntent | null>(null)
   const [generatedFile, setGeneratedFile] = useState<GeneratedFileResult | null>(null)
   const [isGenerating, setIsGenerating] = useState(false)
+  const [isFrameworkFastTrackPromptVisible, setIsFrameworkFastTrackPromptVisible] = useState(false)
+  const [autoFilledQuestionMap, setAutoFilledQuestionMap] = useState<Record<string, boolean>>({})
+  const [autoFillNotice, setAutoFillNotice] = useState<string | null>(null)
 
   const selectedFile = useMemo(() => {
     if (selectedFileId) {
@@ -123,6 +126,11 @@ export function InstructionsWizard({ onClose, selectedFileId }: InstructionsWiza
     [dynamicSteps]
   )
 
+  const nonFrameworkSteps = useMemo(
+    () => wizardSteps.filter((step) => step.id !== FRAMEWORK_STEP_ID),
+    [wizardSteps]
+  )
+
   const currentStep = wizardSteps[currentStepIndex] ?? null
   const currentQuestion = currentStep?.questions[currentQuestionIndex] ?? null
 
@@ -131,9 +139,21 @@ export function InstructionsWizard({ onClose, selectedFileId }: InstructionsWiza
     [wizardSteps]
   )
 
+  const remainingQuestionCount = useMemo(
+    () => nonFrameworkSteps.reduce((count, step) => count + step.questions.length, 0),
+    [nonFrameworkSteps]
+  )
+
   const completionSummary = useMemo(
-    () => buildCompletionSummary(selectedFile ?? null, selectedFileFormatLabel, wizardSteps, responses),
-    [selectedFile, selectedFileFormatLabel, wizardSteps, responses]
+    () =>
+      buildCompletionSummary(
+        selectedFile ?? null,
+        selectedFileFormatLabel,
+        wizardSteps,
+        responses,
+        autoFilledQuestionMap
+      ),
+    [selectedFile, selectedFileFormatLabel, wizardSteps, responses, autoFilledQuestionMap]
   )
 
   const currentAnswerValue = currentQuestion ? responses[currentQuestion.id] : undefined
@@ -167,6 +187,37 @@ export function InstructionsWizard({ onClose, selectedFileId }: InstructionsWiza
     ? `Use default (${defaultAnswer.label})`
     : "Use default"
 
+  const showFrameworkPivot = !isComplete && isFrameworkFastTrackPromptVisible
+  const showQuestionControls = !isComplete && !isFrameworkFastTrackPromptVisible
+
+  const markQuestionsAutoFilled = useCallback((questionIds: string[]) => {
+    if (questionIds.length === 0) {
+      return
+    }
+
+    setAutoFilledQuestionMap((prev) => {
+      const next = { ...prev }
+      questionIds.forEach((id) => {
+        if (id !== FRAMEWORK_QUESTION_ID) {
+          next[id] = true
+        }
+      })
+      return next
+    })
+  }, [])
+
+  const clearAutoFilledFlag = useCallback((questionId: string) => {
+    setAutoFilledQuestionMap((prev) => {
+      if (!prev[questionId]) {
+        return prev
+      }
+
+      const next = { ...prev }
+      delete next[questionId]
+      return next
+    })
+  }, [])
+
   if (!currentStep || !currentQuestion) {
     return null
   }
@@ -198,6 +249,10 @@ export function InstructionsWizard({ onClose, selectedFileId }: InstructionsWiza
   }
 
   const goToPrevious = () => {
+    if (isFrameworkFastTrackPromptVisible) {
+      setIsFrameworkFastTrackPromptVisible(false)
+    }
+
     const isFirstQuestionInStep = currentQuestionIndex === 0
     const isFirstStep = currentStepIndex === 0
 
@@ -233,6 +288,12 @@ export function InstructionsWizard({ onClose, selectedFileId }: InstructionsWiza
         answers: question.answers.map(mapAnswerSourceToWizard),
       }))
 
+      const followUpQuestionCount =
+        mappedQuestions.length + suffixSteps.reduce((count, step) => count + step.questions.length, 0)
+
+      setAutoFilledQuestionMap({})
+      setAutoFillNotice(null)
+
       setDynamicSteps([
         {
           id: `framework-${frameworkId}`,
@@ -240,6 +301,8 @@ export function InstructionsWizard({ onClose, selectedFileId }: InstructionsWiza
           questions: mappedQuestions,
         },
       ])
+
+      setIsFrameworkFastTrackPromptVisible(followUpQuestionCount > 0)
 
       setResponses((prev) => {
         const next = { ...prev }
@@ -255,8 +318,73 @@ export function InstructionsWizard({ onClose, selectedFileId }: InstructionsWiza
     } catch (error) {
       console.error(`Unable to load questions for framework "${frameworkId}"`, error)
       setDynamicSteps([])
+      setIsFrameworkFastTrackPromptVisible(false)
     } finally {
     }
+  }
+
+  const applyDefaultsAcrossWizard = () => {
+    setGeneratedFile(null)
+    setAutoFilledQuestionMap({})
+
+    const autoFilledIds: string[] = []
+
+    setResponses((prev) => {
+      const next: Responses = { ...prev }
+
+      wizardSteps.forEach((step) => {
+        step.questions.forEach((question) => {
+          if (question.id === FRAMEWORK_QUESTION_ID) {
+            return
+          }
+
+          const defaultAnswers = question.answers.filter((answer) => answer.isDefault && !answer.disabled)
+
+          if (defaultAnswers.length === 0) {
+            return
+          }
+
+          autoFilledIds.push(question.id)
+
+          next[question.id] = question.allowMultiple
+            ? defaultAnswers.map((answer) => answer.value)
+            : defaultAnswers[0]?.value
+        })
+      })
+
+      return next
+    })
+
+    markQuestionsAutoFilled(autoFilledIds)
+
+    if (autoFilledIds.length > 0) {
+      setAutoFillNotice("We applied the recommended defaults for you. Tweak any section before generating.")
+    } else {
+      setAutoFillNotice(null)
+    }
+
+    setIsFrameworkFastTrackPromptVisible(false)
+
+    const lastStepIndex = Math.max(wizardSteps.length - 1, 0)
+    const lastStep = wizardSteps[lastStepIndex]
+    const lastQuestionIndex = lastStep ? Math.max(lastStep.questions.length - 1, 0) : 0
+
+    setCurrentStepIndex(lastStepIndex)
+    setCurrentQuestionIndex(lastQuestionIndex)
+    setIsComplete(true)
+  }
+
+  const beginStepByStepFlow = () => {
+    const firstNonFrameworkIndex = wizardSteps.findIndex((step) => step.id !== FRAMEWORK_STEP_ID)
+
+    if (firstNonFrameworkIndex !== -1) {
+      setCurrentStepIndex(firstNonFrameworkIndex)
+      setCurrentQuestionIndex(0)
+    }
+
+    setIsFrameworkFastTrackPromptVisible(false)
+    setIsComplete(false)
+    setAutoFillNotice(null)
   }
 
   const handleAnswerClick = async (answer: WizardAnswer) => {
@@ -292,6 +420,8 @@ export function InstructionsWizard({ onClose, selectedFileId }: InstructionsWiza
       [currentQuestion.id]: nextValue,
     }))
 
+    clearAutoFilledFlag(currentQuestion.id)
+
     const isFrameworkQuestion = currentQuestion.id === FRAMEWORK_QUESTION_ID
     const shouldAutoAdvance =
       !isFrameworkQuestion &&
@@ -309,6 +439,7 @@ export function InstructionsWizard({ onClose, selectedFileId }: InstructionsWiza
         await loadFrameworkQuestions(answer.value, answer.label)
       } else {
         setDynamicSteps([])
+        setIsFrameworkFastTrackPromptVisible(false)
       }
     }
   }
@@ -329,6 +460,8 @@ export function InstructionsWizard({ onClose, selectedFileId }: InstructionsWiza
       [currentQuestion.id]: nextValue,
     }))
 
+    clearAutoFilledFlag(currentQuestion.id)
+
     const isFrameworkQuestion = currentQuestion.id === FRAMEWORK_QUESTION_ID
 
     if (isFrameworkQuestion) {
@@ -348,6 +481,9 @@ export function InstructionsWizard({ onClose, selectedFileId }: InstructionsWiza
     setIsComplete(false)
     setGeneratedFile(null)
     setIsGenerating(false)
+    setIsFrameworkFastTrackPromptVisible(false)
+    setAutoFilledQuestionMap({})
+    setAutoFillNotice(null)
   }
 
   const resetWizard = () => {
@@ -456,15 +592,18 @@ export function InstructionsWizard({ onClose, selectedFileId }: InstructionsWiza
     : undefined
   const showChangeFile = Boolean(onClose && selectedFile)
 
+  const topButtonLabel = showFrameworkPivot ? "Choose a different network" : "Start Over"
+  const topButtonHandler = showFrameworkPivot ? () => goToPrevious() : () => requestResetWizard()
+
   const wizardLayout = (
     <div className="mx-auto flex w-full max-w-4xl flex-col gap-6">
       <Button
         variant="destructive"
         size="sm"
-        onClick={requestResetWizard}
+        onClick={topButtonHandler}
         className="fixed left-4 top-4 z-40"
       >
-        Start Over
+        {topButtonLabel}
       </Button>
 
       {selectedFile ? (
@@ -484,14 +623,38 @@ export function InstructionsWizard({ onClose, selectedFileId }: InstructionsWiza
         </section>
       ) : null}
 
-      {isComplete ? (
-        <WizardCompletionSummary
-          summary={completionSummary}
-          onBack={goToPrevious}
-          onGenerate={() => void generateInstructionsFile()}
-          isGenerating={isGenerating}
-        />
-      ) : (
+      {showFrameworkPivot ? (
+        <section className="rounded-3xl border border-border/80 bg-card/95 p-6 shadow-lg">
+          <div className="flex flex-col gap-6">
+            <div className="space-y-4">
+              <div className="space-y-2">
+                <h1 className="text-3xl font-semibold text-foreground">Skip the deep dive?</h1>
+                <p className="text-sm text-muted-foreground">
+                  We can auto-apply the recommended answers for the next {remainingQuestionCount}{" "}
+                  {remainingQuestionCount === 1 ? "question" : "questions"} across these sections. (You can still tweak the defaults.)
+                </p>
+              </div>
+              <div className="flex flex-wrap items-center justify-between gap-3">
+                <div className="flex flex-wrap gap-2">
+                  <Button variant="secondary" className="px-5" onClick={() => beginStepByStepFlow()}>
+                    Fill it out step-by-step
+                  </Button>
+                  <Button
+                    onClick={() => applyDefaultsAcrossWizard()}
+                    disabled={remainingQuestionCount === 0}
+                    className="px-5"
+                  >
+                    Use recommended defaults
+                  </Button>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </section>
+      ) : null}
+
+      {showQuestionControls ? (
         <section className="rounded-3xl border border-border/80 bg-card/95 p-6 shadow-lg">
           <div className="flex flex-col gap-4">
             <div className="flex flex-wrap items-center gap-2">
@@ -531,7 +694,17 @@ export function InstructionsWizard({ onClose, selectedFileId }: InstructionsWiza
             </div>
           </div>
         </section>
-      )}
+      ) : null}
+
+      {isComplete ? (
+        <WizardCompletionSummary
+          summary={completionSummary}
+          onBack={goToPrevious}
+          onGenerate={() => void generateInstructionsFile()}
+          isGenerating={isGenerating}
+          autoFillNotice={autoFillNotice}
+        />
+      ) : null}
 
       {pendingConfirmation ? (
         <WizardConfirmationDialog

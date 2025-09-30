@@ -5,6 +5,7 @@ export type CompletionSummaryEntry = {
   question: string
   hasSelection: boolean
   answers: string[]
+  isAutoFilled?: boolean
 }
 
 const buildFileSummaryEntry = (
@@ -38,7 +39,8 @@ export const buildCompletionSummary = (
   selectedFile: FileOutputConfig | null,
   selectedFileFormatLabel: string | null,
   steps: WizardStep[],
-  responses: Responses
+  responses: Responses,
+  autoFilledMap: Record<string, boolean> = {}
 ): CompletionSummaryEntry[] => {
   const summary: CompletionSummaryEntry[] = [
     buildFileSummaryEntry(selectedFile, selectedFileFormatLabel),
@@ -64,6 +66,7 @@ export const buildCompletionSummary = (
         question: question.question,
         hasSelection: selectedAnswers.length > 0,
         answers: selectedAnswers.map((answer) => answer.label),
+        isAutoFilled: Boolean(autoFilledMap[question.id]),
       })
     })
   })
