@@ -1,6 +1,6 @@
 "use client"
 
-import { useMemo, useState } from "react"
+import { Suspense, useMemo, useState } from "react"
 
 import { Button } from "@/components/ui/button"
 import { InstructionsWizard } from "@/components/instructions-wizard"
@@ -21,6 +21,14 @@ const fileQuestion = fileQuestionSet[0] ?? null
 const fileOptionsFromData = buildFileOptionsFromQuestion(fileQuestion)
 
 export default function NewInstructionsPage() {
+  return (
+    <Suspense fallback={<LoadingFallback />}>
+      <NewInstructionsPageContent />
+    </Suspense>
+  )
+}
+
+function NewInstructionsPageContent() {
   const searchParams = useSearchParams()
   const [showWizard, setShowWizard] = useState(false)
   const [selectedFileId, setSelectedFileId] = useState<string | null>(null)
@@ -122,6 +130,14 @@ export default function NewInstructionsPage() {
           )}
         </main>
       </div>
+    </div>
+  )
+}
+
+function LoadingFallback() {
+  return (
+    <div className="flex min-h-screen items-center justify-center bg-background text-sm text-muted-foreground">
+      Loading wizard…
     </div>
   )
 }

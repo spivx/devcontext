@@ -4,7 +4,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Undo2 } from "lucide-react"
 
-import type { DataQuestionSource, FileOutputConfig, InstructionsWizardProps, Responses, WizardAnswer, WizardConfirmationIntent, WizardQuestion, WizardStep } from "@/types/wizard"
+import type { DataQuestionSource, InstructionsWizardProps, Responses, WizardAnswer, WizardConfirmationIntent, WizardQuestion, WizardStep } from "@/types/wizard"
 import { buildFilterPlaceholder, useAnswerFilter } from "@/hooks/use-answer-filter"
 import stacksData from "@/data/stacks.json"
 import generalData from "@/data/general.json"
@@ -189,7 +189,7 @@ export function InstructionsWizard({ onClose, selectedFileId, initialStackId }: 
         responses,
         autoFilledQuestionMap
       ),
-    [fileSummaryQuestion, selectedFile, selectedFileFormatLabel, wizardSteps, responses, autoFilledQuestionMap]
+    [selectedFile, selectedFileFormatLabel, wizardSteps, responses, autoFilledQuestionMap]
   )
 
   const currentAnswerValue = currentQuestion ? responses[currentQuestion.id] : undefined
@@ -258,12 +258,8 @@ export function InstructionsWizard({ onClose, selectedFileId, initialStackId }: 
     setActiveEditQuestionId(null)
   }, [])
 
-  if (!currentStep || !currentQuestion) {
-    return null
-  }
-
   const isAnswerSelected = (value: string) => {
-    if (currentQuestion.allowMultiple) {
+    if (currentQuestion?.allowMultiple) {
       return Array.isArray(currentAnswerValue) && currentAnswerValue.includes(value)
     }
 
@@ -271,7 +267,9 @@ export function InstructionsWizard({ onClose, selectedFileId, initialStackId }: 
   }
 
   const advanceToNextQuestion = () => {
-    const isLastQuestionInStep = currentQuestionIndex === currentStep.questions.length - 1
+    const currentStepForAdvance = wizardSteps[currentStepIndex]
+    const isLastQuestionInStep =
+      currentStepForAdvance ? currentQuestionIndex === currentStepForAdvance.questions.length - 1 : false
     const isLastStep = currentStepIndex === wizardSteps.length - 1
 
     if (isLastQuestionInStep && isLastStep) {
@@ -389,6 +387,10 @@ export function InstructionsWizard({ onClose, selectedFileId, initialStackId }: 
 
     void loadStackQuestions(stackAnswer.value, stackAnswer.label)
   }, [initialStackId, loadStackQuestions])
+
+  if (!currentStep || !currentQuestion) {
+    return null
+  }
 
   const applyDefaultsAcrossWizard = () => {
     setGeneratedFile(null)
@@ -807,7 +809,7 @@ export function InstructionsWizard({ onClose, selectedFileId, initialStackId }: 
 
           {showNoFilterMatches ? (
             <p className="mt-6 rounded-xl border border-border/70 bg-muted/30 px-4 py-6 text-sm text-muted-foreground">
-              No options match "{answerFilterQuery}". Try a different search.
+              No options match &ldquo;{answerFilterQuery}&rdquo;. Try a different search.
             </p>
           ) : (
             <WizardAnswerGrid
