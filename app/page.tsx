@@ -13,6 +13,9 @@ export default function LandingPage() {
         <header className="flex items-center justify-end px-6 py-6 lg:px-12 lg:py-8">
           <div className="flex items-center gap-3">
             <Button asChild variant="ghost" size="sm" className="hidden sm:inline-flex">
+              <Link href="/stacks">Browse stacks</Link>
+            </Button>
+            <Button asChild variant="ghost" size="sm" className="hidden sm:inline-flex">
               <Link href="/new">Launch wizard</Link>
             </Button>
             <Button asChild variant="outline" size="sm">

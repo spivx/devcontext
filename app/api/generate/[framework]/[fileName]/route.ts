@@ -4,6 +4,7 @@ import path from 'path'
 
 import type { WizardResponses } from '@/types/wizard'
 import { getTemplateConfig, type TemplateKey } from '@/lib/template-config'
+import { getStackGuidance } from '@/lib/stack-guidance'
 
 function mapOutputFileToTemplateType(outputFile: string): string {
     const mapping: Record<string, string> = {
@@ -111,7 +112,22 @@ export async function POST(
         replaceVariable('logging')
         replaceVariable('commitStyle')
         replaceVariable('prRules')
+        const replaceStaticPlaceholder = (placeholderKey: string, value: string) => {
+            const placeholder = `{{${placeholderKey}}}`
+
+            if (!generatedContent.includes(placeholder)) {
+                return
+            }
+
+            const replacement = isJsonTemplate ? escapeForJson(value) : value
+            generatedContent = generatedContent.replace(placeholder, replacement)
+        }
+
         replaceVariable('outputFile')
+
+        const stackGuidanceSlug = responses.stackSelection || frameworkFromPath
+        const stackGuidance = getStackGuidance(stackGuidanceSlug)
+        replaceStaticPlaceholder('stackGuidance', stackGuidance)
 
         return NextResponse.json({
             content: generatedContent,

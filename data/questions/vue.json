@@ -1,0 +1,224 @@
+[
+    {
+        "id": "vue-tooling",
+        "question": "Which build tooling do you use for Vue?",
+        "responseKey": "tooling",
+        "answers": [
+            {
+                "value": "vite",
+                "label": "Vite",
+                "icon": "/icons/vite.svg",
+                "docs": "https://vitejs.dev/guide/",
+                "pros": [
+                    "Instant HMR",
+                    "Stable defaults"
+                ],
+                "cons": [
+                    "Requires plugin for legacy browsers"
+                ],
+                "example": "npm create vite@latest my-app -- --template vue",
+                "isDefault": true
+            },
+            {
+                "value": "create-vue",
+                "label": "Create Vue",
+                "icon": "vuedotjs",
+                "docs": "https://cli.vuejs.org/guide/",
+                "pros": [
+                    "Official scaffolder",
+                    "Vue CLI UI"
+                ],
+                "cons": [
+                    "Heavier config"
+                ],
+                "example": "npm init vue@latest"
+            },
+            {
+                "value": "quasar",
+                "label": "Quasar CLI",
+                "docs": "https://quasar.dev/start/installation",
+                "pros": [
+                    "Prebuilt components",
+                    "Cross-platform"
+                ],
+                "cons": [
+                    "Opinionated structure"
+                ],
+                "example": "npm init quasar"
+            }
+        ],
+        "explanation": "Choose the bundler or CLI that created your Vue project."
+    },
+    {
+        "id": "vue-language",
+        "question": "Do you author Vue with TypeScript or JavaScript?",
+        "responseKey": "language",
+        "answers": [
+            {
+                "value": "typescript",
+                "label": "TypeScript",
+                "icon": "/icons/typescript.svg",
+                "docs": "https://vuejs.org/guide/typescript/overview.html",
+                "pros": [
+                    "Stronger tooling",
+                    "Better editor DX"
+                ],
+                "cons": [
+                    "Requires type annotations"
+                ],
+                "example": "<script lang=\"ts\" setup>\nconst count = ref<number>(0)\n</script>",
+                "isDefault": true
+            },
+            {
+                "value": "javascript",
+                "label": "JavaScript",
+                "icon": "/icons/javascript.svg",
+                "docs": "https://developer.mozilla.org/en-US/docs/Web/JavaScript",
+                "pros": [
+                    "Lower barrier",
+                    "Less setup"
+                ],
+                "cons": [
+                    "No static checks"
+                ],
+                "example": "<script setup>\nimport { ref } from 'vue'\nconst count = ref(0)\n</script>"
+            }
+        ],
+        "explanation": "Language choice affects linting rules and code completion hints."
+    },
+    {
+        "id": "vue-components",
+        "question": "How do you organize Vue components?",
+        "responseKey": "fileStructure",
+        "answers": [
+            {
+                "value": "feature-folders",
+                "label": "Feature folders",
+                "icon": "/icons/folder-tree.svg",
+                "pros": [
+                    "Domain boundaries",
+                    "Scales with teams"
+                ],
+                "cons": [
+                    "Requires discipline"
+                ],
+                "example": "src/features/auth/components/LoginForm.vue",
+                "isDefault": true
+            },
+            {
+                "value": "flat",
+                "label": "Flat components",
+                "icon": "/icons/layout.svg",
+                "pros": [
+                    "Simple",
+                    "Easy to scan"
+                ],
+                "cons": [
+                    "Becomes cluttered"
+                ],
+                "example": "src/components/Button.vue"
+            },
+            {
+                "value": "single-file-modules",
+                "label": "SFC modules with index",
+                "icon": "/icons/layout.svg",
+                "pros": [
+                    "Encapsulates logic",
+                    "Enables barrel exports"
+                ],
+                "cons": [
+                    "Extra files"
+                ],
+                "example": "src/components/Button/index.ts"
+            }
+        ],
+        "explanation": "Component structure informs import paths and refactors."
+    },
+    {
+        "id": "vue-state",
+        "question": "How do you manage global state?",
+        "responseKey": "stateManagement",
+        "answers": [
+            {
+                "value": "pinia",
+                "label": "Pinia",
+                "docs": "https://pinia.vuejs.org/introduction.html",
+                "pros": [
+                    "Officially recommended",
+                    "Type-first APIs"
+                ],
+                "cons": [
+                    "Requires plugin setup"
+                ],
+                "example": "const store = defineStore('cart', {...})",
+                "isDefault": true
+            },
+            {
+                "value": "vuex",
+                "label": "Vuex",
+                "docs": "https://vuex.vuejs.org/",
+                "pros": [
+                    "Mature tooling",
+                    "Time-travel devtools"
+                ],
+                "cons": [
+                    "Verbosity",
+                    "Mutations boilerplate"
+                ],
+                "example": "store.commit('cart/addItem', payload)"
+            },
+            {
+                "value": "composition-api",
+                "label": "Composition API",
+                "icon": "vuedotjs",
+                "docs": "https://vuejs.org/guide/extras/composition-api-faq.html",
+                "pros": [
+                    "No external dependency",
+                    "Tree-shakeable"
+                ],
+                "cons": [
+                    "Manual patterns"
+                ],
+                "example": "const count = useCounterStore()"
+            }
+        ],
+        "explanation": "State strategy affects reactivity helpers and file imports."
+    },
+    {
+        "id": "vue-testing",
+        "question": "Which Vue testing toolkit do you prefer?",
+        "responseKey": "testingUT",
+        "answers": [
+            {
+                "value": "vitest",
+                "label": "Vitest + Vue Testing Library",
+                "icon": "/icons/vitest.svg",
+                "docs": "https://vitest.dev/guide/",
+                "pros": [
+                    "Fast runs",
+                    "Great DX"
+                ],
+                "cons": [
+                    "Newer ecosystem"
+                ],
+                "example": "import { render } from '@testing-library/vue'",
+                "isDefault": true
+            },
+            {
+                "value": "jest",
+                "label": "Jest + Vue Test Utils",
+                "icon": "/icons/jest.svg",
+                "docs": "https://test-utils.vuejs.org/",
+                "pros": [
+                    "Battle tested",
+                    "Wide plugin support"
+                ],
+                "cons": [
+                    "Slower cold start"
+                ],
+                "example": "const wrapper = shallowMount(MyComponent)"
+            }
+        ],
+        "explanation": "Testing stack drives available helpers and globals."
+    }
+]

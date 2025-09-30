@@ -30,6 +30,36 @@ export const templateCombinations: Record<string, TemplateConfig> = {
         template: 'copilot-instructions-template.md',
         outputFileName: 'copilot-instructions.md',
     },
+    // Copilot Instructions + Vue (specific combination)
+    'copilot-instructions-vue': {
+        template: 'copilot-instructions-template.md',
+        outputFileName: 'copilot-instructions.md',
+    },
+    // Copilot Instructions + Nuxt (specific combination)
+    'copilot-instructions-nuxt': {
+        template: 'copilot-instructions-template.md',
+        outputFileName: 'copilot-instructions.md',
+    },
+    // Copilot Instructions + Svelte (specific combination)
+    'copilot-instructions-svelte': {
+        template: 'copilot-instructions-template.md',
+        outputFileName: 'copilot-instructions.md',
+    },
+    // Copilot Instructions + Astro (specific combination)
+    'copilot-instructions-astro': {
+        template: 'copilot-instructions-template.md',
+        outputFileName: 'copilot-instructions.md',
+    },
+    // Copilot Instructions + Remix (specific combination)
+    'copilot-instructions-remix': {
+        template: 'copilot-instructions-template.md',
+        outputFileName: 'copilot-instructions.md',
+    },
+    // Copilot Instructions + Python (specific combination)
+    'copilot-instructions-python': {
+        template: 'copilot-instructions-template.md',
+        outputFileName: 'copilot-instructions.md',
+    },
     // Agents guide (general)
     agents: {
         template: 'agents-template.md',
@@ -47,6 +77,31 @@ export const templateCombinations: Record<string, TemplateConfig> = {
     },
     // Agents guide + Angular (specific combination)
     'agents-angular': {
+        template: 'agents-template.md',
+        outputFileName: 'agents.md',
+    },
+    // Agents guide + Vue (specific combination)
+    'agents-vue': {
+        template: 'agents-template.md',
+        outputFileName: 'agents.md',
+    },
+    // Agents guide + Nuxt (specific combination)
+    'agents-nuxt': {
+        template: 'agents-template.md',
+        outputFileName: 'agents.md',
+    },
+    // Agents guide + Svelte (specific combination)
+    'agents-svelte': {
+        template: 'agents-template.md',
+        outputFileName: 'agents.md',
+    },
+    // Agents guide + Astro (specific combination)
+    'agents-astro': {
+        template: 'agents-template.md',
+        outputFileName: 'agents.md',
+    },
+    // Agents guide + Remix (specific combination)
+    'agents-remix': {
         template: 'agents-template.md',
         outputFileName: 'agents.md',
     },

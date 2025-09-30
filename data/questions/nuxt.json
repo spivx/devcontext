@@ -1,0 +1,137 @@
+[
+    {
+        "id": "nuxt-rendering",
+        "question": "Which rendering mode do you rely on?",
+        "responseKey": "dataFetching",
+        "answers": [
+            {
+                "value": "server-side",
+                "label": "Server-rendered (SSR)",
+                "docs": "https://nuxt.com/docs/guide/concepts/rendering#server-side-rendering",
+                "pros": ["Great for SEO", "Dynamic data per request"],
+                "cons": ["Higher server cost"],
+                "example": "export default defineNuxtConfig({ ssr: true })",
+                "isDefault": true
+            },
+            {
+                "value": "static",
+                "label": "Static site generation (SSG)",
+                "docs": "https://nuxt.com/docs/guide/concepts/rendering#static-site-generation",
+                "pros": ["Fast edge delivery", "Easy CDN caching"],
+                "cons": ["Requires rebuild to refresh data"],
+                "example": "nuxi generate"
+            },
+            {
+                "value": "hybrid",
+                "label": "Hybrid (ISR / SWR)",
+                "docs": "https://nuxt.com/docs/guide/concepts/rendering#hybrid-rendering",
+                "pros": ["Cache control", "Partial regeneration"],
+                "cons": ["More edge configuration"],
+                "example": "export default defineCachedEventHandler(handler, { swr: true })"
+            }
+        ],
+        "explanation": "Rendering mode determines deployment targets and caching patterns."
+    },
+    {
+        "id": "nuxt-data",
+        "question": "How do you fetch data inside pages?",
+        "responseKey": "apiLayer",
+        "answers": [
+            {
+                "value": "use-fetch",
+                "label": "useFetch / $fetch",
+                "docs": "https://nuxt.com/docs/getting-started/data-fetching",
+                "pros": ["Simple", "SSR-aware"],
+                "cons": ["Limited customization"],
+                "example": "const { data } = await useFetch('/api/products')",
+                "isDefault": true
+            },
+            {
+                "value": "nitro-server",
+                "label": "Nuxt server routes",
+                "docs": "https://nuxt.com/docs/guide/going-further/server",
+                "pros": ["Single language", "Great for BFF"],
+                "cons": ["Requires runtime deployment"],
+                "example": "export default defineEventHandler(event => { ... })"
+            },
+            {
+                "value": "external-client",
+                "label": "External REST/GraphQL client",
+                "docs": "https://nuxt.com/docs/guide/going-further/runtime-config",
+                "pros": ["Reuse existing SDKs"],
+                "cons": ["Client secrets management"],
+                "example": "const client = new GraphQLClient(endpoint)"
+            }
+        ],
+        "explanation": "Fetching strategy affects runtime config and environment variables."
+    },
+    {
+        "id": "nuxt-styling",
+        "question": "How do you approach styling?",
+        "responseKey": "styling",
+        "answers": [
+            {
+                "value": "tailwind",
+                "label": "Tailwind CSS",
+                "icon": "/icons/tailwindcss.svg",
+                "docs": "https://nuxt.com/modules/tailwindcss",
+                "pros": ["Official module", "Fast iteration"],
+                "cons": ["Utility-first learning curve"],
+                "example": "npm install -D @nuxtjs/tailwindcss",
+                "isDefault": true
+            },
+            {
+                "value": "uno",
+                "label": "UnoCSS",
+                "docs": "https://github.com/antfu/unocss",
+                "pros": ["On-demand utilities", "Preset flex"],
+                "cons": ["Less docs"],
+                "example": "npm install -D @unocss/nuxt"
+            },
+            {
+                "value": "scoped-css",
+                "label": "Scoped CSS in SFCs",
+                "docs": "https://vue-loader.vuejs.org/guide/scoped-css.html",
+                "pros": ["Zero deps", "Native to Vue"],
+                "cons": ["No shared design tokens"],
+                "example": "<style scoped>...</style>"
+            }
+        ],
+        "explanation": "Styling choice influences runtime head bleed and bundle size."
+    },
+    {
+        "id": "nuxt-deployment",
+        "question": "Where do you deploy Nuxt?",
+        "responseKey": "folders",
+        "answers": [
+            {
+                "value": "vercel",
+                "label": "Vercel",
+                "icon": "vercel",
+                "docs": "https://nuxt.com/docs/getting-started/deployment#vercel",
+                "pros": ["Zero-config", "Edge rendering"],
+                "cons": ["Cold start quotas"],
+                "example": "vercel --prod",
+                "isDefault": true
+            },
+            {
+                "value": "netlify",
+                "label": "Netlify",
+                "icon": "netlify",
+                "docs": "https://nuxt.com/docs/getting-started/deployment#netlify",
+                "pros": ["Functions included", "Atomic deploys"],
+                "cons": ["ISR configuration"],
+                "example": "netlify deploy --build"
+            },
+            {
+                "value": "custom-node",
+                "label": "Custom Node or Docker",
+                "docs": "https://nuxt.com/docs/getting-started/deployment#node-server",
+                "pros": ["Full control", "Reuse company infra"],
+                "cons": ["Requires provisioning"],
+                "example": "node .output/server/index.mjs"
+            }
+        ],
+        "explanation": "Deployment target signals adapter, environment variables, and caching policies."
+    }
+]

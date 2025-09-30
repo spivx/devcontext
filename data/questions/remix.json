@@ -1,0 +1,130 @@
+[
+    {
+        "id": "remix-deployment",
+        "question": "Which Remix runtime do you target?",
+        "responseKey": "folders",
+        "answers": [
+            {
+                "value": "vercel",
+                "label": "Vercel",
+                "icon": "vercel",
+                "docs": "https://remix.run/docs/en/main/guides/deployment/vercel",
+                "pros": ["Edge runtime", "Zero config"],
+                "cons": ["Streaming nuances"],
+                "example": "npx create-remix@latest --template remix-run/remix/templates/vercel",
+                "isDefault": true
+            },
+            {
+                "value": "flyio",
+                "label": "Fly.io",
+                "docs": "https://remix.run/docs/en/main/guides/deployment/fly",
+                "pros": ["Regional DB close to app"],
+                "cons": ["More ops"],
+                "example": "fly deploy"
+            },
+            {
+                "value": "express",
+                "label": "Custom Node/Express",
+                "docs": "https://remix.run/docs/en/main/guides/deployment/node",
+                "pros": ["Full control"],
+                "cons": ["Manage your own infra"],
+                "example": "import { createRequestHandler } from '@remix-run/express'"
+            }
+        ],
+        "explanation": "Runtime influences adapter config and streaming support."
+    },
+    {
+        "id": "remix-data",
+        "question": "How do you load data in routes?",
+        "responseKey": "dataFetching",
+        "answers": [
+            {
+                "value": "route-loaders",
+                "label": "Route loaders + actions",
+                "docs": "https://remix.run/docs/en/main/file-conventions/route-files-v2",
+                "pros": ["Parallel loading", "Form handling"],
+                "cons": ["Requires server runtime"],
+                "example": "export async function loader({ params }) { ... }",
+                "isDefault": true
+            },
+            {
+                "value": "resource-routes",
+                "label": "Resource routes",
+                "docs": "https://remix.run/docs/en/main/file-conventions/resource-routes",
+                "pros": ["Shareable endpoints"],
+                "cons": ["More files"]
+            },
+            {
+                "value": "client-fetch",
+                "label": "Client-side fetch",
+                "docs": "https://remix.run/docs/en/main/guides/client-data",
+                "pros": ["Works on static hosts"],
+                "cons": ["Delayed data", "Harder SEO"],
+                "example": "useEffect(() => fetch('/api/data'))"
+            }
+        ],
+        "explanation": "Data loaders determine cache headers and request shape."
+    },
+    {
+        "id": "remix-styling",
+        "question": "How do you style Remix routes?",
+        "responseKey": "styling",
+        "answers": [
+            {
+                "value": "tailwind",
+                "label": "Tailwind CSS",
+                "icon": "/icons/tailwindcss.svg",
+                "docs": "https://remix.run/docs/en/main/styling/tailwind",
+                "pros": ["Just-in-time classes"],
+                "cons": ["Requires plugin setup"],
+                "example": "export const links = () => [{ rel: 'stylesheet', href: styles }]",
+                "isDefault": true
+            },
+            {
+                "value": "css-modules",
+                "label": "CSS Modules",
+                "icon": "/icons/css3.svg",
+                "docs": "https://remix.run/docs/en/main/styling/css-modules",
+                "pros": ["Scoped styles"],
+                "cons": ["Compilation step"],
+                "example": "import styles from './route.module.css'"
+            },
+            {
+                "value": "styled-components",
+                "label": "Styled Components",
+                "docs": "https://remix.run/docs/en/main/styling/styled-components",
+                "pros": ["Dynamic theming"],
+                "cons": ["Runtime overhead"],
+                "example": "const Button = styled.button`...`"
+            }
+        ],
+        "explanation": "Styling impacts how you emit <link> tags and manage critical CSS."
+    },
+    {
+        "id": "remix-testing",
+        "question": "What testing setup do you rely on?",
+        "responseKey": "testingUT",
+        "answers": [
+            {
+                "value": "vitest",
+                "label": "Vitest + Testing Library",
+                "icon": "/icons/vitest.svg",
+                "docs": "https://testing-library.com/docs/remix-testing-library/intro/",
+                "pros": ["Lightweight", "Remix-aware"],
+                "cons": ["Needs polyfills"],
+                "example": "import { createRemixStub } from '@remix-run/testing'",
+                "isDefault": true
+            },
+            {
+                "value": "jest",
+                "label": "Jest",
+                "icon": "/icons/jest.svg",
+                "docs": "https://remix.run/docs/en/main/guides/testing",
+                "pros": ["Mature mocks"],
+                "cons": ["Slower cold start"],
+                "example": "jest.mock('@remix-run/react')"
+            }
+        ],
+        "explanation": "Testing toolkit influences route mocks and fixture structure."
+    }
+]

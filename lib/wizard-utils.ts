@@ -50,6 +50,7 @@ export const buildStepFromQuestionSet = (
             allowMultiple: question.allowMultiple,
             responseKey: question.responseKey,
             isReadOnlyOnSummary: question.isReadOnlyOnSummary,
+            enableFilter: question.enableFilter,
             answers: question.answers.map(mapAnswerSourceToWizard),
         })),
 })

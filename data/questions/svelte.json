@@ -1,0 +1,158 @@
+[
+    {
+        "id": "svelte-tooling",
+        "question": "Which Svelte tooling do you use?",
+        "responseKey": "tooling",
+        "answers": [
+            {
+                "value": "sveltekit",
+                "label": "SvelteKit",
+                "icon": "svelte",
+                "docs": "https://kit.svelte.dev/docs/introduction",
+                "pros": ["Full-stack routing", "Adapters"],
+                "cons": ["Requires adapter config"],
+                "example": "npm create svelte@latest my-app",
+                "isDefault": true
+            },
+            {
+                "value": "vite",
+                "label": "Vite + Svelte plugin",
+                "icon": "/icons/vite.svg",
+                "docs": "https://github.com/sveltejs/vite-plugin-svelte",
+                "pros": ["Fast HMR", "Barebones"],
+                "cons": ["Handle routing yourself"],
+                "example": "npm create vite@latest my-app -- --template svelte"
+            },
+            {
+                "value": "elderjs",
+                "label": "Elder.js",
+                "docs": "https://elderguide.com/tech/elderjs/",
+                "pros": ["Content-first", "SEO oriented"],
+                "cons": ["Small community"],
+                "example": "npx create-elder-app my-app"
+            }
+        ],
+        "explanation": "Tooling choice affects routing, adapters, and default file layout."
+    },
+    {
+        "id": "svelte-language",
+        "question": "Which language mode do you prefer?",
+        "responseKey": "language",
+        "answers": [
+            {
+                "value": "typescript",
+                "label": "TypeScript",
+                "icon": "/icons/typescript.svg",
+                "docs": "https://kit.svelte.dev/docs/typescript",
+                "pros": ["Generics in stores", "Autocomplete"],
+                "cons": ["Requires ambient types"],
+                "example": "<script lang=\"ts\">\nlet count: number = 0\n</script>",
+                "isDefault": true
+            },
+            {
+                "value": "javascript",
+                "label": "JavaScript",
+                "icon": "/icons/javascript.svg",
+                "docs": "https://developer.mozilla.org/en-US/docs/Web/JavaScript",
+                "pros": ["Less boilerplate"],
+                "cons": ["No type metadata"],
+                "example": "<script>\nlet count = 0\n</script>"
+            }
+        ],
+        "explanation": "Language selection informs linting and generated types."
+    },
+    {
+        "id": "svelte-state",
+        "question": "How do you manage cross-component state?",
+        "responseKey": "stateManagement",
+        "answers": [
+            {
+                "value": "svelte-stores",
+                "label": "Writable stores",
+                "docs": "https://svelte.dev/docs/svelte-store",
+                "pros": ["No dependencies", "Reactive"],
+                "cons": ["Manual structure"],
+                "example": "export const cart = writable([])",
+                "isDefault": true
+            },
+            {
+                "value": "zustand",
+                "label": "Zustand",
+                "docs": "https://docs.pmnd.rs/zustand/getting-started/introduction",
+                "pros": ["Tiny API", "Immer support"],
+                "cons": ["Requires adapter"],
+                "example": "const useStore = create(set => ({ count: 0 }))"
+            },
+            {
+                "value": "redux-toolkit",
+                "label": "Redux Toolkit",
+                "docs": "https://redux-toolkit.js.org/",
+                "pros": ["Predictable", "Middleware"],
+                "cons": ["Verbose"],
+                "example": "configureStore({ reducer })"
+            }
+        ],
+        "explanation": "State pick influences helper imports and best practices."
+    },
+    {
+        "id": "svelte-styling",
+        "question": "How do you style Svelte components?",
+        "responseKey": "styling",
+        "answers": [
+            {
+                "value": "scoped-css",
+                "label": "Scoped <style> blocks",
+                "docs": "https://svelte.dev/docs/svelte-components#style",
+                "pros": ["Automatic scoping"],
+                "cons": ["No shared tokens"],
+                "example": "<style>button { color: var(--accent); }</style>",
+                "isDefault": true
+            },
+            {
+                "value": "tailwind",
+                "label": "Tailwind CSS",
+                "icon": "/icons/tailwindcss.svg",
+                "docs": "https://tailwindcss.com/docs/guides/sveltekit",
+                "pros": ["Utility-first", "Design tokens"],
+                "cons": ["Class soup"],
+                "example": "<button class='bg-primary text-white px-3 py-2 rounded-md'>Buy</button>"
+            },
+            {
+                "value": "vanilla-extract",
+                "label": "Vanilla Extract",
+                "docs": "https://vanilla-extract.style/documentation/getting-started/sveltekit",
+                "pros": ["Type-safe", "Static CSS"],
+                "cons": ["Build step"],
+                "example": "export const button = style({ background: vars.color.primary })"
+            }
+        ],
+        "explanation": "Styling approach impacts bundler config and component ergonomics."
+    },
+    {
+        "id": "svelte-testing",
+        "question": "What do you use for testing?",
+        "responseKey": "testingUT",
+        "answers": [
+            {
+                "value": "vitest",
+                "label": "Vitest + Testing Library",
+                "icon": "/icons/vitest.svg",
+                "docs": "https://testing-library.com/docs/svelte-testing-library/intro/",
+                "pros": ["Fast", "Svelte-focused"],
+                "cons": ["Needs environment setup"],
+                "example": "import { render } from '@testing-library/svelte'",
+                "isDefault": true
+            },
+            {
+                "value": "playwright",
+                "label": "Playwright",
+                "icon": "/icons/playwright.svg",
+                "docs": "https://playwright.dev/docs/test-intro",
+                "pros": ["Full browser", "Trace viewer"],
+                "cons": ["Slower"],
+                "example": "test('homepage loads', async ({ page }) => {...})"
+            }
+        ],
+        "explanation": "Testing setup defines scripts, globals, and CI expectations."
+    }
+]

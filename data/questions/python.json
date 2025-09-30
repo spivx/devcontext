@@ -1,0 +1,170 @@
+[
+    {
+        "id": "python-framework",
+        "question": "Which primary Python framework are you using?",
+        "responseKey": "apiLayer",
+        "answers": [
+            {
+                "value": "fastapi",
+                "label": "FastAPI",
+                "icon": "fastapi",
+                "docs": "https://fastapi.tiangolo.com/",
+                "pros": ["Async-first", "Great docs"],
+                "cons": ["Requires uvicorn"],
+                "example": "app = FastAPI()",
+                "isDefault": true
+            },
+            {
+                "value": "django",
+                "label": "Django",
+                "icon": "django",
+                "docs": "https://docs.djangoproject.com/en/stable/",
+                "pros": ["Batteries included", "Admin UI"],
+                "cons": ["Heavier"],
+                "example": "django-admin startproject mysite"
+            },
+            {
+                "value": "flask",
+                "label": "Flask",
+                "icon": "flask",
+                "docs": "https://flask.palletsprojects.com/",
+                "pros": ["Lightweight", "Flexible"],
+                "cons": ["Manual decisions"],
+                "example": "app = Flask(__name__)"
+            }
+        ],
+        "explanation": "Framework choice informs project structure, CLI commands, and deployment guidance."
+    },
+    {
+        "id": "python-language",
+        "question": "How strict are your Python type hints?",
+        "responseKey": "language",
+        "answers": [
+            {
+                "value": "typing-required",
+                "label": "PEP 484 everywhere",
+                "docs": "https://peps.python.org/pep-0484/",
+                "pros": ["Strong tooling", "Great for large teams"],
+                "cons": ["Upfront effort"],
+                "example": "def create_user(payload: UserIn) -> UserOut:",
+                "isDefault": true
+            },
+            {
+                "value": "typing-gradual",
+                "label": "Gradual typing",
+                "docs": "https://typing.readthedocs.io/en/latest/",
+                "pros": ["Balance speed and safety"],
+                "cons": ["Mixed consistency"],
+                "example": "name: str | None = None"
+            },
+            {
+                "value": "dynamic",
+                "label": "Dynamic (no hints)",
+                "docs": "https://docs.python.org/3/tutorial/controlflow.html#defining-functions",
+                "pros": ["Fast iteration"],
+                "cons": ["Harder refactors"],
+                "example": "def create_user(payload): ..."
+            }
+        ],
+        "explanation": "Typing policy guides lint rules, CI checks, and editor setup."
+    },
+    {
+        "id": "python-packages",
+        "question": "Which package manager do you standardize on?",
+        "responseKey": "tooling",
+        "answers": [
+            {
+                "value": "poetry",
+                "label": "Poetry",
+                "docs": "https://python-poetry.org/docs/",
+                "pros": ["Lockfile", "Project metadata"],
+                "cons": ["Learns new CLI"],
+                "example": "poetry add fastapi",
+                "isDefault": true
+            },
+            {
+                "value": "pip-tools",
+                "label": "pip + pip-tools",
+                "docs": "https://pip-tools.readthedocs.io/en/latest/",
+                "pros": ["Deterministic builds"],
+                "cons": ["Split requirements files"],
+                "example": "pip-compile --generate-hashes"
+            },
+            {
+                "value": "uv",
+                "label": "uv (Astral)",
+                "docs": "https://docs.astral.sh/uv/",
+                "pros": ["Very fast", "Works with pyproject"],
+                "cons": ["Newer tool"],
+                "example": "uv pip install fastapi"
+            }
+        ],
+        "explanation": "Package tooling defines scripts, lockfiles, and reproducibility guidance."
+    },
+    {
+        "id": "python-testing",
+        "question": "Which testing approach do you use?",
+        "responseKey": "testingUT",
+        "answers": [
+            {
+                "value": "pytest",
+                "label": "pytest",
+                "docs": "https://docs.pytest.org/en/stable/",
+                "pros": ["Fixtures", "Plugins"],
+                "cons": ["Magic can hide errors"],
+                "example": "pytest tests/api --maxfail=1",
+                "isDefault": true
+            },
+            {
+                "value": "unittest",
+                "label": "unittest",
+                "docs": "https://docs.python.org/3/library/unittest.html",
+                "pros": ["Standard library"],
+                "cons": ["Verbose"],
+                "example": "python -m unittest"
+            },
+            {
+                "value": "behave",
+                "label": "Behave",
+                "docs": "https://behave.readthedocs.io/en/stable/",
+                "pros": ["BDD scenarios"],
+                "cons": ["More overhead"],
+                "example": "behave features/"
+            }
+        ],
+        "explanation": "Testing strategy controls fixtures, assertions, and coverage expectations."
+    },
+    {
+        "id": "python-formatting",
+        "question": "How do you enforce formatting and linting?",
+        "responseKey": "codeStyle",
+        "answers": [
+            {
+                "value": "ruff",
+                "label": "Ruff",
+                "docs": "https://docs.astral.sh/ruff/",
+                "pros": ["All-in-one lint+format", "Fast"],
+                "cons": ["Newer tool"],
+                "example": "ruff check .",
+                "isDefault": true
+            },
+            {
+                "value": "black-isort-flake8",
+                "label": "Black + isort + Flake8",
+                "docs": "https://black.readthedocs.io/en/stable/",
+                "pros": ["Battle tested"],
+                "cons": ["Multiple configs"],
+                "example": "black . && isort . && flake8"
+            },
+            {
+                "value": "none",
+                "label": "Ad-hoc per project",
+                "docs": "https://docs.python.org/3/library/",
+                "pros": ["Flexible"],
+                "cons": ["Inconsistent"],
+                "example": "# Document conventions in README"
+            }
+        ],
+        "explanation": "Lint command shapes pre-commit hooks and CI tasks."
+    }
+]

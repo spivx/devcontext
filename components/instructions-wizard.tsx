@@ -1,10 +1,11 @@
 "use client"
 
-import { useCallback, useEffect, useMemo, useState } from "react"
+import { useCallback, useEffect, useMemo, useRef, useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Undo2 } from "lucide-react"
 
 import type { DataQuestionSource, FileOutputConfig, InstructionsWizardProps, Responses, WizardAnswer, WizardConfirmationIntent, WizardQuestion, WizardStep } from "@/types/wizard"
+import { buildFilterPlaceholder, useAnswerFilter } from "@/hooks/use-answer-filter"
 import stacksData from "@/data/stacks.json"
 import generalData from "@/data/general.json"
 import architectureData from "@/data/architecture.json"
@@ -89,7 +90,7 @@ const suffixSteps: WizardStep[] = [
   commitsStep,
 ]
 
-export function InstructionsWizard({ onClose, selectedFileId }: InstructionsWizardProps) {
+export function InstructionsWizard({ onClose, selectedFileId, initialStackId }: InstructionsWizardProps) {
   const [currentStepIndex, setCurrentStepIndex] = useState(0)
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0)
   const [responses, setResponses] = useState<Responses>({})
@@ -102,6 +103,7 @@ export function InstructionsWizard({ onClose, selectedFileId }: InstructionsWiza
   const [autoFilledQuestionMap, setAutoFilledQuestionMap] = useState<Record<string, boolean>>({})
   const [autoFillNotice, setAutoFillNotice] = useState<string | null>(null)
   const [activeEditQuestionId, setActiveEditQuestionId] = useState<string | null>(null)
+  const hasAppliedInitialStack = useRef<string | null>(null)
 
   useEffect(() => {
     if (!isComplete && activeEditQuestionId) {
@@ -152,6 +154,20 @@ export function InstructionsWizard({ onClose, selectedFileId }: InstructionsWiza
 
   const currentStep = wizardSteps[currentStepIndex] ?? null
   const currentQuestion = currentStep?.questions[currentQuestionIndex] ?? null
+
+  const {
+    answers: filteredAnswers,
+    query: answerFilterQuery,
+    setQuery: setAnswerFilterQuery,
+    isFiltering: isFilteringAnswers,
+  } = useAnswerFilter(currentQuestion ?? null)
+  const filterPlaceholder = buildFilterPlaceholder(currentQuestion ?? null)
+  const showNoFilterMatches = Boolean(
+    currentQuestion?.enableFilter &&
+    filteredAnswers.length === 0 &&
+    answerFilterQuery.trim().length > 0
+  )
+  const filterInputId = currentQuestion ? `answer-filter-${currentQuestion.id}` : "answer-filter"
 
   const totalQuestions = useMemo(
     () => wizardSteps.reduce((count, step) => count + step.questions.length, 0),
@@ -297,7 +313,7 @@ export function InstructionsWizard({ onClose, selectedFileId }: InstructionsWiza
     setIsComplete(false)
   }
 
-  const loadStackQuestions = async (stackId: string, stackLabel?: string) => {
+  const loadStackQuestions = useCallback(async (stackId: string, stackLabel?: string) => {
     try {
       setGeneratedFile(null)
 
@@ -346,9 +362,33 @@ export function InstructionsWizard({ onClose, selectedFileId }: InstructionsWiza
       console.error(`Unable to load questions for stack "${stackId}"`, error)
       setDynamicSteps([])
       setIsStackFastTrackPromptVisible(false)
-    } finally {
     }
-  }
+  }, [])
+
+  useEffect(() => {
+    if (!initialStackId) {
+      return
+    }
+
+    if (hasAppliedInitialStack.current === initialStackId) {
+      return
+    }
+
+    const stackAnswer = stackQuestion?.answers.find((answer) => answer.value === initialStackId)
+
+    if (!stackAnswer) {
+      return
+    }
+
+    hasAppliedInitialStack.current = initialStackId
+
+    setResponses((prev) => ({
+      ...prev,
+      [STACK_QUESTION_ID]: stackAnswer.value,
+    }))
+
+    void loadStackQuestions(stackAnswer.value, stackAnswer.label)
+  }, [initialStackId, loadStackQuestions])
 
   const applyDefaultsAcrossWizard = () => {
     setGeneratedFile(null)
@@ -439,35 +479,32 @@ export function InstructionsWizard({ onClose, selectedFileId }: InstructionsWiza
 
     setGeneratedFile(null)
 
+    const prevValue = responses[question.id]
     let nextValue: Responses[keyof Responses]
     let didAddSelection = false
 
-    setResponses((prev) => {
-      const prevValue = prev[question.id]
+    if (question.allowMultiple) {
+      const prevArray = Array.isArray(prevValue) ? prevValue : []
 
-      if (question.allowMultiple) {
-        const prevArray = Array.isArray(prevValue) ? prevValue : []
-
-        if (prevArray.includes(answer.value)) {
-          nextValue = prevArray.filter((item) => item !== answer.value)
-        } else {
-          nextValue = [...prevArray, answer.value]
-          didAddSelection = true
-        }
+      if (prevArray.includes(answer.value)) {
+        nextValue = prevArray.filter((item) => item !== answer.value)
       } else {
-        if (prevValue === answer.value) {
-          nextValue = undefined
-        } else {
-          nextValue = answer.value
-          didAddSelection = true
-        }
+        nextValue = [...prevArray, answer.value]
+        didAddSelection = true
       }
+    } else {
+      if (prevValue === answer.value) {
+        nextValue = undefined
+      } else {
+        nextValue = answer.value
+        didAddSelection = true
+      }
+    }
 
-      return {
-        ...prev,
-        [question.id]: nextValue,
-      }
-    })
+    setResponses((prev) => ({
+      ...prev,
+      [question.id]: nextValue,
+    }))
 
     clearAutoFilledFlag(question.id)
 
@@ -543,6 +580,7 @@ export function InstructionsWizard({ onClose, selectedFileId }: InstructionsWiza
     setIsStackFastTrackPromptVisible(false)
     setAutoFilledQuestionMap({})
     setAutoFillNotice(null)
+    hasAppliedInitialStack.current = null
   }
 
   const resetWizard = () => {
@@ -739,13 +777,45 @@ export function InstructionsWizard({ onClose, selectedFileId }: InstructionsWiza
             <h1 className="text-3xl font-semibold text-foreground">
               {currentQuestion.question}
             </h1>
+
+            {currentQuestion.enableFilter ? (
+              <div className="mt-2 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+                <label
+                  htmlFor={filterInputId}
+                  className="text-xs font-medium uppercase tracking-wide text-muted-foreground"
+                >
+                  Filter options
+                </label>
+                <div className="relative w-full sm:w-auto sm:min-w-[240px]">
+                  <input
+                    id={filterInputId}
+                    type="text"
+                    value={answerFilterQuery}
+                    onChange={(event) => setAnswerFilterQuery(event.target.value)}
+                    placeholder={filterPlaceholder}
+                    className="w-full rounded-lg border border-border/70 bg-background/80 px-3 py-2 text-sm text-foreground shadow-sm transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/60"
+                  />
+                </div>
+                {isFilteringAnswers && !showNoFilterMatches ? (
+                  <p className="text-xs text-muted-foreground sm:text-right">
+                    Showing {filteredAnswers.length} of {currentQuestion.answers.length}
+                  </p>
+                ) : null}
+              </div>
+            ) : null}
           </div>
 
-          <WizardAnswerGrid
-            answers={currentQuestion.answers}
-            onAnswerClick={handleAnswerClick}
-            isSelected={isAnswerSelected}
-          />
+          {showNoFilterMatches ? (
+            <p className="mt-6 rounded-xl border border-border/70 bg-muted/30 px-4 py-6 text-sm text-muted-foreground">
+              No options match "{answerFilterQuery}". Try a different search.
+            </p>
+          ) : (
+            <WizardAnswerGrid
+              answers={filteredAnswers}
+              onAnswerClick={handleAnswerClick}
+              isSelected={isAnswerSelected}
+            />
+          )}
 
           <div className="mt-6 flex items-center justify-end">
             <div className="text-xs text-muted-foreground">
