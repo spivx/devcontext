@@ -34,10 +34,37 @@ jobs:
         run: npm run build
 
       - name: Deploy to Vercel
+        id: vercel_deploy
         uses: amondnet/vercel-action@v25
+        continue-on-error: true
         with:
           vercel-token: ${{ secrets.VERCEL_TOKEN }}
           vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
           vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID }}
           working-directory: .
           vercel-args: '--prod'
+
+      - name: Create GitHub deployment
+        if: always()
+        id: deployment
+        uses: bobheadxi/deployments@v1
+        with:
+          step: start
+          token: ${{ secrets.GITHUB_TOKEN }}
+          env: production
+          ref: ${{ github.sha }}
+
+      - name: Update deployment status
+        if: always()
+        uses: bobheadxi/deployments@v1
+        with:
+          step: finish
+          token: ${{ secrets.GITHUB_TOKEN }}
+          status: ${{ steps.vercel_deploy.outcome == 'success' && 'success' || 'failure' }}
+          env: ${{ steps.deployment.outputs.env }}
+          deployment_id: ${{ steps.deployment.outputs.deployment_id }}
+          env_url: https://devcontext.xyz
+
+      - name: Fail job if deployment failed
+        if: ${{ steps.vercel_deploy.outcome != 'success' }}
+        run: exit 1
