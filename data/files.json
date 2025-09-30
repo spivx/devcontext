@@ -1,29 +1,36 @@
 [
     {
-        "id": "instructions-md",
-        "label": "Copilot Instructions (Markdown)",
-        "filename": "copilot-instructions.md",
-        "format": "markdown",
-        "enabled": true,
-        "icon": "markdown",
-        "docs": "https://docs.github.com/en/copilot",
-        "isDefault": true
-    },
-    {
-        "id": "agents-md",
-        "label": "Agents Development Guide",
-        "filename": "agents.md",
-        "format": "markdown",
-        "enabled": true,
-        "icon": "markdown",
-        "docs": "https://docs.github.com/en/copilot"
-    },
-    {
-        "id": "cursor-rules",
-        "label": "Cursor Rules",
-        "filename": ".cursor/rules",
-        "format": "json",
-        "enabled": true,
-        "docs": "https://docs.cursor.com/workflows/rules"
+        "id": "outputFileSelection",
+        "question": "Which instructions file do you want to generate?",
+        "isReadOnlyOnSummary": true,
+        "answers": [
+            {
+                "value": "instructions-md",
+                "label": "Copilot Instructions (Markdown)",
+                "filename": "copilot-instructions.md",
+                "format": "markdown",
+                "icon": "markdown",
+                "docs": "https://docs.github.com/en/copilot",
+                "isDefault": true,
+                "enabled": true
+            },
+            {
+                "value": "agents-md",
+                "label": "Agents Development Guide",
+                "filename": "agents.md",
+                "format": "markdown",
+                "icon": "markdown",
+                "docs": "https://docs.github.com/en/copilot",
+                "enabled": true
+            },
+            {
+                "value": "cursor-rules",
+                "label": "Cursor Rules",
+                "filename": ".cursor/rules",
+                "format": "json",
+                "docs": "https://docs.cursor.com/workflows/rules",
+                "enabled": true
+            }
+        ]
     }
 ]

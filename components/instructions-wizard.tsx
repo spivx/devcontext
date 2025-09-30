@@ -1,11 +1,11 @@
 "use client"
 
-import { useCallback, useMemo, useState } from "react"
+import { useCallback, useEffect, useMemo, useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Undo2 } from "lucide-react"
 
-import type { DataQuestionSource, FileOutputConfig, FrameworkConfig, InstructionsWizardProps, Responses, WizardAnswer, WizardConfirmationIntent, WizardQuestion, WizardStep } from "@/types/wizard"
-import rawFrameworks from "@/data/frameworks.json"
+import type { DataQuestionSource, FileOutputConfig, InstructionsWizardProps, Responses, WizardAnswer, WizardConfirmationIntent, WizardQuestion, WizardStep } from "@/types/wizard"
+import frameworksData from "@/data/frameworks.json"
 import generalData from "@/data/general.json"
 import architectureData from "@/data/architecture.json"
 import performanceData from "@/data/performance.json"
@@ -16,43 +16,40 @@ import FinalOutputView from "./final-output-view"
 import { WizardAnswerGrid } from "./wizard-answer-grid"
 import { WizardCompletionSummary } from "./wizard-completion-summary"
 import { WizardConfirmationDialog } from "./wizard-confirmation-dialog"
+import { WizardEditAnswerDialog } from "./wizard-edit-answer-dialog"
 
 import { generateInstructions } from "@/lib/instructions-api"
 import { buildCompletionSummary } from "@/lib/wizard-summary"
 import { serializeWizardResponses } from "@/lib/wizard-response"
-import { buildStepFromQuestionSet, getFormatLabel, mapAnswerSourceToWizard } from "@/lib/wizard-utils"
+import { buildFileOptionsFromQuestion, buildStepFromQuestionSet, getFormatLabel, mapAnswerSourceToWizard } from "@/lib/wizard-utils"
 import type { GeneratedFileResult } from "@/types/output"
-
-const fileOptions = filesData as FileOutputConfig[]
-const defaultFileOption =
-  fileOptions.find((file) => file.isDefault) ??
-  fileOptions.find((file) => file.enabled !== false) ??
-  fileOptions[0] ??
-  null
 
 const FRAMEWORK_STEP_ID = "frameworks"
 const FRAMEWORK_QUESTION_ID = "frameworkSelection"
 const DEVCONTEXT_ROOT_URL = "https://devcontext.xyz/"
 
-const frameworksStep: WizardStep = {
-  id: FRAMEWORK_STEP_ID,
-  title: "Choose Your Framework",
-  questions: [
-    {
-      id: FRAMEWORK_QUESTION_ID,
-      question: "Which framework are you working with?",
-      answers: (rawFrameworks as FrameworkConfig[]).map((framework) => ({
-        value: framework.id,
-        label: framework.label,
-        icon: framework.icon,
-        disabled: framework.enabled === false,
-        disabledLabel: framework.enabled === false ? "Soon" : undefined,
-        docs: framework.docs,
-        isDefault: framework.isDefault,
-      })),
-    },
-  ],
-}
+const frameworkQuestionSet = frameworksData as DataQuestionSource[]
+const frameworksStep = buildStepFromQuestionSet(
+  FRAMEWORK_STEP_ID,
+  "Choose Your Framework",
+  frameworkQuestionSet
+)
+const frameworkQuestion = frameworksStep.questions.find((question) => question.id === FRAMEWORK_QUESTION_ID) ?? null
+
+const fileQuestionSet = filesData as DataQuestionSource[]
+const fileQuestion = fileQuestionSet[0] ?? null
+const fileOptions = buildFileOptionsFromQuestion(fileQuestion)
+const defaultFileOption =
+  fileOptions.find((file) => file.isDefault) ??
+  fileOptions[0] ??
+  null
+const fileSummaryQuestion = fileQuestion
+  ? {
+      id: fileQuestion.id,
+      question: fileQuestion.question,
+      isReadOnlyOnSummary: fileQuestion.isReadOnlyOnSummary,
+    }
+  : null
 
 const generalStep = buildStepFromQuestionSet(
   "general",
@@ -104,6 +101,13 @@ export function InstructionsWizard({ onClose, selectedFileId }: InstructionsWiza
   const [isFrameworkFastTrackPromptVisible, setIsFrameworkFastTrackPromptVisible] = useState(false)
   const [autoFilledQuestionMap, setAutoFilledQuestionMap] = useState<Record<string, boolean>>({})
   const [autoFillNotice, setAutoFillNotice] = useState<string | null>(null)
+  const [activeEditQuestionId, setActiveEditQuestionId] = useState<string | null>(null)
+
+  useEffect(() => {
+    if (!isComplete && activeEditQuestionId) {
+      setActiveEditQuestionId(null)
+    }
+  }, [isComplete, activeEditQuestionId])
 
   const selectedFile = useMemo(() => {
     if (selectedFileId) {
@@ -131,6 +135,21 @@ export function InstructionsWizard({ onClose, selectedFileId }: InstructionsWiza
     [wizardSteps]
   )
 
+  const wizardQuestionsById = useMemo(() => {
+    const lookup: Record<string, WizardQuestion> = {}
+
+    wizardSteps.forEach((step) => {
+      step.questions.forEach((question) => {
+        lookup[question.id] = question
+      })
+    })
+
+    return lookup
+  }, [wizardSteps])
+
+  const editingQuestion = activeEditQuestionId ? wizardQuestionsById[activeEditQuestionId] ?? null : null
+  const editingAnswerValue = editingQuestion ? responses[editingQuestion.id] : undefined
+
   const currentStep = wizardSteps[currentStepIndex] ?? null
   const currentQuestion = currentStep?.questions[currentQuestionIndex] ?? null
 
@@ -147,13 +166,14 @@ export function InstructionsWizard({ onClose, selectedFileId }: InstructionsWiza
   const completionSummary = useMemo(
     () =>
       buildCompletionSummary(
+        fileSummaryQuestion,
         selectedFile ?? null,
         selectedFileFormatLabel,
         wizardSteps,
         responses,
         autoFilledQuestionMap
       ),
-    [selectedFile, selectedFileFormatLabel, wizardSteps, responses, autoFilledQuestionMap]
+    [fileSummaryQuestion, selectedFile, selectedFileFormatLabel, wizardSteps, responses, autoFilledQuestionMap]
   )
 
   const currentAnswerValue = currentQuestion ? responses[currentQuestion.id] : undefined
@@ -218,6 +238,10 @@ export function InstructionsWizard({ onClose, selectedFileId }: InstructionsWiza
     })
   }, [])
 
+  const closeEditDialog = useCallback(() => {
+    setActiveEditQuestionId(null)
+  }, [])
+
   if (!currentStep || !currentQuestion) {
     return null
   }
@@ -273,7 +297,7 @@ export function InstructionsWizard({ onClose, selectedFileId }: InstructionsWiza
     setIsComplete(false)
   }
 
-  const loadFrameworkQuestions = async (frameworkId: string, frameworkLabel: string) => {
+  const loadFrameworkQuestions = async (frameworkId: string, frameworkLabel?: string) => {
     try {
       setGeneratedFile(null)
 
@@ -294,10 +318,13 @@ export function InstructionsWizard({ onClose, selectedFileId }: InstructionsWiza
       setAutoFilledQuestionMap({})
       setAutoFillNotice(null)
 
+      const resolvedFrameworkLabel =
+        frameworkLabel ?? frameworkQuestion?.answers.find((answer) => answer.value === frameworkId)?.label ?? frameworkId
+
       setDynamicSteps([
         {
           id: `framework-${frameworkId}`,
-          title: `${frameworkLabel} Preferences`,
+          title: `${resolvedFrameworkLabel} Preferences`,
           questions: mappedQuestions,
         },
       ])
@@ -387,46 +414,70 @@ export function InstructionsWizard({ onClose, selectedFileId }: InstructionsWiza
     setAutoFillNotice(null)
   }
 
-  const handleAnswerClick = async (answer: WizardAnswer) => {
+  const handleEditEntry = (entryId: string) => {
+    if (!entryId) {
+      return
+    }
+
+    const question = wizardQuestionsById[entryId]
+
+    if (!question) {
+      return
+    }
+
+    setActiveEditQuestionId(entryId)
+  }
+
+  const handleQuestionAnswerSelection = async (
+    question: WizardQuestion,
+    answer: WizardAnswer,
+    { skipAutoAdvance = false }: { skipAutoAdvance?: boolean } = {}
+  ) => {
     if (answer.disabled) {
       return
     }
 
     setGeneratedFile(null)
 
-    const previousValue = responses[currentQuestion.id]
     let nextValue: Responses[keyof Responses]
     let didAddSelection = false
 
-    if (currentQuestion.allowMultiple) {
-      const prevArray = Array.isArray(previousValue) ? previousValue : []
-      if (prevArray.includes(answer.value)) {
-        nextValue = prevArray.filter((item) => item !== answer.value)
+    setResponses((prev) => {
+      const prevValue = prev[question.id]
+
+      if (question.allowMultiple) {
+        const prevArray = Array.isArray(prevValue) ? prevValue : []
+
+        if (prevArray.includes(answer.value)) {
+          nextValue = prevArray.filter((item) => item !== answer.value)
+        } else {
+          nextValue = [...prevArray, answer.value]
+          didAddSelection = true
+        }
       } else {
-        nextValue = [...prevArray, answer.value]
-        didAddSelection = true
+        if (prevValue === answer.value) {
+          nextValue = undefined
+        } else {
+          nextValue = answer.value
+          didAddSelection = true
+        }
       }
-    } else {
-      if (previousValue === answer.value) {
-        nextValue = undefined
-      } else {
-        nextValue = answer.value
-        didAddSelection = true
+
+      return {
+        ...prev,
+        [question.id]: nextValue,
       }
-    }
+    })
 
-    setResponses((prev) => ({
-      ...prev,
-      [currentQuestion.id]: nextValue,
-    }))
+    clearAutoFilledFlag(question.id)
 
-    clearAutoFilledFlag(currentQuestion.id)
+    const isFrameworkQuestion = question.id === FRAMEWORK_QUESTION_ID
 
-    const isFrameworkQuestion = currentQuestion.id === FRAMEWORK_QUESTION_ID
     const shouldAutoAdvance =
+      !skipAutoAdvance &&
       !isFrameworkQuestion &&
-      ((currentQuestion.allowMultiple && Array.isArray(nextValue) && nextValue.length > 0 && didAddSelection) ||
-        (!currentQuestion.allowMultiple && nextValue !== undefined && nextValue !== null && didAddSelection))
+      ((question.allowMultiple && Array.isArray(nextValue) && nextValue.length > 0 && didAddSelection) ||
+        (!question.allowMultiple && nextValue !== undefined && nextValue !== null && didAddSelection))
 
     if (shouldAutoAdvance) {
       setTimeout(() => {
@@ -442,6 +493,14 @@ export function InstructionsWizard({ onClose, selectedFileId }: InstructionsWiza
         setIsFrameworkFastTrackPromptVisible(false)
       }
     }
+  }
+
+  const handleAnswerClick = (answer: WizardAnswer) => {
+    if (!currentQuestion) {
+      return
+    }
+
+    void handleQuestionAnswerSelection(currentQuestion, answer)
   }
 
   const applyDefaultAnswer = async () => {
@@ -703,6 +762,7 @@ export function InstructionsWizard({ onClose, selectedFileId }: InstructionsWiza
           onGenerate={() => void generateInstructionsFile()}
           isGenerating={isGenerating}
           autoFillNotice={autoFillNotice}
+          onEditEntry={handleEditEntry}
         />
       ) : null}
 
@@ -719,6 +779,20 @@ export function InstructionsWizard({ onClose, selectedFileId }: InstructionsWiza
   return (
     <>
       {wizardLayout}
+      {editingQuestion ? (
+        <WizardEditAnswerDialog
+          question={editingQuestion}
+          value={editingAnswerValue}
+          onAnswerSelect={async (selectedAnswer) => {
+            await handleQuestionAnswerSelection(editingQuestion, selectedAnswer, { skipAutoAdvance: true })
+
+            if (!editingQuestion.allowMultiple) {
+              closeEditDialog()
+            }
+          }}
+          onClose={closeEditDialog}
+        />
+      ) : null}
       {generatedFile ? (
         <FinalOutputView
           fileName={generatedFile.fileName}

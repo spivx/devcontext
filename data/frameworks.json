@@ -1,24 +1,29 @@
 [
     {
-        "id": "react",
-        "label": "React",
-        "icon": "react",
-        "enabled": true,
-        "docs": "https://react.dev/learn",
-        "isDefault": true
-    },
-    {
-        "id": "nextjs",
-        "label": "Next.js",
-        "icon": "nextdotjs",
-        "enabled": true,
-        "docs": "https://nextjs.org/docs"
-    },
-    {
-        "id": "angular",
-        "label": "Angular",
-        "icon": "angular",
-        "enabled": true,
-        "docs": "https://angular.io/docs"
+        "id": "frameworkSelection",
+        "question": "Which framework are you working with?",
+        "responseKey": "frameworkSelection",
+        "isReadOnlyOnSummary": true,
+        "answers": [
+            {
+                "value": "react",
+                "label": "React",
+                "icon": "react",
+                "docs": "https://react.dev/learn",
+                "isDefault": true
+            },
+            {
+                "value": "nextjs",
+                "label": "Next.js",
+                "icon": "nextdotjs",
+                "docs": "https://nextjs.org/docs"
+            },
+            {
+                "value": "angular",
+                "label": "Angular",
+                "icon": "angular",
+                "docs": "https://angular.io/docs"
+            }
+        ]
     }
 ]

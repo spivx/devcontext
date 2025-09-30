@@ -1,4 +1,4 @@
-import type { DataAnswerSource, DataQuestionSource, WizardAnswer, WizardStep } from "@/types/wizard"
+import type { DataAnswerSource, DataQuestionSource, FileOutputConfig, WizardAnswer, WizardStep } from "@/types/wizard"
 
 /**
  * Maps a data answer source to a wizard answer format
@@ -14,6 +14,9 @@ export const mapAnswerSourceToWizard = (answer: DataAnswerSource): WizardAnswer 
         infoLines.push(`Cons: ${answer.cons.join(", ")}`)
     }
 
+    const isDisabled = answer.disabled ?? (answer.enabled === false)
+    const disabledLabel = answer.disabledLabel ?? (answer.enabled === false ? "Soon" : undefined)
+
     return {
         value: answer.value,
         label: answer.label,
@@ -23,8 +26,11 @@ export const mapAnswerSourceToWizard = (answer: DataAnswerSource): WizardAnswer 
         docs: answer.docs,
         tags: answer.tags,
         isDefault: answer.isDefault,
-        disabled: answer.disabled,
-        disabledLabel: answer.disabledLabel,
+        disabled: isDisabled,
+        disabledLabel,
+        filename: answer.filename,
+        format: answer.format,
+        enabled: answer.enabled,
     }
 }
 
@@ -43,9 +49,31 @@ export const buildStepFromQuestionSet = (
             question: question.question,
             allowMultiple: question.allowMultiple,
             responseKey: question.responseKey,
+            isReadOnlyOnSummary: question.isReadOnlyOnSummary,
             answers: question.answers.map(mapAnswerSourceToWizard),
         })),
 })
+
+export const buildFileOptionsFromQuestion = (
+    question?: DataQuestionSource | null
+): FileOutputConfig[] => {
+    if (!question) {
+        return []
+    }
+
+    return question.answers
+        .filter((answer) => answer.enabled !== false)
+        .map((answer) => ({
+            id: answer.value,
+            label: answer.label,
+            filename: answer.filename ?? answer.label,
+            format: answer.format ?? "markdown",
+            enabled: answer.enabled,
+            icon: answer.icon,
+            docs: answer.docs,
+            isDefault: answer.isDefault,
+        }))
+}
 
 const formatLabelMap: Record<string, string> = {
     markdown: "Markdown",

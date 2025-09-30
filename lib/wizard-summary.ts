@@ -1,23 +1,36 @@
 import type { FileOutputConfig, Responses, WizardStep } from "@/types/wizard"
 
+type SummaryQuestionDetails = {
+  id: string
+  question: string
+  isReadOnlyOnSummary?: boolean
+}
+
 export type CompletionSummaryEntry = {
   id: string
   question: string
   hasSelection: boolean
   answers: string[]
   isAutoFilled?: boolean
+  isReadOnlyOnSummary?: boolean
 }
 
 const buildFileSummaryEntry = (
+  fileQuestion: SummaryQuestionDetails | null,
   selectedFile: FileOutputConfig | null,
   selectedFileFormatLabel: string | null
 ): CompletionSummaryEntry => {
+  const questionId = fileQuestion?.id ?? "instructions-file"
+  const questionLabel = fileQuestion?.question ?? "Instructions file"
+  const questionReadOnly = fileQuestion?.isReadOnlyOnSummary ?? false
+
   if (!selectedFile) {
     return {
-      id: "instructions-file",
-      question: "Instructions file",
+      id: questionId,
+      question: questionLabel,
       hasSelection: false,
       answers: [],
+      isReadOnlyOnSummary: questionReadOnly,
     }
   }
 
@@ -28,14 +41,16 @@ const buildFileSummaryEntry = (
   ].filter((entry): entry is string => Boolean(entry))
 
   return {
-    id: "instructions-file",
-    question: "Instructions file",
+    id: questionId,
+    question: questionLabel,
     hasSelection: true,
     answers,
+    isReadOnlyOnSummary: questionReadOnly,
   }
 }
 
 export const buildCompletionSummary = (
+  fileQuestion: SummaryQuestionDetails | null,
   selectedFile: FileOutputConfig | null,
   selectedFileFormatLabel: string | null,
   steps: WizardStep[],
@@ -43,7 +58,7 @@ export const buildCompletionSummary = (
   autoFilledMap: Record<string, boolean> = {}
 ): CompletionSummaryEntry[] => {
   const summary: CompletionSummaryEntry[] = [
-    buildFileSummaryEntry(selectedFile, selectedFileFormatLabel),
+    buildFileSummaryEntry(fileQuestion, selectedFile, selectedFileFormatLabel),
   ]
 
   steps.forEach((step) => {
@@ -67,6 +82,7 @@ export const buildCompletionSummary = (
         hasSelection: selectedAnswers.length > 0,
         answers: selectedAnswers.map((answer) => answer.label),
         isAutoFilled: Boolean(autoFilledMap[question.id]),
+        isReadOnlyOnSummary: Boolean(question.isReadOnlyOnSummary),
       })
     })
   })

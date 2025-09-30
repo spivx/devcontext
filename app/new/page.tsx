@@ -8,19 +8,22 @@ import { AnimatedBackground } from "@/components/AnimatedBackground"
 import { getHomeMainClasses } from "@/lib/utils"
 import { ANALYTICS_EVENTS } from "@/lib/analytics-events"
 import { track } from "@/lib/mixpanel"
-import type { FileOutputConfig } from "@/types/wizard"
+import type { DataQuestionSource, FileOutputConfig } from "@/types/wizard"
 import { Github } from "lucide-react"
 import Link from "next/link"
 
 import filesData from "@/data/files.json"
+import { buildFileOptionsFromQuestion } from "@/lib/wizard-utils"
+
+const fileQuestionSet = filesData as DataQuestionSource[]
+const fileQuestion = fileQuestionSet[0] ?? null
+const fileOptionsFromData = buildFileOptionsFromQuestion(fileQuestion)
 
 export default function NewInstructionsPage() {
   const [showWizard, setShowWizard] = useState(false)
   const [selectedFileId, setSelectedFileId] = useState<string | null>(null)
 
-  const fileOptions = useMemo(() => {
-    return (filesData as FileOutputConfig[]).filter((file) => file.enabled !== false)
-  }, [])
+  const fileOptions = useMemo(() => fileOptionsFromData, [])
 
   const handleFileCtaClick = (file: FileOutputConfig) => {
     setSelectedFileId(file.id)
