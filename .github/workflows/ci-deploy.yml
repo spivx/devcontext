@@ -53,6 +53,7 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
           env: production
           ref: ${{ github.sha }}
+          override: false
 
       - name: Update deployment status
         if: always()
@@ -64,6 +65,8 @@ jobs:
           env: ${{ steps.deployment.outputs.env }}
           deployment_id: ${{ steps.deployment.outputs.deployment_id }}
           env_url: https://devcontext.xyz
+          override: false
+          auto_inactive: true
 
       - name: Fail job if deployment failed
         if: ${{ steps.vercel_deploy.outcome != 'success' }}
