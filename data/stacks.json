@@ -4,25 +4,107 @@
         "question": "Which stack are you working with?",
         "responseKey": "stackSelection",
         "isReadOnlyOnSummary": true,
+        "enableFilter": true,
         "answers": [
             {
                 "value": "react",
                 "label": "React",
                 "icon": "react",
                 "docs": "https://react.dev/learn",
-                "isDefault": true
+                "isDefault": true,
+                "tags": [
+                    "frontend",
+                    "spa",
+                    "jsx"
+                ]
             },
             {
                 "value": "nextjs",
                 "label": "Next.js",
                 "icon": "nextdotjs",
-                "docs": "https://nextjs.org/docs"
+                "docs": "https://nextjs.org/docs",
+                "tags": [
+                    "react",
+                    "ssr",
+                    "app-router"
+                ]
             },
             {
                 "value": "angular",
                 "label": "Angular",
                 "icon": "angular",
-                "docs": "https://angular.io/docs"
+                "docs": "https://angular.io/docs",
+                "tags": [
+                    "frontend",
+                    "typescript",
+                    "spa"
+                ]
+            },
+            {
+                "value": "python",
+                "label": "Python",
+                "icon": "python",
+                "docs": "https://docs.python.org/3/",
+                "tags": [
+                    "backend",
+                    "scripting",
+                    "language"
+                ]
+            },
+            {
+                "value": "vue",
+                "label": "Vue",
+                "icon": "vuedotjs",
+                "docs": "https://vuejs.org/guide/introduction.html",
+                "tags": [
+                    "frontend",
+                    "composition-api",
+                    "spa"
+                ]
+            },
+            {
+                "value": "nuxt",
+                "label": "Nuxt",
+                "icon": "nuxtdotjs",
+                "docs": "https://nuxt.com/docs",
+                "tags": [
+                    "vue",
+                    "full-stack",
+                    "ssr"
+                ]
+            },
+            {
+                "value": "svelte",
+                "label": "Svelte",
+                "icon": "svelte",
+                "docs": "https://svelte.dev/docs",
+                "tags": [
+                    "frontend",
+                    "compiler",
+                    "lightweight"
+                ]
+            },
+            {
+                "value": "astro",
+                "label": "Astro",
+                "icon": "astro",
+                "docs": "https://docs.astro.build",
+                "tags": [
+                    "islands",
+                    "content",
+                    "ssg"
+                ]
+            },
+            {
+                "value": "remix",
+                "label": "Remix",
+                "icon": "remix",
+                "docs": "https://remix.run/docs",
+                "tags": [
+                    "react",
+                    "routing",
+                    "full-stack"
+                ]
             }
         ]
     }

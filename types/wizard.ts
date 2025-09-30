@@ -21,6 +21,7 @@ export type DataQuestionSource = {
     allowMultiple?: boolean
     responseKey?: string
     isReadOnlyOnSummary?: boolean
+    enableFilter?: boolean
     answers: DataAnswerSource[]
 }
 
@@ -57,6 +58,7 @@ export type WizardQuestion = {
     allowMultiple?: boolean
     responseKey?: string
     isReadOnlyOnSummary?: boolean
+    enableFilter?: boolean
     answers: WizardAnswer[]
 }
 
@@ -71,6 +73,7 @@ export type WizardConfirmationIntent = "change-file" | "reset"
 export type InstructionsWizardProps = {
     selectedFileId?: string | null
     onClose?: () => void
+    initialStackId?: string | null
 }
 
 export type Responses = Record<string, string | string[] | null | undefined>

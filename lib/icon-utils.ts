@@ -63,7 +63,7 @@ const getSimpleIconMarkup = (icon: SimpleIcon) => {
   return markup
 }
 
-const normalizeHex = (hex: string) => {
+export const normalizeHex = (hex: string) => {
   const trimmed = hex.trim().replace(/^#/, "")
   if (trimmed.length === 3) {
     return trimmed
@@ -102,7 +102,7 @@ export const getAccessibleIconColor = (hex: string) => {
   return `#${normalized}`
 }
 
-const normalizeIconSlug = (raw?: string) => {
+export const normalizeIconSlug = (raw?: string) => {
   if (!raw) {
     return null
   }

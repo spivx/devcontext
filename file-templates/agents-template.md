@@ -12,7 +12,13 @@ This guide provides conventions and best practices for building AI agent applica
 
 ---
 
-## 2. Development Standards
+## 2. Stack Playbook
+
+{{stackGuidance}}
+
+---
+
+## 3. Development Standards
 
 ### Code Organization
 - File structure: **{{fileStructure}}**
@@ -37,7 +43,7 @@ This guide provides conventions and best practices for building AI agent applica
 
 ---
 
-## 3. Agent-Specific Patterns
+## 4. Agent-Specific Patterns
 
 ### State & Memory
 - State handling: **{{stateManagement}}**
@@ -60,7 +66,7 @@ This guide provides conventions and best practices for building AI agent applica
 
 ---
 
-## 4. Collaboration & Git
+## 5. Collaboration & Git
 
 ### Version Control
 - Commit style: **{{commitStyle}}**

@@ -1,0 +1,140 @@
+[
+    {
+        "id": "astro-integrations",
+        "question": "Which frontend integration do you render islands with?",
+        "responseKey": "tooling",
+        "answers": [
+            {
+                "value": "react",
+                "label": "React components",
+                "icon": "react",
+                "docs": "https://docs.astro.build/en/guides/integrations-guide/react/",
+                "pros": ["Huge ecosystem", "JSX familiarity"],
+                "cons": ["Larger bundle"],
+                "example": "npx astro add react",
+                "isDefault": true
+            },
+            {
+                "value": "vue",
+                "label": "Vue components",
+                "icon": "vuedotjs",
+                "docs": "https://docs.astro.build/en/guides/integrations-guide/vue/",
+                "pros": ["Reactivity", "SFC ergonomics"],
+                "cons": ["Need to manage hydration"],
+                "example": "npx astro add vue"
+            },
+            {
+                "value": "svelte",
+                "label": "Svelte components",
+                "icon": "svelte",
+                "docs": "https://docs.astro.build/en/guides/integrations-guide/svelte/",
+                "pros": ["Compile-time", "Small output"],
+                "cons": ["Less SSR libs"],
+                "example": "npx astro add svelte"
+            }
+        ],
+        "explanation": "Primary integration influences hydration directives and linting."
+    },
+    {
+        "id": "astro-rendering",
+        "question": "How do you prefer Astro to render pages?",
+        "responseKey": "dataFetching",
+        "answers": [
+            {
+                "value": "ssg",
+                "label": "Static (SSG)",
+                "docs": "https://docs.astro.build/en/concepts/islands/",
+                "pros": ["Ultra fast delivery", "No server costs"],
+                "cons": ["Rebuild to refresh data"],
+                "example": "astro build",
+                "isDefault": true
+            },
+            {
+                "value": "ssr",
+                "label": "Server-side rendering",
+                "docs": "https://docs.astro.build/en/guides/server-side-rendering/",
+                "pros": ["Personalized content"],
+                "cons": ["Need hosting runtime"],
+                "example": "export const prerender = false"
+            },
+            {
+                "value": "hybrid",
+                "label": "Hybrid (SSG + ISR)",
+                "docs": "https://docs.astro.build/en/guides/content-collections/",
+                "pros": ["Control freshness", "Cache friendly"],
+                "cons": ["More ops complexity"],
+                "example": "export const revalidate = 60"
+            }
+        ],
+        "explanation": "Rendering model informs content strategy and hosting provider."
+    },
+    {
+        "id": "astro-content",
+        "question": "Where does your content live?",
+        "responseKey": "folders",
+        "answers": [
+            {
+                "value": "content-collections",
+                "label": "Content collections",
+                "docs": "https://docs.astro.build/en/guides/content-collections/",
+                "pros": ["Type-safe frontmatter", "MDX ready"],
+                "cons": ["Needs schema definitions"],
+                "example": "defineCollection({ type: 'content', schema })",
+                "isDefault": true
+            },
+            {
+                "value": "cms",
+                "label": "External CMS",
+                "docs": "https://docs.astro.build/en/guides/cms/",
+                "pros": ["Editorial workflows"],
+                "cons": ["Auth tokens"],
+                "example": "const posts = await fetchCMSEntries()"
+            },
+            {
+                "value": "filesystem",
+                "label": "Filesystem markdown",
+                "docs": "https://docs.astro.build/en/core-concepts/astro-pages/",
+                "pros": ["Quick start"],
+                "cons": ["Manual organization"],
+                "example": "src/pages/posts/post-1.md"
+            }
+        ],
+        "explanation": "Content strategy shapes file organization and build scripts."
+    },
+    {
+        "id": "astro-deployment",
+        "question": "Where do you deploy Astro?",
+        "responseKey": "collaboration",
+        "answers": [
+            {
+                "value": "vercel",
+                "label": "Vercel",
+                "icon": "vercel",
+                "docs": "https://docs.astro.build/en/guides/deploy/vercel/",
+                "pros": ["Edge functions", "Git integration"],
+                "cons": ["SSR quotas"],
+                "example": "vercel deploy",
+                "isDefault": true
+            },
+            {
+                "value": "netlify",
+                "label": "Netlify",
+                "icon": "netlify",
+                "docs": "https://docs.astro.build/en/guides/deploy/netlify/",
+                "pros": ["Forms and edge"],
+                "cons": ["Build minutes"],
+                "example": "netlify deploy"
+            },
+            {
+                "value": "cloudflare",
+                "label": "Cloudflare Pages",
+                "icon": "cloudflare",
+                "docs": "https://docs.astro.build/en/guides/deploy/cloudflare/",
+                "pros": ["Global edge"],
+                "cons": ["Limited Node APIs"],
+                "example": "wrangler pages deploy dist"
+            }
+        ],
+        "explanation": "Hosting target sets adapter, environment variables, and CI strategy."
+    }
+]

@@ -22,7 +22,13 @@ Regenerate whenever your JSON configuration changes (stack, naming, testing, etc
 
 ---
 
-## 2. Naming, Style & Structure Rules
+## 2. Stack Playbook
+
+{{stackGuidance}}
+
+---
+
+## 3. Naming, Style & Structure Rules
 
 ### Naming & Exports
 - Variables, functions, object keys: **{{variableNaming}}**  
@@ -39,11 +45,12 @@ Regenerate whenever your JSON configuration changes (stack, naming, testing, etc
 - API layer organization: **{{apiLayer}}**  
 - Folder strategy: **{{folders}}**
 
+
 > Copilot should not generate code outside these structures or naming patterns.
 
 ---
 
-## 3. Testing & Quality Assurance
+## 4. Testing & Quality Assurance
 
 - Unit tests: **{{testingUT}}**  
 - E2E / integration: **{{testingE2E}}**
@@ -56,7 +63,7 @@ Regenerate whenever your JSON configuration changes (stack, naming, testing, etc
 
 ---
 
-## 4. Performance & Data Loading
+## 5. Performance & Data Loading
 
 - Data fetching: **{{dataFetching}}**  
 - React performance optimizations: **{{reactPerf}}**
@@ -72,7 +79,7 @@ Regenerate whenever your JSON configuration changes (stack, naming, testing, etc
 
 ---
 
-## 5. Security, Validation, Logging
+## 6. Security, Validation, Logging
 
 - Secrets/auth handling: **{{auth}}**  
 - Input validation: **{{validation}}**  
@@ -86,7 +93,7 @@ Regenerate whenever your JSON configuration changes (stack, naming, testing, etc
 
 ---
 
-## 6. Commit & PR Conventions
+## 7. Commit & PR Conventions
 
 - Commit style: **{{commitStyle}}**  
 - PR rules: **{{prRules}}**
@@ -103,7 +110,7 @@ Regenerate whenever your JSON configuration changes (stack, naming, testing, etc
 
 ---
 
-## 7. Copilot Usage Guidance
+## 8. Copilot Usage Guidance
 
 - Use Copilot for boilerplate (hooks, component scaffolds).  
 - Provide context in comments/prompts.  
@@ -118,7 +125,7 @@ Regenerate whenever your JSON configuration changes (stack, naming, testing, etc
 
 ---
 
-## 8. Editor Setup
+## 9. Editor Setup
 
 Recommended editor configuration:
 
@@ -132,7 +139,7 @@ Recommended editor configuration:
 
 ---
 
-## 9. Caveats & Overrides
+## 10. Caveats & Overrides
 
 - Document exceptions with comments.  
 - Experimental features must be flagged.  

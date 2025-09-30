@@ -11,6 +11,7 @@ import { track } from "@/lib/mixpanel"
 import type { DataQuestionSource, FileOutputConfig } from "@/types/wizard"
 import { Github } from "lucide-react"
 import Link from "next/link"
+import { useSearchParams } from "next/navigation"
 
 import filesData from "@/data/files.json"
 import { buildFileOptionsFromQuestion } from "@/lib/wizard-utils"
@@ -20,10 +21,12 @@ const fileQuestion = fileQuestionSet[0] ?? null
 const fileOptionsFromData = buildFileOptionsFromQuestion(fileQuestion)
 
 export default function NewInstructionsPage() {
+  const searchParams = useSearchParams()
   const [showWizard, setShowWizard] = useState(false)
   const [selectedFileId, setSelectedFileId] = useState<string | null>(null)
 
   const fileOptions = useMemo(() => fileOptionsFromData, [])
+  const preferredStackId = searchParams.get("stack")?.toLowerCase() ?? null
 
   const handleFileCtaClick = (file: FileOutputConfig) => {
     setSelectedFileId(file.id)
@@ -72,7 +75,11 @@ export default function NewInstructionsPage() {
         {/* Hero Section */}
         <main className={getHomeMainClasses(showWizard)}>
           {showWizard && selectedFileId ? (
-            <InstructionsWizard selectedFileId={selectedFileId} onClose={handleWizardClose} />
+            <InstructionsWizard
+              selectedFileId={selectedFileId}
+              onClose={handleWizardClose}
+              initialStackId={preferredStackId}
+            />
           ) : (
             <>
               <div className="space-y-6">
