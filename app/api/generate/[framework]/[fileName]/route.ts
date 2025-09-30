@@ -31,7 +31,7 @@ export async function POST(
 
         const templateKeyFromParams: TemplateKey = {
             templateType: mapOutputFileToTemplateType(fileName),
-            framework: frameworkFromPath,
+            stack: frameworkFromPath,
         }
 
         let templateConfig = getTemplateConfig(templateKeyFromParams)
@@ -39,7 +39,7 @@ export async function POST(
         if (!templateConfig && responses.outputFile) {
             const templateKeyFromBody: TemplateKey = {
                 templateType: mapOutputFileToTemplateType(responses.outputFile),
-                framework: responses.frameworkSelection || undefined,
+                stack: responses.stackSelection || undefined,
             }
 
             templateConfig = getTemplateConfig(templateKeyFromBody)
@@ -86,7 +86,7 @@ export async function POST(
             }
         }
 
-        replaceVariable('frameworkSelection')
+        replaceVariable('stackSelection')
         replaceVariable('tooling')
         replaceVariable('language')
         replaceVariable('projectPriority')

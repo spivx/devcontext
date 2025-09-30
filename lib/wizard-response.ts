@@ -1,7 +1,7 @@
 import type { Responses, WizardResponses, WizardStep } from "@/types/wizard"
 
 const createBaseResponses = (): WizardResponses => ({
-  frameworkSelection: null,
+  stackSelection: null,
   tooling: null,
   language: null,
   fileStructure: null,

@@ -6,13 +6,13 @@ applyTo: "**/*.{ts,tsx,js,jsx,md}"  # apply to all code files by default
 # Copilot Instructions
 
 ⚠️ This file is **auto-generated**. Do not edit manually unless overriding defaults.  
-Regenerate whenever your JSON configuration changes (framework, naming, testing, etc.).
+Regenerate whenever your JSON configuration changes (stack, naming, testing, etc.).
 
 ---
 
 ## 1. Project Context & Priorities
 
-- Framework: **{{frameworkSelection}}**  
+- Stack: **{{stackSelection}}**  
 - Build tooling: **{{tooling}}**  
 - Language: **{{language}}**  
 

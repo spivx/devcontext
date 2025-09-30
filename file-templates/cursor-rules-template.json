@@ -1,6 +1,6 @@
 {
     "project": {
-        "framework": "{{frameworkSelection}}",
+        "framework": "{{stackSelection}}",
         "language": "{{language}}",
         "tooling": "{{tooling}}",
         "priority": "{{projectPriority}}"

@@ -75,7 +75,7 @@ export type InstructionsWizardProps = {
 
 export type Responses = Record<string, string | string[] | null | undefined>
 export interface WizardResponses {
-    frameworkSelection: string | null;
+    stackSelection: string | null;
     tooling: string | null;
     language: string | null;
     fileStructure: string | null;

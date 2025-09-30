@@ -48,10 +48,10 @@ describe('template-config', () => {
         })
 
         describe('with TemplateKey object', () => {
-            it('should return config for specific framework combination', () => {
+            it('should return config for specific stack combination', () => {
                 const key: TemplateKey = {
                     templateType: 'agents',
-                    framework: 'python',
+                    stack: 'python',
                 }
                 const result = getTemplateConfig(key)
                 expect(result).toEqual({
@@ -63,7 +63,7 @@ describe('template-config', () => {
             it('should return config for specific react combination', () => {
                 const key: TemplateKey = {
                     templateType: 'agents',
-                    framework: 'react',
+                    stack: 'react',
                 }
                 const result = getTemplateConfig(key)
                 expect(result).toEqual({
@@ -72,10 +72,10 @@ describe('template-config', () => {
                 })
             })
 
-            it('should fallback to general combination when specific framework not found', () => {
+            it('should fallback to general combination when specific stack not found', () => {
                 const key: TemplateKey = {
                     templateType: 'copilot-instructions',
-                    framework: 'nonexistent-framework',
+                    stack: 'nonexistent-stack',
                 }
                 const result = getTemplateConfig(key)
                 expect(result).toEqual({
@@ -84,7 +84,7 @@ describe('template-config', () => {
                 })
             })
 
-            it('should return general combination when no framework specified', () => {
+            it('should return general combination when no stack specified', () => {
                 const key: TemplateKey = {
                     templateType: 'copilot-instructions',
                 }

@@ -5,10 +5,10 @@ export interface TemplateConfig {
 
 export interface TemplateKey {
     templateType: string
-    framework?: string
+    stack?: string
 }
 
-// Template configurations based on template type + optional framework combinations
+// Template configurations based on template type + optional stack combinations
 export const templateCombinations: Record<string, TemplateConfig> = {
     // Copilot Instructions (general)
     'copilot-instructions': {
@@ -73,10 +73,10 @@ export function getTemplateConfig(key: string | TemplateKey): TemplateConfig | n
         return templateCombinations[key] ?? null
     }
 
-    const { templateType, framework } = key
+    const { templateType, stack } = key
 
-    if (framework) {
-        const specificKey = `${templateType}-${framework}`
+    if (stack) {
+        const specificKey = `${templateType}-${stack}`
         if (templateCombinations[specificKey]) {
             return templateCombinations[specificKey]
         }

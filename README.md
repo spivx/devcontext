@@ -6,13 +6,13 @@ Build high-signal agent and instruction files from community-proven best practic
 
 ## What devcontext does
 - Transforms curated community knowledge into ready-to-use instructions for agents, coding copilots, and repo guides.
-- Guides you through a multi-step wizard that selects files, frameworks, and scenario-specific topics.
+- Guides you through a multi-step wizard that selects files, stacks, and scenario-specific topics.
 - Surfaces examples, trade-offs, and documentation links so every choice is backed by trusted references.
 
 ## How the wizard works
 1. Launch the app and switch from the landing hero to the Instructions Wizard.
 2. Pick the instruction file you want to assemble (from templates defined in `data/files.json`).
-3. Choose your framework and automatically load its follow-up question set (dynamic imports from `data/questions/<framework>.json`).
+3. Choose your stack and automatically load its follow-up question set (dynamic imports from `data/questions/<stack>.json`).
 4. Answer topic prompts across general, architecture, performance, security, commits, and more—or lean on the recommended defaults when you need a fast decision.
 5. Review a completion summary that highlights what made it into your file and which areas still need decisions.
 
@@ -38,7 +38,7 @@ Then open the printed local URL in your browser to explore the wizard.
 
 ## Contribute back to the community
 - Add or improve topics in `data/*.json` with clear labels, examples, and `docs` links.
-- Propose new framework questionnaires under `data/questions/`, keeping the schema consistent.
+- Propose new stack questionnaires under `data/questions/`, keeping the schema consistent.
 - Share hooks, utilities, or UI refinements that make the wizard easier to reason about for first-time contributors.
 
 Every addition helps the community build better instruction files faster.

@@ -8,8 +8,8 @@
 - Entry point at `app/page.tsx` toggles between a marketing hero and the instructions wizard.
 - Wizard steps currently cover:
   - Instructions file selection (`data/files.json`).
-  - Framework selection (`data/frameworks.json`) with branching into framework-specific question sets (e.g., `data/questions/react.json`).
-  - Dynamic question sets loaded via `import()` based on the chosen framework.
+  - Stack selection (`data/stacks.json`) with branching into stack-specific question sets (e.g., `data/questions/react.json`).
+  - Dynamic question sets loaded via `import()` based on the chosen stack.
 - User actions per question:
   - Select single or multiple answers, or apply the recommended default when unsure.
   - Review hover tooltips with examples, pros/cons, tags, and documentation links.
@@ -18,8 +18,8 @@
 ## Data Conventions
 - Every answer object may define: `value`, `label`, `icon`, `example`, `infoLines` (derived from `pros`/`cons`), `tags`, `isDefault`, `disabled`, `disabledLabel`, and `docs`.
 - JSON files in `data/` supply domain-specific options:
-  - `files.json`, `frameworks.json`, `general.json`, `architecture.json`, `performance.json`, `security.json`, `commits.json`.
-  - Framework-specific questionnaires live in `data/questions/<framework>.json`.
+  - `files.json`, `stacks.json`, `general.json`, `architecture.json`, `performance.json`, `security.json`, `commits.json`.
+  - Stack-specific questionnaires live in `data/questions/<stack>.json`.
 - Newly added `docs` fields should point to authoritative resources and are surfaced in tooltips as external links.
 
 ## Visual & Interaction Details (components/instructions-wizard.tsx)
@@ -31,7 +31,7 @@
 
 ## Extending the Wizard
 1. Add new answer sets to relevant JSON files with `docs` links when possible.
-2. For additional frameworks, create `data/questions/<framework>.json` and ensure the `docs` field on the framework entry is populated.
+2. For additional stacks, create `data/questions/<stack>.json` and ensure the `docs` field on the stack entry is populated.
 3. The wizard automatically consumes new questions when they follow the existing schema.
 
 ## Development Workflow

@@ -5,7 +5,7 @@ import type { GeneratedFileResult } from "@/types/output"
 import type { WizardResponses } from "@/types/wizard"
 
 type GenerateInstructionsParams = {
-  frameworkSegment: string
+  stackSegment: string
   outputFileId: string
   responses: WizardResponses
   fileFormat?: string
@@ -17,7 +17,7 @@ type GenerateApiResponse = {
 }
 
 export const generateInstructions = async ({
-  frameworkSegment,
+  stackSegment,
   outputFileId,
   responses,
   fileFormat,
@@ -27,7 +27,7 @@ export const generateInstructions = async ({
   })
 
   const fetchResponse = await fetch(
-    `/api/generate/${encodeURIComponent(frameworkSegment)}/${encodeURIComponent(outputFileId)}`,
+    `/api/generate/${encodeURIComponent(stackSegment)}/${encodeURIComponent(outputFileId)}`,
     {
       method: "POST",
       headers: {

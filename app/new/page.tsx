@@ -83,7 +83,7 @@ export default function NewInstructionsPage() {
                   </p>
                   <div className="mx-auto max-w-2xl text-left text-sm text-muted-foreground/90 md:text-base">
                     <ul className="list-disc space-y-2 pl-5">
-                      <li>Pick a preset to load framework, architecture, and workflow prompts.</li>
+                      <li>Pick a preset to load stack, architecture, and workflow prompts.</li>
                       <li>Answer or skip questions — you can revisit any step before exporting.</li>
                       <li>Download the generated file once every section shows as complete.</li>
                     </ul>

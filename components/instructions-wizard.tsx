@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button"
 import { Undo2 } from "lucide-react"
 
 import type { DataQuestionSource, FileOutputConfig, InstructionsWizardProps, Responses, WizardAnswer, WizardConfirmationIntent, WizardQuestion, WizardStep } from "@/types/wizard"
-import frameworksData from "@/data/frameworks.json"
+import stacksData from "@/data/stacks.json"
 import generalData from "@/data/general.json"
 import architectureData from "@/data/architecture.json"
 import performanceData from "@/data/performance.json"
@@ -24,17 +24,17 @@ import { serializeWizardResponses } from "@/lib/wizard-response"
 import { buildFileOptionsFromQuestion, buildStepFromQuestionSet, getFormatLabel, mapAnswerSourceToWizard } from "@/lib/wizard-utils"
 import type { GeneratedFileResult } from "@/types/output"
 
-const FRAMEWORK_STEP_ID = "frameworks"
-const FRAMEWORK_QUESTION_ID = "frameworkSelection"
+const STACK_STEP_ID = "stacks"
+const STACK_QUESTION_ID = "stackSelection"
 const DEVCONTEXT_ROOT_URL = "https://devcontext.xyz/"
 
-const frameworkQuestionSet = frameworksData as DataQuestionSource[]
-const frameworksStep = buildStepFromQuestionSet(
-  FRAMEWORK_STEP_ID,
-  "Choose Your Framework",
-  frameworkQuestionSet
+const stackQuestionSet = stacksData as DataQuestionSource[]
+const stacksStep = buildStepFromQuestionSet(
+  STACK_STEP_ID,
+  "Choose Your Stack",
+  stackQuestionSet
 )
-const frameworkQuestion = frameworksStep.questions.find((question) => question.id === FRAMEWORK_QUESTION_ID) ?? null
+const stackQuestion = stacksStep.questions.find((question) => question.id === STACK_QUESTION_ID) ?? null
 
 const fileQuestionSet = filesData as DataQuestionSource[]
 const fileQuestion = fileQuestionSet[0] ?? null
@@ -98,7 +98,7 @@ export function InstructionsWizard({ onClose, selectedFileId }: InstructionsWiza
   const [pendingConfirmation, setPendingConfirmation] = useState<WizardConfirmationIntent | null>(null)
   const [generatedFile, setGeneratedFile] = useState<GeneratedFileResult | null>(null)
   const [isGenerating, setIsGenerating] = useState(false)
-  const [isFrameworkFastTrackPromptVisible, setIsFrameworkFastTrackPromptVisible] = useState(false)
+  const [isStackFastTrackPromptVisible, setIsStackFastTrackPromptVisible] = useState(false)
   const [autoFilledQuestionMap, setAutoFilledQuestionMap] = useState<Record<string, boolean>>({})
   const [autoFillNotice, setAutoFillNotice] = useState<string | null>(null)
   const [activeEditQuestionId, setActiveEditQuestionId] = useState<string | null>(null)
@@ -126,12 +126,12 @@ export function InstructionsWizard({ onClose, selectedFileId }: InstructionsWiza
   )
 
   const wizardSteps = useMemo(
-    () => [frameworksStep, ...dynamicSteps, ...suffixSteps],
+    () => [stacksStep, ...dynamicSteps, ...suffixSteps],
     [dynamicSteps]
   )
 
-  const nonFrameworkSteps = useMemo(
-    () => wizardSteps.filter((step) => step.id !== FRAMEWORK_STEP_ID),
+  const nonStackSteps = useMemo(
+    () => wizardSteps.filter((step) => step.id !== STACK_STEP_ID),
     [wizardSteps]
   )
 
@@ -159,8 +159,8 @@ export function InstructionsWizard({ onClose, selectedFileId }: InstructionsWiza
   )
 
   const remainingQuestionCount = useMemo(
-    () => nonFrameworkSteps.reduce((count, step) => count + step.questions.length, 0),
-    [nonFrameworkSteps]
+    () => nonStackSteps.reduce((count, step) => count + step.questions.length, 0),
+    [nonStackSteps]
   )
 
   const completionSummary = useMemo(
@@ -207,8 +207,8 @@ export function InstructionsWizard({ onClose, selectedFileId }: InstructionsWiza
     ? `Use default (${defaultAnswer.label})`
     : "Use default"
 
-  const showFrameworkPivot = !isComplete && isFrameworkFastTrackPromptVisible
-  const showQuestionControls = !isComplete && !isFrameworkFastTrackPromptVisible
+  const showStackPivot = !isComplete && isStackFastTrackPromptVisible
+  const showQuestionControls = !isComplete && !isStackFastTrackPromptVisible
 
   const markQuestionsAutoFilled = useCallback((questionIds: string[]) => {
     if (questionIds.length === 0) {
@@ -218,7 +218,7 @@ export function InstructionsWizard({ onClose, selectedFileId }: InstructionsWiza
     setAutoFilledQuestionMap((prev) => {
       const next = { ...prev }
       questionIds.forEach((id) => {
-        if (id !== FRAMEWORK_QUESTION_ID) {
+        if (id !== STACK_QUESTION_ID) {
           next[id] = true
         }
       })
@@ -273,8 +273,8 @@ export function InstructionsWizard({ onClose, selectedFileId }: InstructionsWiza
   }
 
   const goToPrevious = () => {
-    if (isFrameworkFastTrackPromptVisible) {
-      setIsFrameworkFastTrackPromptVisible(false)
+    if (isStackFastTrackPromptVisible) {
+      setIsStackFastTrackPromptVisible(false)
     }
 
     const isFirstQuestionInStep = currentQuestionIndex === 0
@@ -297,11 +297,11 @@ export function InstructionsWizard({ onClose, selectedFileId }: InstructionsWiza
     setIsComplete(false)
   }
 
-  const loadFrameworkQuestions = async (frameworkId: string, frameworkLabel?: string) => {
+  const loadStackQuestions = async (stackId: string, stackLabel?: string) => {
     try {
       setGeneratedFile(null)
 
-      const questionsModule = await import(`@/data/questions/${frameworkId}.json`)
+      const questionsModule = await import(`@/data/questions/${stackId}.json`)
       const questionsData = (questionsModule.default ?? questionsModule) as DataQuestionSource[]
 
       const mappedQuestions: WizardQuestion[] = questionsData.map((question) => ({
@@ -318,18 +318,18 @@ export function InstructionsWizard({ onClose, selectedFileId }: InstructionsWiza
       setAutoFilledQuestionMap({})
       setAutoFillNotice(null)
 
-      const resolvedFrameworkLabel =
-        frameworkLabel ?? frameworkQuestion?.answers.find((answer) => answer.value === frameworkId)?.label ?? frameworkId
+      const resolvedStackLabel =
+        stackLabel ?? stackQuestion?.answers.find((answer) => answer.value === stackId)?.label ?? stackId
 
       setDynamicSteps([
         {
-          id: `framework-${frameworkId}`,
-          title: `${resolvedFrameworkLabel} Preferences`,
+          id: `stack-${stackId}`,
+          title: `${resolvedStackLabel} Preferences`,
           questions: mappedQuestions,
         },
       ])
 
-      setIsFrameworkFastTrackPromptVisible(followUpQuestionCount > 0)
+      setIsStackFastTrackPromptVisible(followUpQuestionCount > 0)
 
       setResponses((prev) => {
         const next = { ...prev }
@@ -343,9 +343,9 @@ export function InstructionsWizard({ onClose, selectedFileId }: InstructionsWiza
       setCurrentQuestionIndex(0)
       setIsComplete(false)
     } catch (error) {
-      console.error(`Unable to load questions for framework "${frameworkId}"`, error)
+      console.error(`Unable to load questions for stack "${stackId}"`, error)
       setDynamicSteps([])
-      setIsFrameworkFastTrackPromptVisible(false)
+      setIsStackFastTrackPromptVisible(false)
     } finally {
     }
   }
@@ -361,7 +361,7 @@ export function InstructionsWizard({ onClose, selectedFileId }: InstructionsWiza
 
       wizardSteps.forEach((step) => {
         step.questions.forEach((question) => {
-          if (question.id === FRAMEWORK_QUESTION_ID) {
+          if (question.id === STACK_QUESTION_ID) {
             return
           }
 
@@ -390,7 +390,7 @@ export function InstructionsWizard({ onClose, selectedFileId }: InstructionsWiza
       setAutoFillNotice(null)
     }
 
-    setIsFrameworkFastTrackPromptVisible(false)
+    setIsStackFastTrackPromptVisible(false)
 
     const lastStepIndex = Math.max(wizardSteps.length - 1, 0)
     const lastStep = wizardSteps[lastStepIndex]
@@ -402,14 +402,14 @@ export function InstructionsWizard({ onClose, selectedFileId }: InstructionsWiza
   }
 
   const beginStepByStepFlow = () => {
-    const firstNonFrameworkIndex = wizardSteps.findIndex((step) => step.id !== FRAMEWORK_STEP_ID)
+    const firstNonStackIndex = wizardSteps.findIndex((step) => step.id !== STACK_STEP_ID)
 
-    if (firstNonFrameworkIndex !== -1) {
-      setCurrentStepIndex(firstNonFrameworkIndex)
+    if (firstNonStackIndex !== -1) {
+      setCurrentStepIndex(firstNonStackIndex)
       setCurrentQuestionIndex(0)
     }
 
-    setIsFrameworkFastTrackPromptVisible(false)
+    setIsStackFastTrackPromptVisible(false)
     setIsComplete(false)
     setAutoFillNotice(null)
   }
@@ -471,11 +471,11 @@ export function InstructionsWizard({ onClose, selectedFileId }: InstructionsWiza
 
     clearAutoFilledFlag(question.id)
 
-    const isFrameworkQuestion = question.id === FRAMEWORK_QUESTION_ID
+    const isStackQuestion = question.id === STACK_QUESTION_ID
 
     const shouldAutoAdvance =
       !skipAutoAdvance &&
-      !isFrameworkQuestion &&
+      !isStackQuestion &&
       ((question.allowMultiple && Array.isArray(nextValue) && nextValue.length > 0 && didAddSelection) ||
         (!question.allowMultiple && nextValue !== undefined && nextValue !== null && didAddSelection))
 
@@ -485,12 +485,12 @@ export function InstructionsWizard({ onClose, selectedFileId }: InstructionsWiza
       }, 0)
     }
 
-    if (isFrameworkQuestion) {
+    if (isStackQuestion) {
       if (nextValue === answer.value) {
-        await loadFrameworkQuestions(answer.value, answer.label)
+        await loadStackQuestions(answer.value, answer.label)
       } else {
         setDynamicSteps([])
-        setIsFrameworkFastTrackPromptVisible(false)
+        setIsStackFastTrackPromptVisible(false)
       }
     }
   }
@@ -521,10 +521,10 @@ export function InstructionsWizard({ onClose, selectedFileId }: InstructionsWiza
 
     clearAutoFilledFlag(currentQuestion.id)
 
-    const isFrameworkQuestion = currentQuestion.id === FRAMEWORK_QUESTION_ID
+    const isStackQuestion = currentQuestion.id === STACK_QUESTION_ID
 
-    if (isFrameworkQuestion) {
-      await loadFrameworkQuestions(defaultAnswer.value, defaultAnswer.label)
+    if (isStackQuestion) {
+      await loadStackQuestions(defaultAnswer.value, defaultAnswer.label)
       return
     }
 
@@ -540,7 +540,7 @@ export function InstructionsWizard({ onClose, selectedFileId }: InstructionsWiza
     setIsComplete(false)
     setGeneratedFile(null)
     setIsGenerating(false)
-    setIsFrameworkFastTrackPromptVisible(false)
+    setIsStackFastTrackPromptVisible(false)
     setAutoFilledQuestionMap({})
     setAutoFillNotice(null)
   }
@@ -609,14 +609,14 @@ export function InstructionsWizard({ onClose, selectedFileId }: InstructionsWiza
 
       console.log("Template combination data:", {
         outputFile: questionsAndAnswers.outputFile,
-        framework: questionsAndAnswers.frameworkSelection,
+        stack: questionsAndAnswers.stackSelection,
       })
 
-      const frameworkSegment = questionsAndAnswers.frameworkSelection ?? "general"
+      const stackSegment = questionsAndAnswers.stackSelection ?? "general"
       const fileConfig = fileOptions.find((file) => file.id === outputFileId)
 
       const result = await generateInstructions({
-        frameworkSegment,
+        stackSegment,
         outputFileId,
         responses: questionsAndAnswers,
         fileFormat: fileConfig?.format,
@@ -651,8 +651,8 @@ export function InstructionsWizard({ onClose, selectedFileId }: InstructionsWiza
     : undefined
   const showChangeFile = Boolean(onClose && selectedFile)
 
-  const topButtonLabel = showFrameworkPivot ? "Choose a different network" : "Start Over"
-  const topButtonHandler = showFrameworkPivot ? () => goToPrevious() : () => requestResetWizard()
+  const topButtonLabel = showStackPivot ? "Choose a different stack" : "Start Over"
+  const topButtonHandler = showStackPivot ? () => goToPrevious() : () => requestResetWizard()
 
   const wizardLayout = (
     <div className="mx-auto flex w-full max-w-4xl flex-col gap-6">
@@ -682,7 +682,7 @@ export function InstructionsWizard({ onClose, selectedFileId }: InstructionsWiza
         </section>
       ) : null}
 
-      {showFrameworkPivot ? (
+      {showStackPivot ? (
         <section className="rounded-3xl border border-border/80 bg-card/95 p-6 shadow-lg">
           <div className="flex flex-col gap-6">
             <div className="space-y-4">

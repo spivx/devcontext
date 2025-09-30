@@ -6,7 +6,7 @@ This guide provides conventions and best practices for building AI agent applica
 
 ## 1. Project Overview
 
-- Framework/Language: **{{frameworkSelection}}** / **{{language}}**
+- Stack/Language: **{{stackSelection}}** / **{{language}}**
 - Build tooling: **{{tooling}}**
 - Primary focus: **{{projectPriority}}**
 

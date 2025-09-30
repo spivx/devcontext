@@ -1,8 +1,8 @@
 [
     {
-        "id": "frameworkSelection",
-        "question": "Which framework are you working with?",
-        "responseKey": "frameworkSelection",
+        "id": "stackSelection",
+        "question": "Which stack are you working with?",
+        "responseKey": "stackSelection",
         "isReadOnlyOnSummary": true,
         "answers": [
             {
