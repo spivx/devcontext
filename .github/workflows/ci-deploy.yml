@@ -52,7 +52,7 @@ jobs:
         with:
           step: start
           token: ${{ secrets.GITHUB_TOKEN }}
-          env: production
+          env: github-production
           ref: ${{ github.sha }}
 
       # Update deployment status based on job result
