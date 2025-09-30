@@ -1,12 +1,3 @@
-export type FrameworkConfig = {
-    id: string
-    label: string
-    icon?: string
-    enabled?: boolean
-    docs?: string
-    isDefault?: boolean
-}
-
 export type DataAnswerSource = {
     value: string
     label: string
@@ -19,6 +10,9 @@ export type DataAnswerSource = {
     isDefault?: boolean
     disabled?: boolean
     disabledLabel?: string
+    enabled?: boolean
+    filename?: string
+    format?: string
 }
 
 export type DataQuestionSource = {
@@ -26,6 +20,7 @@ export type DataQuestionSource = {
     question: string
     allowMultiple?: boolean
     responseKey?: string
+    isReadOnlyOnSummary?: boolean
     answers: DataAnswerSource[]
 }
 
@@ -51,6 +46,9 @@ export type WizardAnswer = {
     disabled?: boolean
     disabledLabel?: string
     docs?: string
+    filename?: string
+    format?: string
+    enabled?: boolean
 }
 
 export type WizardQuestion = {
@@ -58,6 +56,7 @@ export type WizardQuestion = {
     question: string
     allowMultiple?: boolean
     responseKey?: string
+    isReadOnlyOnSummary?: boolean
     answers: WizardAnswer[]
 }
 

@@ -212,8 +212,7 @@
                 "cons": [
                     "More resource-heavy"
                 ],
-                "example": "npm install --save-dev cypress",
-                "isDefault": true
+                "example": "npm install --save-dev cypress"
             },
             {
                 "value": "playwright",
@@ -227,7 +226,8 @@
                 "cons": [
                     "Steeper learning curve"
                 ],
-                "example": "npm install --save-dev playwright"
+                "example": "npm install --save-dev playwright",
+                "isDefault": true
             }
         ],
         "explanation": "E2E testing ensures workflows function correctly in the browser."
