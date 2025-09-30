@@ -65,7 +65,7 @@ export function WizardEditAnswerDialog({ question, value, onAnswerSelect, onClos
 
         {showNoMatches ? (
           <p className="rounded-xl border border-border/70 bg-muted/30 px-4 py-6 text-sm text-muted-foreground">
-            No options match "{query}". Try a different search.
+            No options match &ldquo;{query}&rdquo;. Try a different search.
           </p>
         ) : (
           <WizardAnswerGrid answers={answers} onAnswerClick={onAnswerSelect} isSelected={isSelected} />
