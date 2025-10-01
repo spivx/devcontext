@@ -69,5 +69,12 @@ export function buildFilterPlaceholder(question: WizardQuestion | null) {
     return ""
   }
 
-  return `Filter ${question.answers.length} options`
+  const defaultAnswer = question.answers.find((answer) => answer.isDefault && !answer.disabled)
+  const exampleLabel = defaultAnswer?.label?.trim() || defaultAnswer?.value?.trim()
+
+  if (exampleLabel && exampleLabel.length > 0) {
+    return `Type ${exampleLabel} for example...`
+  }
+
+  return "Type to filter options..."
 }
