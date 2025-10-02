@@ -55,11 +55,12 @@ export const buildCompletionSummary = (
   selectedFileFormatLabel: string | null,
   steps: WizardStep[],
   responses: Responses,
-  autoFilledMap: Record<string, boolean> = {}
+  autoFilledMap: Record<string, boolean> = {},
+  includeFileEntry = true
 ): CompletionSummaryEntry[] => {
-  const summary: CompletionSummaryEntry[] = [
-    buildFileSummaryEntry(fileQuestion, selectedFile, selectedFileFormatLabel),
-  ]
+  const summary: CompletionSummaryEntry[] = includeFileEntry
+    ? [buildFileSummaryEntry(fileQuestion, selectedFile, selectedFileFormatLabel)]
+    : []
 
   steps.forEach((step) => {
     step.questions.forEach((question) => {

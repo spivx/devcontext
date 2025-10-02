@@ -11,16 +11,15 @@ const geistSans = Geist({
   subsets: ["latin"],
 });
 
-
 const geistMono = Geist_Mono({
   variable: "--font-geist-mono",
   subsets: ["latin"],
 });
 
-const siteUrl = "https://devcontext.com";
-const siteTitle = "DevContext – AI Coding Guidelines & Context Generator";
+const siteUrl = "https://devcontext.xyz";
+const siteTitle = "DevContext – AI Coding Guidelines & Repo Analyzer";
 const siteDescription =
-  "DevContext helps developers generate AI config files like Copilot instructions, Cursor rules, and prompts — consistent, fast, IDE-ready.";
+  "DevContext helps developers generate AI config files like Copilot instructions, Cursor rules, and agents.md. Start fresh with a guided wizard or analyze your GitHub repo to auto-detect stack, frameworks, and best practices — consistent, fast, and IDE-ready.";
 
 const ogImage = `${siteUrl}/og-image.png`;
 
@@ -46,14 +45,22 @@ const structuredData = {
   featureList: [
     "Guided wizard for AI coding instructions",
     "Prebuilt templates for Copilot, Cursor, and IDE agents",
-    "Context-aware questions with best-practice examples",
+    "Scan a GitHub repo to auto-detect stack, frameworks, and tooling",
+    "Context-aware questions with best-practice suggestions",
+    "Instant boilerplate generation with smart defaults",
   ],
   keywords: [
+    "AI coding guidelines",
+    "Copilot instructions generator",
+    "Cursor rules builder",
+    "IDE setup automation",
+    "Developer onboarding docs",
     "generate Copilot instructions file",
     "generate agents file",
-    "generate AI instructions",
     "generate Cursor rules",
-    "AI development workflows",
+    "AI repo analyzer",
+    "GitHub repo scanner for Copilot",
+    "repo-aware coding guidelines",
   ],
 };
 
@@ -79,6 +86,10 @@ export const metadata: Metadata = {
     "Copilot instructions",
     "Cursor rules",
     "agents md",
+    "GitHub repo analyzer",
+    "generate coding standards from GitHub repo",
+    "repo-aware AI coding guidelines",
+    "auto-detect framework coding rules",
   ],
   authors: [{ name: "DevContext" }],
   creator: "DevContext",
@@ -89,8 +100,7 @@ export const metadata: Metadata = {
   },
   openGraph: {
     title: siteTitle,
-    description:
-      "Generate AI config files like Copilot instructions, Cursor rules, and prompts. Consistent, fast, and IDE-ready.",
+    description: siteDescription,
     url: siteUrl,
     siteName: "DevContext",
     images: [
@@ -107,8 +117,7 @@ export const metadata: Metadata = {
   twitter: {
     card: "summary_large_image",
     title: siteTitle,
-    description:
-      "Generate AI config files like Copilot instructions, Cursor rules, and prompts. Consistent, fast, and IDE-ready.",
+    description: siteDescription,
     images: [ogImage],
     site: "@devcontext",
   },
@@ -141,20 +150,21 @@ export const metadata: Metadata = {
   },
 };
 
-
-
 export default function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-
   return (
     <html lang="en" suppressHydrationWarning className="dark">
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <Script id="structured-data" type="application/ld+json" strategy="beforeInteractive">
+        <Script
+          id="structured-data"
+          type="application/ld+json"
+          strategy="beforeInteractive"
+        >
           {JSON.stringify(structuredData)}
         </Script>
         <ThemeProvider

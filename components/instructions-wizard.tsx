@@ -1,157 +1,45 @@
 "use client"
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react"
+import Link from "next/link"
+
 import { Button } from "@/components/ui/button"
 import { Undo2 } from "lucide-react"
 
-import type { DataQuestionSource, InstructionsWizardProps, Responses, WizardAnswer, WizardConfirmationIntent, WizardQuestion, WizardStep } from "@/types/wizard"
+import type { InstructionsWizardProps, Responses, WizardAnswer, WizardQuestion, WizardStep, WizardConfirmationIntent } from "@/types/wizard"
 import { buildFilterPlaceholder, useAnswerFilter } from "@/hooks/use-answer-filter"
-import stacksData from "@/data/stacks.json"
-import generalData from "@/data/general.json"
-import architectureData from "@/data/architecture.json"
-import performanceData from "@/data/performance.json"
-import securityData from "@/data/security.json"
-import commitsData from "@/data/commits.json"
-import filesData from "@/data/files.json"
-import FinalOutputView from "./final-output-view"
-import { WizardAnswerGrid } from "./wizard-answer-grid"
-import { WizardCompletionSummary } from "./wizard-completion-summary"
-import { WizardConfirmationDialog } from "./wizard-confirmation-dialog"
-import { WizardEditAnswerDialog } from "./wizard-edit-answer-dialog"
-
-import { generateInstructions } from "@/lib/instructions-api"
-import { buildCompletionSummary } from "@/lib/wizard-summary"
-import { serializeWizardResponses } from "@/lib/wizard-response"
-import { buildFileOptionsFromQuestion, buildStepFromQuestionSet, getFormatLabel, mapAnswerSourceToWizard } from "@/lib/wizard-utils"
-import type { GeneratedFileResult } from "@/types/output"
-
-const STACK_STEP_ID = "stacks"
-const STACK_QUESTION_ID = "stackSelection"
-const DEVCONTEXT_ROOT_URL = "https://devcontext.xyz/"
-
-const stackQuestionSet = stacksData as DataQuestionSource[]
-const stacksStep = buildStepFromQuestionSet(
+import {
+  STACK_QUESTION_ID,
   STACK_STEP_ID,
-  "Choose Your Stack",
-  stackQuestionSet
-)
-const stackQuestion = stacksStep.questions.find((question) => question.id === STACK_QUESTION_ID) ?? null
+  loadStackWizardStep,
+  stackQuestion,
+  stacksStep,
+  getSuffixSteps,
+} from "@/lib/wizard-config"
+import { persistWizardState, clearWizardState } from "@/lib/wizard-storage"
+import { WizardAnswerGrid } from "./wizard-answer-grid"
+import { WizardConfirmationDialog } from "./wizard-confirmation-dialog"
 
-const fileQuestionSet = filesData as DataQuestionSource[]
-const fileQuestion = fileQuestionSet[0] ?? null
-const fileOptions = buildFileOptionsFromQuestion(fileQuestion)
-const defaultFileOption =
-  fileOptions.find((file) => file.isDefault) ??
-  fileOptions[0] ??
-  null
-const fileSummaryQuestion = fileQuestion
-  ? {
-      id: fileQuestion.id,
-      question: fileQuestion.question,
-      isReadOnlyOnSummary: fileQuestion.isReadOnlyOnSummary,
-    }
-  : null
+const suffixSteps = getSuffixSteps()
 
-const generalStep = buildStepFromQuestionSet(
-  "general",
-  "Project Foundations",
-  generalData as DataQuestionSource[]
-)
-
-const architectureStep = buildStepFromQuestionSet(
-  "architecture",
-  "Architecture Practices",
-  architectureData as DataQuestionSource[]
-)
-
-const performanceStep = buildStepFromQuestionSet(
-  "performance",
-  "Performance Guidelines",
-  performanceData as DataQuestionSource[]
-)
-
-const securityStep = buildStepFromQuestionSet(
-  "security",
-  "Security & Compliance",
-  securityData as DataQuestionSource[]
-)
-
-const commitsStep = buildStepFromQuestionSet(
-  "commits",
-  "Collaboration & Version Control",
-  commitsData as DataQuestionSource[]
-)
-
-const suffixSteps: WizardStep[] = [
-  generalStep,
-  architectureStep,
-  performanceStep,
-  securityStep,
-  commitsStep,
-]
-
-export function InstructionsWizard({ onClose, selectedFileId, initialStackId }: InstructionsWizardProps) {
+export function InstructionsWizard({
+  initialStackId,
+  onStackSelected,
+  onStackCleared,
+  autoStartAfterStackSelection = true,
+  onComplete,
+}: InstructionsWizardProps) {
   const [currentStepIndex, setCurrentStepIndex] = useState(0)
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0)
   const [responses, setResponses] = useState<Responses>({})
   const [dynamicSteps, setDynamicSteps] = useState<WizardStep[]>([])
-  const [isComplete, setIsComplete] = useState(false)
-  const [pendingConfirmation, setPendingConfirmation] = useState<WizardConfirmationIntent | null>(null)
-  const [generatedFile, setGeneratedFile] = useState<GeneratedFileResult | null>(null)
-  const [isGenerating, setIsGenerating] = useState(false)
   const [isStackFastTrackPromptVisible, setIsStackFastTrackPromptVisible] = useState(false)
+  const [pendingConfirmation, setPendingConfirmation] = useState<WizardConfirmationIntent | null>(null)
   const [autoFilledQuestionMap, setAutoFilledQuestionMap] = useState<Record<string, boolean>>({})
-  const [autoFillNotice, setAutoFillNotice] = useState<string | null>(null)
-  const [activeEditQuestionId, setActiveEditQuestionId] = useState<string | null>(null)
   const hasAppliedInitialStack = useRef<string | null>(null)
+  const [activeStackLabel, setActiveStackLabel] = useState<string | null>(null)
 
-  useEffect(() => {
-    if (!isComplete && activeEditQuestionId) {
-      setActiveEditQuestionId(null)
-    }
-  }, [isComplete, activeEditQuestionId])
-
-  const selectedFile = useMemo(() => {
-    if (selectedFileId) {
-      const matchedFile = fileOptions.find((file) => file.id === selectedFileId)
-      if (matchedFile) {
-        return matchedFile
-      }
-    }
-
-    return defaultFileOption
-  }, [selectedFileId])
-
-  const selectedFileFormatLabel = useMemo(
-    () => (selectedFile ? getFormatLabel(selectedFile.format) : null),
-    [selectedFile]
-  )
-
-  const wizardSteps = useMemo(
-    () => [stacksStep, ...dynamicSteps, ...suffixSteps],
-    [dynamicSteps]
-  )
-
-  const nonStackSteps = useMemo(
-    () => wizardSteps.filter((step) => step.id !== STACK_STEP_ID),
-    [wizardSteps]
-  )
-
-  const wizardQuestionsById = useMemo(() => {
-    const lookup: Record<string, WizardQuestion> = {}
-
-    wizardSteps.forEach((step) => {
-      step.questions.forEach((question) => {
-        lookup[question.id] = question
-      })
-    })
-
-    return lookup
-  }, [wizardSteps])
-
-  const editingQuestion = activeEditQuestionId ? wizardQuestionsById[activeEditQuestionId] ?? null : null
-  const editingAnswerValue = editingQuestion ? responses[editingQuestion.id] : undefined
-
+  const wizardSteps = useMemo(() => [stacksStep, ...dynamicSteps, ...suffixSteps], [dynamicSteps])
   const currentStep = wizardSteps[currentStepIndex] ?? null
   const currentQuestion = currentStep?.questions[currentQuestionIndex] ?? null
 
@@ -161,6 +49,7 @@ export function InstructionsWizard({ onClose, selectedFileId, initialStackId }: 
     setQuery: setAnswerFilterQuery,
     isFiltering: isFilteringAnswers,
   } = useAnswerFilter(currentQuestion ?? null)
+
   const filterPlaceholder = buildFilterPlaceholder(currentQuestion ?? null)
   const showNoFilterMatches = Boolean(
     currentQuestion?.enableFilter &&
@@ -168,29 +57,6 @@ export function InstructionsWizard({ onClose, selectedFileId, initialStackId }: 
     answerFilterQuery.trim().length > 0
   )
   const filterInputId = currentQuestion ? `answer-filter-${currentQuestion.id}` : "answer-filter"
-
-  const totalQuestions = useMemo(
-    () => wizardSteps.reduce((count, step) => count + step.questions.length, 0),
-    [wizardSteps]
-  )
-
-  const remainingQuestionCount = useMemo(
-    () => nonStackSteps.reduce((count, step) => count + step.questions.length, 0),
-    [nonStackSteps]
-  )
-
-  const completionSummary = useMemo(
-    () =>
-      buildCompletionSummary(
-        fileSummaryQuestion,
-        selectedFile ?? null,
-        selectedFileFormatLabel,
-        wizardSteps,
-        responses,
-        autoFilledQuestionMap
-      ),
-    [selectedFile, selectedFileFormatLabel, wizardSteps, responses, autoFilledQuestionMap]
-  )
 
   const currentAnswerValue = currentQuestion ? responses[currentQuestion.id] : undefined
 
@@ -212,7 +78,6 @@ export function InstructionsWizard({ onClose, selectedFileId, initialStackId }: 
   }, [currentAnswerValue, currentQuestion, defaultAnswer])
 
   const canUseDefault = Boolean(
-    !isComplete &&
     currentQuestion &&
     defaultAnswer &&
     !defaultAnswer.disabled &&
@@ -223,8 +88,10 @@ export function InstructionsWizard({ onClose, selectedFileId, initialStackId }: 
     ? `Use default (${defaultAnswer.label})`
     : "Use default"
 
-  const showStackPivot = !isComplete && isStackFastTrackPromptVisible
-  const showQuestionControls = !isComplete && !isStackFastTrackPromptVisible
+  const selectedStackId = useMemo(() => {
+    const value = responses[STACK_QUESTION_ID]
+    return typeof value === "string" && value.length > 0 ? value : null
+  }, [responses])
 
   const markQuestionsAutoFilled = useCallback((questionIds: string[]) => {
     if (questionIds.length === 0) {
@@ -254,17 +121,97 @@ export function InstructionsWizard({ onClose, selectedFileId, initialStackId }: 
     })
   }, [])
 
-  const closeEditDialog = useCallback(() => {
-    setActiveEditQuestionId(null)
-  }, [])
+  const persistStateIfPossible = useCallback(
+    (nextResponses: Responses, nextAutoFilled: Record<string, boolean>, stackId: string | null, stackLabel?: string | null) => {
+      if (!stackId) {
+        return
+      }
 
-  const isAnswerSelected = (value: string) => {
-    if (currentQuestion?.allowMultiple) {
-      return Array.isArray(currentAnswerValue) && currentAnswerValue.includes(value)
+      persistWizardState({
+        stackId,
+        stackLabel: stackLabel ?? undefined,
+        responses: nextResponses,
+        autoFilledMap: nextAutoFilled,
+        updatedAt: Date.now(),
+      })
+    },
+    []
+  )
+
+  const loadStackQuestions = useCallback(
+    async (
+      stackId: string,
+      stackLabelFromAnswer?: string,
+      options?: { skipFastTrackPrompt?: boolean }
+    ) => {
+      try {
+        const { step, label } = await loadStackWizardStep(stackId, stackLabelFromAnswer)
+        setActiveStackLabel(label)
+
+        setDynamicSteps([step])
+        setIsStackFastTrackPromptVisible(!options?.skipFastTrackPrompt && step.questions.length > 0)
+
+        setResponses((prev) => {
+          const next: Responses = { ...prev }
+          step.questions.forEach((question) => {
+            delete next[question.id]
+          })
+          return next
+        })
+        setCurrentStepIndex(1)
+        setCurrentQuestionIndex(0)
+        setAutoFilledQuestionMap({})
+      } catch (error) {
+        console.error(`Unable to load questions for stack "${stackId}"`, error)
+        setDynamicSteps([])
+        setIsStackFastTrackPromptVisible(false)
+      }
+    },
+    []
+  )
+
+  useEffect(() => {
+    if (!initialStackId) {
+      return
     }
 
-    return currentAnswerValue === value
-  }
+    if (hasAppliedInitialStack.current === initialStackId) {
+      return
+    }
+
+    const stackAnswer = stackQuestion?.answers.find((answer) => answer.value === initialStackId)
+
+    if (!stackAnswer) {
+      return
+    }
+
+    hasAppliedInitialStack.current = initialStackId
+
+    setResponses((prev) => ({
+      ...prev,
+      [STACK_QUESTION_ID]: stackAnswer.value,
+    }))
+
+    void loadStackQuestions(stackAnswer.value, stackAnswer.label, {
+      skipFastTrackPrompt: autoStartAfterStackSelection,
+    })
+  }, [initialStackId, loadStackQuestions, autoStartAfterStackSelection])
+
+  useEffect(() => {
+    if (!selectedStackId) {
+      return
+    }
+
+    persistStateIfPossible(responses, autoFilledQuestionMap, selectedStackId, activeStackLabel)
+  }, [responses, autoFilledQuestionMap, selectedStackId, activeStackLabel, persistStateIfPossible])
+
+  const handleWizardCompletion = useCallback(() => {
+    if (!selectedStackId) {
+      return
+    }
+
+    onComplete?.(selectedStackId)
+  }, [selectedStackId, onComplete])
 
   const advanceToNextQuestion = () => {
     const currentStepForAdvance = wizardSteps[currentStepIndex]
@@ -273,7 +220,7 @@ export function InstructionsWizard({ onClose, selectedFileId, initialStackId }: 
     const isLastStep = currentStepIndex === wizardSteps.length - 1
 
     if (isLastQuestionInStep && isLastStep) {
-      setIsComplete(true)
+      handleWizardCompletion()
       return
     }
 
@@ -303,99 +250,13 @@ export function InstructionsWizard({ onClose, selectedFileId, initialStackId }: 
       const previousStep = wizardSteps[previousStepIndex]
       setCurrentStepIndex(previousStepIndex)
       setCurrentQuestionIndex(previousStep.questions.length - 1)
-      setIsComplete(false)
       return
     }
 
     setCurrentQuestionIndex((prev) => Math.max(prev - 1, 0))
-    setIsComplete(false)
   }
 
-  const loadStackQuestions = useCallback(async (stackId: string, stackLabel?: string) => {
-    try {
-      setGeneratedFile(null)
-
-      const questionsModule = await import(`@/data/questions/${stackId}.json`)
-      const questionsData = (questionsModule.default ?? questionsModule) as DataQuestionSource[]
-
-      const mappedQuestions: WizardQuestion[] = questionsData.map((question) => ({
-        id: question.id,
-        question: question.question,
-        allowMultiple: question.allowMultiple,
-        responseKey: question.responseKey,
-        answers: question.answers.map(mapAnswerSourceToWizard),
-      }))
-
-      const followUpQuestionCount =
-        mappedQuestions.length + suffixSteps.reduce((count, step) => count + step.questions.length, 0)
-
-      setAutoFilledQuestionMap({})
-      setAutoFillNotice(null)
-
-      const resolvedStackLabel =
-        stackLabel ?? stackQuestion?.answers.find((answer) => answer.value === stackId)?.label ?? stackId
-
-      setDynamicSteps([
-        {
-          id: `stack-${stackId}`,
-          title: `${resolvedStackLabel} Preferences`,
-          questions: mappedQuestions,
-        },
-      ])
-
-      setIsStackFastTrackPromptVisible(followUpQuestionCount > 0)
-
-      setResponses((prev) => {
-        const next = { ...prev }
-        mappedQuestions.forEach((question) => {
-          delete next[question.id]
-        })
-        return next
-      })
-
-      setCurrentStepIndex(1)
-      setCurrentQuestionIndex(0)
-      setIsComplete(false)
-    } catch (error) {
-      console.error(`Unable to load questions for stack "${stackId}"`, error)
-      setDynamicSteps([])
-      setIsStackFastTrackPromptVisible(false)
-    }
-  }, [])
-
-  useEffect(() => {
-    if (!initialStackId) {
-      return
-    }
-
-    if (hasAppliedInitialStack.current === initialStackId) {
-      return
-    }
-
-    const stackAnswer = stackQuestion?.answers.find((answer) => answer.value === initialStackId)
-
-    if (!stackAnswer) {
-      return
-    }
-
-    hasAppliedInitialStack.current = initialStackId
-
-    setResponses((prev) => ({
-      ...prev,
-      [STACK_QUESTION_ID]: stackAnswer.value,
-    }))
-
-    void loadStackQuestions(stackAnswer.value, stackAnswer.label)
-  }, [initialStackId, loadStackQuestions])
-
-  if (!currentStep || !currentQuestion) {
-    return null
-  }
-
-  const applyDefaultsAcrossWizard = () => {
-    setGeneratedFile(null)
-    setAutoFilledQuestionMap({})
-
+  const applyDefaultsAcrossWizard = useCallback(() => {
     const autoFilledIds: string[] = []
 
     setResponses((prev) => {
@@ -425,23 +286,9 @@ export function InstructionsWizard({ onClose, selectedFileId, initialStackId }: 
     })
 
     markQuestionsAutoFilled(autoFilledIds)
-
-    if (autoFilledIds.length > 0) {
-      setAutoFillNotice("We applied the recommended defaults for you. Tweak any section before generating.")
-    } else {
-      setAutoFillNotice(null)
-    }
-
     setIsStackFastTrackPromptVisible(false)
-
-    const lastStepIndex = Math.max(wizardSteps.length - 1, 0)
-    const lastStep = wizardSteps[lastStepIndex]
-    const lastQuestionIndex = lastStep ? Math.max(lastStep.questions.length - 1, 0) : 0
-
-    setCurrentStepIndex(lastStepIndex)
-    setCurrentQuestionIndex(lastQuestionIndex)
-    setIsComplete(true)
-  }
+    handleWizardCompletion()
+  }, [markQuestionsAutoFilled, wizardSteps, handleWizardCompletion])
 
   const beginStepByStepFlow = () => {
     const firstNonStackIndex = wizardSteps.findIndex((step) => step.id !== STACK_STEP_ID)
@@ -452,22 +299,6 @@ export function InstructionsWizard({ onClose, selectedFileId, initialStackId }: 
     }
 
     setIsStackFastTrackPromptVisible(false)
-    setIsComplete(false)
-    setAutoFillNotice(null)
-  }
-
-  const handleEditEntry = (entryId: string) => {
-    if (!entryId) {
-      return
-    }
-
-    const question = wizardQuestionsById[entryId]
-
-    if (!question) {
-      return
-    }
-
-    setActiveEditQuestionId(entryId)
   }
 
   const handleQuestionAnswerSelection = async (
@@ -478,8 +309,6 @@ export function InstructionsWizard({ onClose, selectedFileId, initialStackId }: 
     if (answer.disabled) {
       return
     }
-
-    setGeneratedFile(null)
 
     const prevValue = responses[question.id]
     let nextValue: Responses[keyof Responses]
@@ -526,10 +355,14 @@ export function InstructionsWizard({ onClose, selectedFileId, initialStackId }: 
 
     if (isStackQuestion) {
       if (nextValue === answer.value) {
-        await loadStackQuestions(answer.value, answer.label)
+        await loadStackQuestions(answer.value, answer.label, {
+          skipFastTrackPrompt: autoStartAfterStackSelection,
+        })
+        onStackSelected?.(answer.value, answer.label)
       } else {
         setDynamicSteps([])
         setIsStackFastTrackPromptVisible(false)
+        onStackCleared?.()
       }
     }
   }
@@ -543,11 +376,9 @@ export function InstructionsWizard({ onClose, selectedFileId, initialStackId }: 
   }
 
   const applyDefaultAnswer = async () => {
-    if (!defaultAnswer || defaultAnswer.disabled) {
+    if (!defaultAnswer || defaultAnswer.disabled || !currentQuestion) {
       return
     }
-
-    setGeneratedFile(null)
 
     const nextValue: Responses[keyof Responses] = currentQuestion.allowMultiple
       ? [defaultAnswer.value]
@@ -563,7 +394,10 @@ export function InstructionsWizard({ onClose, selectedFileId, initialStackId }: 
     const isStackQuestion = currentQuestion.id === STACK_QUESTION_ID
 
     if (isStackQuestion) {
-      await loadStackQuestions(defaultAnswer.value, defaultAnswer.label)
+      await loadStackQuestions(defaultAnswer.value, defaultAnswer.label, {
+        skipFastTrackPrompt: autoStartAfterStackSelection,
+      })
+      onStackSelected?.(defaultAnswer.value, defaultAnswer.label)
       return
     }
 
@@ -571,38 +405,29 @@ export function InstructionsWizard({ onClose, selectedFileId, initialStackId }: 
       advanceToNextQuestion()
     }, 0)
   }
+
   const resetWizardState = () => {
+    const stackIdToClear = selectedStackId
     setResponses({})
     setDynamicSteps([])
     setCurrentStepIndex(0)
     setCurrentQuestionIndex(0)
-    setIsComplete(false)
-    setGeneratedFile(null)
-    setIsGenerating(false)
     setIsStackFastTrackPromptVisible(false)
     setAutoFilledQuestionMap({})
-    setAutoFillNotice(null)
+    setActiveStackLabel(null)
     hasAppliedInitialStack.current = null
+    if (stackIdToClear) {
+      clearWizardState(stackIdToClear)
+    }
   }
 
   const resetWizard = () => {
-    if (onClose) {
-      resetWizardState()
-      onClose()
-      return
-    }
-
     resetWizardState()
+    onStackCleared?.()
   }
 
   const requestResetWizard = () => {
     setPendingConfirmation("reset")
-  }
-
-  const requestChangeFile = () => {
-    if (typeof window !== "undefined") {
-      window.location.assign(DEVCONTEXT_ROOT_URL)
-    }
   }
 
   const confirmPendingConfirmation = () => {
@@ -614,15 +439,6 @@ export function InstructionsWizard({ onClose, selectedFileId, initialStackId }: 
       resetWizard()
     }
 
-    if (pendingConfirmation === "change-file") {
-      if (typeof window !== "undefined") {
-        window.location.assign(DEVCONTEXT_ROOT_URL)
-        return
-      }
-      resetWizard()
-      onClose?.()
-    }
-
     setPendingConfirmation(null)
   }
 
@@ -630,99 +446,53 @@ export function InstructionsWizard({ onClose, selectedFileId, initialStackId }: 
     setPendingConfirmation(null)
   }
 
-  const generateInstructionsFile = async () => {
-    if (isGenerating) {
-      return
+  const isAnswerSelected = (value: string) => {
+    if (currentQuestion?.allowMultiple) {
+      return Array.isArray(currentAnswerValue) && currentAnswerValue.includes(value)
     }
 
-    const outputFileId = selectedFile?.id ?? null
-    if (!outputFileId) {
-      console.error("No instructions file selected. Cannot generate output.")
-      return
-    }
-
-    setIsGenerating(true)
-    setGeneratedFile(null)
-
-    try {
-      const questionsAndAnswers = serializeWizardResponses(wizardSteps, responses, outputFileId)
-
-      console.log("Template combination data:", {
-        outputFile: questionsAndAnswers.outputFile,
-        stack: questionsAndAnswers.stackSelection,
-      })
-
-      const stackSegment = questionsAndAnswers.stackSelection ?? "general"
-      const fileConfig = fileOptions.find((file) => file.id === outputFileId)
-
-      const result = await generateInstructions({
-        stackSegment,
-        outputFileId,
-        responses: questionsAndAnswers,
-        fileFormat: fileConfig?.format,
-      })
-
-      if (result) {
-        setGeneratedFile(result)
-      }
-    } catch (error) {
-      console.error("Error calling generate API:", error)
-    } finally {
-      setIsGenerating(false)
-    }
+    return currentAnswerValue === value
   }
 
   const questionNumber = wizardSteps
     .slice(0, currentStepIndex)
     .reduce((count, step) => count + step.questions.length, 0) + currentQuestionIndex + 1
 
-  const isAtFirstQuestion = currentStepIndex === 0 && currentQuestionIndex === 0
-  const backDisabled = isAtFirstQuestion && !isComplete
-  const defaultButtonTitle = !canUseDefault
-    ? isComplete
-      ? "Questions complete"
-      : defaultAnswer?.disabled
-        ? "Default option unavailable"
-        : isDefaultSelected && !currentQuestion.allowMultiple
-          ? "Default already selected"
-          : defaultAnswer
-            ? undefined
-            : "No default available"
-    : undefined
-  const showChangeFile = Boolean(onClose && selectedFile)
+  const totalQuestions = useMemo(
+    () => wizardSteps.reduce((count, step) => count + step.questions.length, 0),
+    [wizardSteps]
+  )
 
-  const topButtonLabel = showStackPivot ? "Choose a different stack" : "Start Over"
-  const topButtonHandler = showStackPivot ? () => goToPrevious() : () => requestResetWizard()
+  const remainingQuestionCount = useMemo(() => {
+    return wizardSteps
+      .slice(currentStepIndex)
+      .reduce((count, step, stepIndex) => {
+        if (stepIndex === 0) {
+          return count + (step.questions.length - currentQuestionIndex)
+        }
+        return count + step.questions.length
+      }, 0)
+  }, [wizardSteps, currentStepIndex, currentQuestionIndex])
+
+  const isAtFirstQuestion = currentStepIndex === 0 && currentQuestionIndex === 0
+  const backDisabled = isAtFirstQuestion
+
+  if (!currentStep || !currentQuestion) {
+    return null
+  }
 
   const wizardLayout = (
     <div className="mx-auto flex w-full max-w-4xl flex-col gap-6">
-      <Button
-        variant="destructive"
-        size="sm"
-        onClick={topButtonHandler}
-        className="fixed left-4 top-4 z-40"
-      >
-        {topButtonLabel}
-      </Button>
+      <div className="flex items-center justify-start">
+        <Link
+          href="/"
+          className="text-sm font-semibold text-foreground transition hover:text-primary"
+        >
+          DevContext
+        </Link>
+      </div>
 
-      {selectedFile ? (
-        <section className="rounded-3xl border border-border/70 bg-secondary/20 p-5 shadow-sm">
-          <div className="flex flex-wrap items-center gap-3">
-            <div>
-              <p className="text-lg font-semibold text-foreground">
-                {selectedFile.filename ?? selectedFile.label}
-              </p>
-            </div>
-            {showChangeFile ? (
-              <Button variant="outline" size="sm" onClick={requestChangeFile}>
-                Change File
-              </Button>
-            ) : null}
-          </div>
-        </section>
-      ) : null}
-
-      {showStackPivot ? (
+      {isStackFastTrackPromptVisible ? (
         <section className="rounded-3xl border border-border/80 bg-card/95 p-6 shadow-lg">
           <div className="flex flex-col gap-6">
             <div className="space-y-4">
@@ -730,30 +500,21 @@ export function InstructionsWizard({ onClose, selectedFileId, initialStackId }: 
                 <h1 className="text-3xl font-semibold text-foreground">Skip the deep dive?</h1>
                 <p className="text-sm text-muted-foreground">
                   We can auto-apply the recommended answers for the next {remainingQuestionCount}{" "}
-                  {remainingQuestionCount === 1 ? "question" : "questions"} across these sections. (You can still tweak the defaults.)
+                  {remainingQuestionCount === 1 ? "question" : "questions"}. You can still tweak everything later.
                 </p>
               </div>
-              <div className="flex flex-wrap items-center justify-between gap-3">
-                <div className="flex flex-wrap gap-2">
-                  <Button variant="secondary" className="px-5" onClick={() => beginStepByStepFlow()}>
-                    Fill it out step-by-step
-                  </Button>
-                  <Button
-                    onClick={() => applyDefaultsAcrossWizard()}
-                    disabled={remainingQuestionCount === 0}
-                    className="px-5"
-                  >
-                    Use recommended defaults
-                  </Button>
-                </div>
+              <div className="flex flex-wrap items-center gap-3">
+                <Button variant="secondary" className="px-5" onClick={() => beginStepByStepFlow()}>
+                  Fill it out step-by-step
+                </Button>
+                <Button onClick={() => applyDefaultsAcrossWizard()} className="px-5">
+                  Use recommended defaults
+                </Button>
               </div>
             </div>
-
           </div>
         </section>
-      ) : null}
-
-      {showQuestionControls ? (
+      ) : (
         <section className="rounded-3xl border border-border/80 bg-card/95 p-6 shadow-lg">
           <div className="flex flex-col gap-4">
             <div className="flex flex-wrap items-center gap-2">
@@ -770,7 +531,6 @@ export function InstructionsWizard({ onClose, selectedFileId, initialStackId }: 
                 variant="outline"
                 onClick={() => void applyDefaultAnswer()}
                 disabled={!canUseDefault}
-                title={defaultButtonTitle}
               >
                 {defaultButtonLabel}
               </Button>
@@ -797,19 +557,19 @@ export function InstructionsWizard({ onClose, selectedFileId, initialStackId }: 
                     placeholder={filterPlaceholder}
                     className="w-full rounded-lg border border-border/70 bg-background/80 px-3 py-2 text-sm text-foreground shadow-sm transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/60"
                   />
+                  {isFilteringAnswers ? (
+                    <span className="absolute inset-y-0 right-3 inline-flex items-center text-xs text-muted-foreground">
+                      Filtering…
+                    </span>
+                  ) : null}
                 </div>
-                {isFilteringAnswers && !showNoFilterMatches ? (
-                  <p className="text-xs text-muted-foreground sm:text-right">
-                    Showing {filteredAnswers.length} of {currentQuestion.answers.length}
-                  </p>
-                ) : null}
               </div>
             ) : null}
           </div>
 
           {showNoFilterMatches ? (
             <p className="mt-6 rounded-xl border border-border/70 bg-muted/30 px-4 py-6 text-sm text-muted-foreground">
-              No options match &ldquo;{answerFilterQuery}&rdquo;. Try a different search.
+              No options match “{answerFilterQuery}”. Try a different search.
             </p>
           ) : (
             <WizardAnswerGrid
@@ -819,58 +579,31 @@ export function InstructionsWizard({ onClose, selectedFileId, initialStackId }: 
             />
           )}
 
-          <div className="mt-6 flex items-center justify-end">
+          <div className="mt-6 flex flex-wrap items-center justify-between gap-3">
             <div className="text-xs text-muted-foreground">
               Question {questionNumber} of {totalQuestions}
             </div>
+            <Button
+              variant="destructive"
+              size="sm"
+              onClick={requestResetWizard}
+            >
+              Start Over
+            </Button>
           </div>
         </section>
-      ) : null}
-
-      {isComplete ? (
-        <WizardCompletionSummary
-          summary={completionSummary}
-          onBack={goToPrevious}
-          onGenerate={() => void generateInstructionsFile()}
-          isGenerating={isGenerating}
-          autoFillNotice={autoFillNotice}
-          onEditEntry={handleEditEntry}
-        />
-      ) : null}
-
-      {pendingConfirmation ? (
-        <WizardConfirmationDialog
-          intent={pendingConfirmation}
-          onCancel={cancelPendingConfirmation}
-          onConfirm={confirmPendingConfirmation}
-        />
-      ) : null}
+      )}
     </div>
   )
 
   return (
     <>
       {wizardLayout}
-      {editingQuestion ? (
-        <WizardEditAnswerDialog
-          question={editingQuestion}
-          value={editingAnswerValue}
-          onAnswerSelect={async (selectedAnswer) => {
-            await handleQuestionAnswerSelection(editingQuestion, selectedAnswer, { skipAutoAdvance: true })
-
-            if (!editingQuestion.allowMultiple) {
-              closeEditDialog()
-            }
-          }}
-          onClose={closeEditDialog}
-        />
-      ) : null}
-      {generatedFile ? (
-        <FinalOutputView
-          fileName={generatedFile.fileName}
-          fileContent={generatedFile.fileContent}
-          mimeType={generatedFile.mimeType}
-          onClose={() => setGeneratedFile(null)}
+      {pendingConfirmation ? (
+        <WizardConfirmationDialog
+          intent={pendingConfirmation}
+          onCancel={cancelPendingConfirmation}
+          onConfirm={confirmPendingConfirmation}
         />
       ) : null}
     </>

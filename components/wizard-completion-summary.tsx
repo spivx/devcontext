@@ -1,5 +1,6 @@
 import { Button } from "@/components/ui/button"
 import type { CompletionSummaryEntry } from "@/lib/wizard-summary"
+import type { FileOutputConfig } from "@/types/wizard"
 
 type WizardCompletionSummaryProps = {
   summary: CompletionSummaryEntry[]
@@ -8,6 +9,9 @@ type WizardCompletionSummaryProps = {
   isGenerating: boolean
   autoFillNotice?: string | null
   onEditEntry?: (entryId: string) => void
+  fileOptions: FileOutputConfig[]
+  selectedFileId: string | null
+  onSelectFile: (fileId: string) => void
 }
 
 export function WizardCompletionSummary({
@@ -17,7 +21,12 @@ export function WizardCompletionSummary({
   isGenerating,
   autoFillNotice,
   onEditEntry,
+  fileOptions,
+  selectedFileId,
+  onSelectFile,
 }: WizardCompletionSummaryProps) {
+  const selectedOption = fileOptions.find((file) => file.id === selectedFileId) ?? null
+
   return (
     <div className="space-y-6 rounded-3xl border border-border/80 bg-card/95 p-8 shadow-lg">
       <div className="space-y-3">
@@ -32,7 +41,11 @@ export function WizardCompletionSummary({
             <Button variant="outline" onClick={onBack}>
               Back to questions
             </Button>
-            <Button onClick={onGenerate} disabled={isGenerating}>
+            <Button
+              onClick={onGenerate}
+              disabled={isGenerating}
+              className="h-[26px] px-4 py-0 leading-none"
+            >
               {isGenerating ? "Generating..." : "Generate My Instructions"}
             </Button>
           </div>
@@ -44,6 +57,43 @@ export function WizardCompletionSummary({
         ) : null}
       </div>
 
+      <div className="space-y-4 rounded-2xl border border-border/70 bg-background/90 p-5">
+        <div className="flex flex-wrap items-center justify-between gap-2">
+          <div>
+            <p className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">
+              Output file
+            </p>
+            <p className="text-sm text-muted-foreground">
+              Pick the instructions file format to generate. You can change this anytime.
+            </p>
+          </div>
+          {selectedOption ? (
+            <span className="rounded-full bg-secondary/30 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+              {selectedOption.filename}
+            </span>
+          ) : null}
+        </div>
+        <div className="grid gap-3 md:grid-cols-3">
+          {fileOptions.map((file) => {
+            const isSelected = file.id === selectedFileId
+            return (
+              <button
+                key={file.id}
+                type="button"
+                onClick={() => onSelectFile(file.id)}
+                className={`flex flex-col gap-2 rounded-2xl border px-4 py-3 text-left transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/60 ${isSelected
+                  ? "border-primary bg-primary/10 shadow-lg shadow-primary/20"
+                  : "border-border/60 bg-background/95 hover:-translate-y-0.5 hover:border-primary/40 hover:shadow-md"
+                  }`}
+              >
+                <span className="text-sm font-semibold text-foreground">{file.label}</span>
+                <span className="text-xs text-muted-foreground">{file.filename}</span>
+              </button>
+            )
+          })}
+        </div>
+      </div>
+
       <div className="space-y-3">
         {summary.map((entry) => (
           <div
@@ -52,11 +102,6 @@ export function WizardCompletionSummary({
           >
             <div className="flex flex-wrap items-start justify-between gap-3">
               <p className="text-sm font-medium text-muted-foreground">{entry.question}</p>
-              {entry.isAutoFilled ? (
-                <span className="rounded-full bg-secondary/30 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-                  Default applied
-                </span>
-              ) : null}
             </div>
             {entry.hasSelection ? (
               <ul className="mt-2 list-disc space-y-1 pl-5 text-sm text-foreground">

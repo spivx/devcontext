@@ -30,6 +30,7 @@ export type FileOutputConfig = {
     label: string
     filename: string
     format: string
+    slug: string
     enabled?: boolean
     icon?: string
     docs?: string
@@ -68,12 +69,14 @@ export type WizardStep = {
     questions: WizardQuestion[]
 }
 
-export type WizardConfirmationIntent = "change-file" | "reset"
+export type WizardConfirmationIntent = "reset"
 
 export type InstructionsWizardProps = {
-    selectedFileId?: string | null
-    onClose?: () => void
     initialStackId?: string | null
+    onStackSelected?: (stackId: string, stackLabel?: string) => void
+    onStackCleared?: () => void
+    autoStartAfterStackSelection?: boolean
+    onComplete?: (stackId: string | null) => void
 }
 
 export type Responses = Record<string, string | string[] | null | undefined>
