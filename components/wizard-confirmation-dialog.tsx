@@ -17,11 +17,6 @@ const copyByIntent: Record<WizardConfirmationIntent, {
     description: "This will clear all of your current selections. Are you sure you want to continue?",
     confirmLabel: "Reset Wizard",
   },
-  "change-file": {
-    title: "Change file?",
-    description: "Switching files will clear all of your current selections. Are you sure you want to continue?",
-    confirmLabel: "Change File",
-  },
 }
 
 export function WizardConfirmationDialog({ intent, onCancel, onConfirm }: WizardConfirmationDialogProps) {

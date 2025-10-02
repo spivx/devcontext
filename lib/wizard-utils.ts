@@ -1,5 +1,28 @@
 import type { DataAnswerSource, DataQuestionSource, FileOutputConfig, WizardAnswer, WizardStep } from "@/types/wizard"
 
+const buildFileSlug = (filename?: string, fallback?: string) => {
+    const base = filename ?? fallback ?? ""
+    const trimmed = base.trim()
+
+    if (!trimmed) {
+        return (fallback ?? "file").toLowerCase()
+    }
+
+    const withoutLeadingDot = trimmed.replace(/^\./, "")
+    const noExtension = withoutLeadingDot.replace(/\.[^./]+$/, "")
+    const normalizedSeparators = noExtension.replace(/[\\/]+/g, "-")
+    const collapsed = normalizedSeparators.replace(/[^a-zA-Z0-9]+/g, "-")
+    const hyphenReduced = collapsed.replace(/-+/g, "-")
+    const trimmedHyphen = hyphenReduced.replace(/^-|-$/g, "")
+
+    const slug = trimmedHyphen.toLowerCase()
+    if (slug.length === 0) {
+        return (fallback ?? "file").toLowerCase()
+    }
+
+    return slug
+}
+
 /**
  * Maps a data answer source to a wizard answer format
  */
@@ -69,6 +92,7 @@ export const buildFileOptionsFromQuestion = (
             label: answer.label,
             filename: answer.filename ?? answer.label,
             format: answer.format ?? "markdown",
+            slug: buildFileSlug(answer.filename, answer.value ?? answer.label),
             enabled: answer.enabled,
             icon: answer.icon,
             docs: answer.docs,

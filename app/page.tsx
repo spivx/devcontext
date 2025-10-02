@@ -10,7 +10,10 @@ export default function LandingPage() {
     <div className="relative min-h-screen overflow-hidden bg-background text-foreground">
       <AnimatedBackground />
       <div className="relative z-10 flex min-h-screen flex-col">
-        <header className="flex items-center justify-end px-6 py-6 lg:px-12 lg:py-8">
+        <header className="flex items-center justify-between px-6 py-6 lg:px-12 lg:py-8">
+          <Link href="/" className="text-sm font-semibold text-foreground transition hover:text-primary">
+            DevContext
+          </Link>
           <div className="flex items-center gap-3">
             <Button asChild variant="ghost" size="sm" className="hidden sm:inline-flex">
               <Link href="/stacks">Browse stacks</Link>

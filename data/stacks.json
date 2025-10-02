@@ -30,17 +30,6 @@
                 ]
             },
             {
-                "value": "angular",
-                "label": "Angular",
-                "icon": "angular",
-                "docs": "https://angular.io/docs",
-                "tags": [
-                    "frontend",
-                    "typescript",
-                    "spa"
-                ]
-            },
-            {
                 "value": "python",
                 "label": "Python",
                 "icon": "python",
@@ -49,6 +38,17 @@
                     "backend",
                     "scripting",
                     "language"
+                ]
+            },
+            {
+                "value": "angular",
+                "label": "Angular",
+                "icon": "angular",
+                "docs": "https://angular.io/docs",
+                "tags": [
+                    "frontend",
+                    "typescript",
+                    "spa"
                 ]
             },
             {
