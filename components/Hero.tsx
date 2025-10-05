@@ -33,6 +33,8 @@ const featureHighlights = [
 
 const stackQuestion = (stacksData as DataQuestionSource[])[0]
 const stackAnswers = stackQuestion?.answers ?? []
+const selectionCardClass =
+  "rounded-3xl border border-border/70 bg-background/95 p-6 shadow-sm text-left"
 
 export function Hero() {
   const router = useRouter()
@@ -98,15 +100,15 @@ export function Hero() {
 
 
 
-        <motion.div
-          className="mx-auto w-full max-w-4xl text-left"
-          variants={itemVariants}
-        >
-          <div className="flex flex-col gap-6 lg:flex-row lg:items-start">
-            <div className="flex-1 space-y-4">
-              <h2 className="text-lg font-semibold uppercase tracking-wide text-muted-foreground">
+        <motion.div className="mx-auto w-full max-w-4xl text-left" variants={itemVariants}>
+          <div className="grid gap-5 lg:grid-cols-[1fr_auto_1fr] lg:items-stretch">
+            <div className={`${selectionCardClass} flex flex-col gap-4`}>
+              <p className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">
                 Start fast with popular stacks
-              </h2>
+              </p>
+              <p className="text-sm text-muted-foreground">
+                Pick a curated quickstart and we&apos;ll pre-fill the wizard with stack defaults.
+              </p>
               <div className="flex flex-wrap gap-3">
                 {popularStacks.map((stack) => {
                   const descriptor = getIconDescriptor(stack.icon ?? stack.value)
@@ -163,10 +165,17 @@ export function Hero() {
               </div>
             </div>
 
-            <form
-              onSubmit={handleGithubSubmit}
-              className="flex flex-1 flex-col gap-3 rounded-3xl border border-border/70 bg-background/95 p-6 shadow-sm"
-            >
+            <div className="flex items-center justify-center">
+              <span className="sr-only">Choose one entry point</span>
+              <span
+                aria-hidden
+                className="text-xs font-semibold uppercase tracking-[0.6em] text-muted-foreground"
+              >
+                OR
+              </span>
+            </div>
+
+            <form onSubmit={handleGithubSubmit} className={`${selectionCardClass} flex flex-col gap-4`}>
               <div className="space-y-2 text-left">
                 <p className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">
                   Scan a GitHub repository
