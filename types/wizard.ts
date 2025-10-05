@@ -1,3 +1,5 @@
+import type { PropsWithChildren } from "react"
+
 export type DataAnswerSource = {
     value: string
     label: string
@@ -68,6 +70,10 @@ export type WizardStep = {
     title: string
     questions: WizardQuestion[]
 }
+
+export type StackWizardShellProps = PropsWithChildren<{
+    showWizard?: boolean
+}>
 
 export type WizardConfirmationIntent = "reset"
 

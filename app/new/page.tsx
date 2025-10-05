@@ -1,5 +1,7 @@
 import type { Metadata } from "next"
-import { redirect } from "next/navigation"
+
+import { StackWizardShell } from "@/components/stack-wizard-shell"
+import { StackWizardClient } from "@/app/new/stack/stack-wizard-client"
 
 const title = "Launch the DevContext Wizard"
 const description =
@@ -35,5 +37,9 @@ export const metadata: Metadata = {
 }
 
 export default function NewPage() {
-  redirect(`/new/stack`)
+  return (
+    <StackWizardShell>
+      <StackWizardClient stackIdFromRoute={null} />
+    </StackWizardShell>
+  )
 }
