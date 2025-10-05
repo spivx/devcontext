@@ -5,6 +5,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { ThemeProvider } from "@/components/theme-provider";
 import { MixpanelInit } from "@/components/MixpanelInit";
+import { SITE_URL } from "@/lib/site-metadata";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -16,7 +17,7 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
-const siteUrl = "https://devcontext.xyz";
+const siteUrl = SITE_URL;
 const siteTitle = "DevContext – AI Coding Guidelines & Repo Analyzer";
 const siteDescription =
   "DevContext helps developers generate AI config files like Copilot instructions, Cursor rules, and agents.md. Start fresh with a guided wizard or analyze your GitHub repo to auto-detect stack, frameworks, and best practices — consistent, fast, and IDE-ready.";

@@ -4,6 +4,7 @@ import { notFound } from "next/navigation"
 
 import stacksData from "@/data/stacks.json"
 import type { DataQuestionSource } from "@/types/wizard"
+import { absoluteUrl } from "@/lib/site-metadata"
 
 const stackQuestionSet = stacksData as DataQuestionSource[]
 const stackQuestion = stackQuestionSet[0]
@@ -120,7 +121,7 @@ export function generateMetadata({ params }: { params: { stack: string } }): Met
     title,
     description,
     alternates: {
-      canonical: `https://devcontext.xyz/stacks/${slug}`,
+      canonical: absoluteUrl(`/stacks/${slug}`),
     },
   }
 }

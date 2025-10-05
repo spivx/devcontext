@@ -1,6 +1,6 @@
 import type { MetadataRoute } from "next";
 
-const baseUrl = "https://devcontext.com";
+import { SITE_URL, absoluteUrl } from "@/lib/site-metadata";
 
 export default function robots(): MetadataRoute.Robots {
   return {
@@ -8,7 +8,7 @@ export default function robots(): MetadataRoute.Robots {
       userAgent: "*",
       allow: "/",
     },
-    host: baseUrl,
-    sitemap: `${baseUrl}/sitemap.xml`,
+    host: SITE_URL,
+    sitemap: absoluteUrl("/sitemap.xml"),
   };
 }

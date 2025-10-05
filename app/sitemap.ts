@@ -2,8 +2,7 @@ import type { MetadataRoute } from "next"
 
 import stacksData from "@/data/stacks.json"
 import type { DataQuestionSource } from "@/types/wizard"
-
-const baseUrl = "https://devcontext.com"
+import { absoluteUrl } from "@/lib/site-metadata"
 
 const STATIC_ENTRIES: Array<{
   path: string
@@ -48,7 +47,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
   ])
 
   return [...STATIC_ENTRIES, ...stackEntries].map(({ path, priority, changeFrequency }) => ({
-    url: `${baseUrl}${path}`,
+    url: absoluteUrl(path),
     priority,
     changeFrequency,
     lastModified,
