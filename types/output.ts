@@ -3,6 +3,7 @@ export type FinalOutputViewProps = {
   fileContent: string
   mimeType?: string | null
   onClose?: () => void
+  onContentChange?: (content: string) => void
 }
 
 export type GeneratedFileResult = {

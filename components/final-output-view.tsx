@@ -1,7 +1,7 @@
 "use client"
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react"
-import type { MouseEvent } from "react"
+import type { ChangeEvent, MouseEvent } from "react"
 import { Copy, Download, X } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
@@ -9,10 +9,12 @@ import type { FinalOutputViewProps } from "@/types/output"
 
 const COPY_RESET_DELAY = 2200
 
-export default function FinalOutputView({ fileName, fileContent, mimeType, onClose }: FinalOutputViewProps) {
+export default function FinalOutputView({ fileName, fileContent, mimeType, onClose, onContentChange }: FinalOutputViewProps) {
   const [copyStatus, setCopyStatus] = useState<"idle" | "copied" | "error">("idle")
   const resetTimerRef = useRef<number | null>(null)
   const dialogRef = useRef<HTMLDivElement | null>(null)
+  const [baselineContent, setBaselineContent] = useState(fileContent ?? "")
+  const [currentContent, setCurrentContent] = useState(fileContent ?? "")
 
   const normalizedFileName = useMemo(() => {
     const trimmed = fileName?.trim()
@@ -20,12 +22,18 @@ export default function FinalOutputView({ fileName, fileContent, mimeType, onClo
   }, [fileName])
 
   useEffect(() => {
+    const normalizedContent = fileContent ?? ""
+    setBaselineContent(normalizedContent)
+    setCurrentContent(normalizedContent)
+  }, [fileContent])
+
+  useEffect(() => {
     setCopyStatus("idle")
     if (resetTimerRef.current !== null) {
       window.clearTimeout(resetTimerRef.current)
       resetTimerRef.current = null
     }
-  }, [fileContent, normalizedFileName])
+  }, [baselineContent, normalizedFileName])
 
   useEffect(() => {
     const previousOverflow = document.body.style.overflow
@@ -50,7 +58,7 @@ export default function FinalOutputView({ fileName, fileContent, mimeType, onClo
   }, [onClose])
 
   const handleCopyClick = useCallback(async () => {
-    if (!fileContent) {
+    if (!currentContent) {
       return
     }
 
@@ -59,7 +67,7 @@ export default function FinalOutputView({ fileName, fileContent, mimeType, onClo
         throw new Error("Clipboard API not available")
       }
 
-      await navigator.clipboard.writeText(fileContent)
+      await navigator.clipboard.writeText(currentContent)
       setCopyStatus("copied")
     } catch {
       setCopyStatus("error")
@@ -73,15 +81,15 @@ export default function FinalOutputView({ fileName, fileContent, mimeType, onClo
       setCopyStatus("idle")
       resetTimerRef.current = null
     }, COPY_RESET_DELAY)
-  }, [fileContent])
+  }, [currentContent])
 
   const handleDownloadClick = useCallback(() => {
-    if (!fileContent) {
+    if (!currentContent) {
       return
     }
 
     const downloadMimeType = mimeType ?? "text/plain;charset=utf-8"
-    const blob = new Blob([fileContent], { type: downloadMimeType })
+    const blob = new Blob([currentContent], { type: downloadMimeType })
     const url = URL.createObjectURL(blob)
 
     const link = document.createElement("a")
@@ -93,7 +101,7 @@ export default function FinalOutputView({ fileName, fileContent, mimeType, onClo
     document.body.removeChild(link)
 
     URL.revokeObjectURL(url)
-  }, [fileContent, mimeType, normalizedFileName])
+  }, [currentContent, mimeType, normalizedFileName])
 
   const handleBackdropClick = () => {
     onClose?.()
@@ -103,7 +111,29 @@ export default function FinalOutputView({ fileName, fileContent, mimeType, onClo
     event.stopPropagation()
   }
 
-  const displayedContent = fileContent && fileContent.length > 0 ? fileContent : "No content available."
+  const handleRestoreDefault = useCallback(() => {
+    setCurrentContent(baselineContent)
+    setCopyStatus("idle")
+    if (resetTimerRef.current !== null) {
+      window.clearTimeout(resetTimerRef.current)
+      resetTimerRef.current = null
+    }
+    onContentChange?.(baselineContent)
+  }, [baselineContent, onContentChange])
+
+  const handleTextareaChange = (event: ChangeEvent<HTMLTextAreaElement>) => {
+    if (resetTimerRef.current !== null) {
+      window.clearTimeout(resetTimerRef.current)
+      resetTimerRef.current = null
+    }
+    setCopyStatus("idle")
+    const value = event.target.value
+    setCurrentContent(value)
+    onContentChange?.(value)
+  }
+
+  const displayedContent = currentContent && currentContent.length > 0 ? currentContent : ""
+  const restoreDisabled = displayedContent === baselineContent
 
   return (
     <div
@@ -130,7 +160,15 @@ export default function FinalOutputView({ fileName, fileContent, mimeType, onClo
             </h2>
           </div>
           <div className="flex flex-wrap items-center gap-2">
-            <Button variant="outline" size="sm" onClick={handleCopyClick} disabled={!fileContent}>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={handleRestoreDefault}
+              disabled={restoreDisabled}
+            >
+              Restore original
+            </Button>
+            <Button variant="outline" size="sm" onClick={handleCopyClick} disabled={!displayedContent}>
               <Copy className="mr-2 h-4 w-4" aria-hidden />
               {copyStatus === "copied"
                 ? "Copied"
@@ -138,7 +176,7 @@ export default function FinalOutputView({ fileName, fileContent, mimeType, onClo
                   ? "Copy Failed"
                   : "Copy"}
             </Button>
-            <Button size="sm" onClick={handleDownloadClick} disabled={!fileContent}>
+            <Button size="sm" onClick={handleDownloadClick} disabled={!displayedContent}>
               <Download className="mr-2 h-4 w-4" aria-hidden />
               Download
             </Button>
@@ -155,9 +193,14 @@ export default function FinalOutputView({ fileName, fileContent, mimeType, onClo
         </header>
         <div className="relative flex-1 min-h-0 bg-muted/20 p-6">
           <div className="flex h-full flex-1 rounded-2xl border border-border/60 bg-background/95 shadow-inner">
-            <pre className="min-h-0 h-full w-full overflow-auto whitespace-pre-wrap break-words rounded-2xl bg-transparent p-6 font-mono text-sm leading-relaxed text-foreground">
-              <code>{displayedContent}</code>
-            </pre>
+            <textarea
+              value={displayedContent}
+              onChange={handleTextareaChange}
+              spellCheck={false}
+              className="min-h-0 h-full w-full resize-none rounded-2xl bg-transparent p-6 font-mono text-sm leading-relaxed text-foreground focus:outline-none"
+              aria-label="Generated instructions content"
+              placeholder="No content available."
+            />
           </div>
         </div>
         <span className="sr-only" aria-live="polite">

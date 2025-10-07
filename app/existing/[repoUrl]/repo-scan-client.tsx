@@ -1,7 +1,6 @@
 "use client"
 
 import { useCallback, useEffect, useMemo, useState } from "react"
-import { useRouter } from "next/navigation"
 import Link from "next/link"
 
 import { AlertTriangle, CheckCircle2 } from "lucide-react"
@@ -12,7 +11,6 @@ import { normalizeGitHubRepoInput } from "@/lib/github"
 import type { RepoScanSummary } from "@/types/repo-scan"
 import { getFileOptions } from "@/lib/wizard-config"
 import { generateFromRepoScan } from "@/lib/scan-generate"
-import { prefillWizardFromScan } from "@/lib/scan-prefill"
 import FinalOutputView from "@/components/final-output-view"
 import RepoScanLoader from "@/components/repo-scan-loader"
 import type { GeneratedFileResult } from "@/types/output"
@@ -28,7 +26,6 @@ type RepoScanClientProps = {
 }
 
 export default function RepoScanClient({ initialRepoUrl }: RepoScanClientProps) {
-    const router = useRouter()
     const [scanResult, setScanResult] = useState<RepoScanSummary | null>(null)
     const [error, setError] = useState<string | null>(null)
     const [isLoading, setIsLoading] = useState(false)
@@ -135,8 +132,6 @@ export default function RepoScanClient({ initialRepoUrl }: RepoScanClientProps) 
     const fileOptions = getFileOptions()
     const [isGeneratingMap, setIsGeneratingMap] = useState<Record<string, boolean>>({})
     const [generatedFile, setGeneratedFile] = useState<GeneratedFileResult | null>(null)
-    const [isPrefilling, setIsPrefilling] = useState(false)
-    const [prefillError, setPrefillError] = useState<string | null>(null)
 
     const handleGenerate = useCallback(async (fileId: string) => {
         if (!scanResult) return
@@ -151,25 +146,6 @@ export default function RepoScanClient({ initialRepoUrl }: RepoScanClientProps) 
             setIsGeneratingMap((prev) => ({ ...prev, [fileId]: false }))
         }
     }, [scanResult])
-
-    const handlePrefillWizard = useCallback(async () => {
-        if (!scanResult) {
-            return
-        }
-
-        setIsPrefilling(true)
-        setPrefillError(null)
-
-        try {
-            const { stackId } = await prefillWizardFromScan(scanResult)
-            router.push(`/new/stack/${stackId}/user/summary`)
-        } catch (prefillProblem) {
-            console.error("Failed to prefill wizard from scan", prefillProblem)
-            setPrefillError("We couldn't prefill the wizard. Try again or open the wizard manually.")
-        } finally {
-            setIsPrefilling(false)
-        }
-    }, [scanResult, router])
 
     return (
         <div className="relative flex min-h-screen flex-col bg-background text-foreground">
@@ -189,7 +165,7 @@ export default function RepoScanClient({ initialRepoUrl }: RepoScanClientProps) 
                             ) : null}
                         </CardTitle>
                         <CardDescription>
-                            Scan the repository to pre-fill DevContext with detected stack and tooling.
+                            Run a quick analysis of the repository and generate AI-friendly instruction files tailored to what we detect.
                         </CardDescription>
                     </CardHeader>
                     <CardContent className="space-y-6">
@@ -224,47 +200,53 @@ export default function RepoScanClient({ initialRepoUrl }: RepoScanClientProps) 
                             </div>
                         ) : scanResult ? (
                             <div className="space-y-8">
+                                <section className="space-y-2">
+                                    <h3 className="text-lg font-semibold text-foreground">Detected snapshot</h3>
+                                    <p className="text-sm text-muted-foreground">
+                                        We mapped the repository to highlight the primary language, tooling, and structure so you can generate the right instructions in one click.
+                                    </p>
+                                </section>
                                 <section className="grid gap-6 md:grid-cols-2">
-                                    <div className="rounded-lg border border-border/60 bg-background/60 p-4">
+                                    <div className="rounded-2xl border border-border/60 bg-background/70 p-5">
                                         <div className="flex items-center gap-2 text-sm font-semibold">
                                             <CheckCircle2 className="size-4 text-primary" aria-hidden="true" />
-                                            Primary Language
+                                            Primary language
                                         </div>
-                                        <p className="mt-2 text-base text-foreground">
+                                        <p className="mt-3 text-base text-foreground">
                                             {scanResult.language ?? "Not detected"}
                                         </p>
                                         {scanResult.languages.length > 1 ? (
                                             <p className="mt-2 text-xs text-muted-foreground">
-                                                Other languages: {scanResult.languages.slice(1).join(", ")}
+                                                Also spotted: {scanResult.languages.slice(1).join(", ")}
                                             </p>
                                         ) : null}
                                     </div>
-                                    <div className="rounded-lg border border-border/60 bg-background/60 p-4">
+                                    <div className="rounded-2xl border border-border/60 bg-background/70 p-5">
                                         <div className="flex items-center gap-2 text-sm font-semibold">
                                             <CheckCircle2 className="size-4 text-primary" aria-hidden="true" />
                                             Default branch
                                         </div>
-                                        <p className="mt-2 text-base text-foreground">{scanResult.defaultBranch}</p>
+                                        <p className="mt-3 text-base text-foreground">{scanResult.defaultBranch}</p>
                                     </div>
                                 </section>
                                 <section className="grid gap-6 md:grid-cols-2">
-                                    <div className="rounded-lg border border-border/60 bg-background/60 p-4">
+                                    <div className="rounded-2xl border border-border/60 bg-background/70 p-5">
                                         <h3 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">Frameworks</h3>
-                                        <p className="mt-2 text-sm text-foreground">{formatList(scanResult.frameworks)}</p>
+                                        <p className="mt-3 text-sm text-foreground">{formatList(scanResult.frameworks)}</p>
                                     </div>
-                                    <div className="rounded-lg border border-border/60 bg-background/60 p-4">
+                                    <div className="rounded-2xl border border-border/60 bg-background/70 p-5">
                                         <h3 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">Tooling</h3>
-                                        <p className="mt-2 text-sm text-foreground">{formatList(scanResult.tooling)}</p>
+                                        <p className="mt-3 text-sm text-foreground">{formatList(scanResult.tooling)}</p>
                                     </div>
-                                    <div className="rounded-lg border border-border/60 bg-background/60 p-4">
+                                    <div className="rounded-2xl border border-border/60 bg-background/70 p-5">
                                         <h3 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">Testing</h3>
-                                        <p className="mt-2 text-sm text-foreground">{formatList(scanResult.testing)}</p>
+                                        <p className="mt-3 text-sm text-foreground">{formatList(scanResult.testing)}</p>
                                     </div>
-                                    <div className="rounded-lg border border-border/60 bg-background/60 p-4">
-                                        <h3 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">Structure</h3>
-                                        <ul className="mt-2 space-y-1 text-sm text-foreground">
+                                    <div className="rounded-2xl border border-border/60 bg-background/70 p-5">
+                                        <h3 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">Structure hints</h3>
+                                        <ul className="mt-3 space-y-2 text-sm text-foreground">
                                             {structureEntries.map(({ key, value }) => (
-                                                <li key={key} className="flex items-center gap-2">
+                                                <li key={key} className="flex items-center justify-between gap-4">
                                                     <span className="font-medium capitalize">{key}</span>
                                                     <span className={value ? "text-emerald-400" : "text-muted-foreground"}>
                                                         {value ? "Present" : "Missing"}
@@ -274,44 +256,31 @@ export default function RepoScanClient({ initialRepoUrl }: RepoScanClientProps) 
                                         </ul>
                                     </div>
                                 </section>
-                                <section className="rounded-lg border border-border/60 bg-background/60 p-4">
-                                    <div className="flex flex-col gap-3">
-                                        <div>
-                                            <h3 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">Generate context files</h3>
-                                            <p className="mt-1 text-xs text-muted-foreground">We prefill smart defaults from the scan. You can tweak later in the wizard.</p>
-                                        </div>
-                                        <div className="flex flex-wrap gap-3">
-                                            {fileOptions.map((file) => {
-                                                const busy = Boolean(isGeneratingMap[file.id])
-                                                return (
-                                                    <Button
-                                                        key={file.id}
-                                                        onClick={() => void handleGenerate(file.id)}
-                                                        disabled={busy}
-                                                        className="flex h-[36px] items-center rounded-full px-4 py-0 text-sm"
-                                                    >
-                                                        {busy ? `Generating ${file.filename}…` : `Generate ${file.filename}`}
-                                                    </Button>
-                                                )
-                                            })}
-                                        </div>
-                                        <div className="flex flex-wrap items-center gap-3 pt-2">
-                                            <Button
-                                                variant="outline"
-                                                onClick={() => void handlePrefillWizard()}
-                                                disabled={isPrefilling}
-                                                className="flex h-[36px] items-center rounded-full px-4 py-0 text-sm"
-                                            >
-                                                {isPrefilling ? "Opening wizard…" : "Open in wizard"}
-                                            </Button>
-                                            {prefillError ? (
-                                                <span className="text-xs text-destructive">{prefillError}</span>
-                                            ) : null}
-                                        </div>
+                                <section className="space-y-4 rounded-2xl border border-border/60 bg-background/70 p-5">
+                                    <div className="space-y-1">
+                                        <h3 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">Generate instructions</h3>
+                                        <p className="text-xs text-muted-foreground">
+                                            Choose the file you need—each one opens an Instructions ready preview powered by this scan.
+                                        </p>
+                                    </div>
+                                    <div className="flex flex-wrap gap-3">
+                                        {fileOptions.map((file) => {
+                                            const busy = Boolean(isGeneratingMap[file.id])
+                                            return (
+                                                <Button
+                                                    key={file.id}
+                                                    onClick={() => void handleGenerate(file.id)}
+                                                    disabled={busy}
+                                                    className="flex h-[36px] items-center rounded-full px-4 py-0 text-sm"
+                                                >
+                                                    {busy ? `Generating ${file.filename}…` : `Generate ${file.filename}`}
+                                                </Button>
+                                            )
+                                        })}
                                     </div>
                                 </section>
                                 {warnings.length > 0 ? (
-                                    <div className="rounded-lg border border-amber-400/60 bg-amber-950/40 p-4 text-amber-200">
+                                    <div className="rounded-2xl border border-amber-400/60 bg-amber-950/40 p-4 text-amber-200">
                                         <div className="flex items-start gap-2">
                                             <AlertTriangle className="mt-0.5 size-4" aria-hidden="true" />
                                             <div className="space-y-1 text-sm">
@@ -322,7 +291,7 @@ export default function RepoScanClient({ initialRepoUrl }: RepoScanClientProps) 
                                         </div>
                                     </div>
                                 ) : null}
-                                <div className="rounded-lg border border-border/60 bg-background/60 p-4">
+                                <div className="rounded-2xl border border-border/60 bg-background/70 p-5">
                                     <h3 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">Raw response</h3>
                                     <pre className="mt-3 max-h-72 overflow-auto rounded-md bg-muted p-3 text-xs text-muted-foreground">
                                         {JSON.stringify(scanResult, null, 2)}
