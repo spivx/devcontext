@@ -1,21 +1,32 @@
-import Link from "next/link"
+import type { Metadata } from "next"
 
-import { Button } from "@/components/ui/button"
+import { absoluteUrl } from "@/lib/site-metadata"
+import { ExistingRepoEntryClient } from "./existing-repo-entry-client"
 
-export default function ExistingProjectPage() {
-  return (
-    <div className="flex min-h-screen flex-col items-center justify-center bg-background px-6 py-24 text-center text-foreground">
-      <div className="space-y-6">
-        <div className="space-y-2">
-          <h1 className="text-4xl font-semibold tracking-tight md:text-5xl">Existing projects are coming soon</h1>
-          <p className="mx-auto max-w-2xl text-base text-muted-foreground md:text-lg">
-            We&apos;re crafting guided flows to ingest your current instructions, audit gaps, and align new guidance with your repository. Leave your email in the wizard and we&apos;ll reach out the moment it&apos;s live.
-          </p>
-        </div>
-        <Button asChild size="lg">
-          <Link href="/new">Explore the new project wizard</Link>
-        </Button>
-      </div>
-    </div>
-  )
+const title = "Analyze an existing repository | DevContext"
+const description =
+  "Scan a GitHub repository to auto-detect languages, frameworks, tooling, and testing so DevContext can prefill your AI instructions."
+const canonicalUrl = absoluteUrl("/existing")
+
+export const metadata: Metadata = {
+  title,
+  description,
+  alternates: {
+    canonical: canonicalUrl,
+  },
+  openGraph: {
+    title,
+    description,
+    url: canonicalUrl,
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title,
+    description,
+  },
+}
+
+export default function ExistingRepoEntryPage() {
+  return <ExistingRepoEntryClient />
 }

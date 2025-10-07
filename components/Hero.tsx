@@ -3,11 +3,12 @@
 import { useState, type FormEvent } from "react"
 
 import { motion } from "framer-motion"
-import { ArrowRight, CheckCircle2, Github } from "lucide-react"
+import { ArrowRight, Github } from "lucide-react"
 import { useRouter } from "next/navigation"
 
 import Logo from "@/components/Logo"
 import { Button } from "@/components/ui/button"
+import { normalizeGitHubRepoInput } from "@/lib/github"
 import stacksData from "@/data/stacks.json"
 import type { DataQuestionSource } from "@/types/wizard"
 import { getIconDescriptor, iconColorOverrides, getAccessibleIconColor, hexToRgba, getFallbackInitials } from "@/lib/icon-utils"
@@ -24,12 +25,6 @@ const itemVariants = {
   hidden: { opacity: 0, y: 28 },
   show: { opacity: 1, y: 0, transition: { ease: "easeOut", duration: 0.7 } },
 }
-
-const featureHighlights = [
-  "Copilot instructions grounded in your stack",
-  "Cursor rules that mirror team conventions",
-  "agents.md blueprints generated on demand",
-]
 
 const stackQuestion = (stacksData as DataQuestionSource[])[0]
 const stackAnswers = stackQuestion?.answers ?? []
@@ -56,7 +51,14 @@ export function Hero() {
       return
     }
 
-    router.push(`/existing?repo=${encodeURIComponent(trimmed)}`)
+    const normalized = normalizeGitHubRepoInput(trimmed)
+
+    if (normalized) {
+      router.push(`/existing/${encodeURIComponent(normalized)}`)
+      return
+    }
+
+    router.push(`/existing`)
   }
 
   return (

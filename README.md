@@ -1,6 +1,5 @@
 ![devcontext logo](public/logo.png)
 
-# devcontext
 
 Build high-signal agent and instruction files from community-proven best practices.
 

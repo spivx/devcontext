@@ -1,3 +1,5 @@
+import { describe, test } from 'vitest'
+
 import { scanDataIds } from '../data-id-validator'
 
 describe('data ID validation', () => {
@@ -13,4 +15,3 @@ describe('data ID validation', () => {
         }
     })
 })
-

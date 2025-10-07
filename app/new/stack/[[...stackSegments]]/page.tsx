@@ -2,8 +2,9 @@ import { notFound } from "next/navigation"
 import type { Metadata } from "next"
 
 import stacksData from "@/data/stacks.json"
-import type { DataQuestionSource } from "@/types/wizard"
+import type { DataQuestionSource, WizardStep } from "@/types/wizard"
 import { StackWizardShell } from "@/components/stack-wizard-shell"
+import { loadStackWizardStep } from "@/lib/wizard-config"
 import { StackWizardClient } from "../stack-wizard-client"
 import { StackSummaryPage } from "../stack-summary-page"
 
@@ -90,10 +91,13 @@ export async function generateMetadata({ params }: MetadataProps): Promise<Metad
   }
 }
 
-export default function StackRoutePage({ params }: PageProps) {
+export default async function StackRoutePage({ params }: PageProps) {
   const { stackSegments } = params
   let stackIdFromRoute: string | null = null
   let summaryMode: "default" | "user" | null = null
+
+  let initialStackStep: WizardStep | null = null
+  let initialStackLabel: string | null = null
 
   if (Array.isArray(stackSegments) && stackSegments.length > 0) {
     const potentialStackId = stackSegments[0]
@@ -120,12 +124,27 @@ export default function StackRoutePage({ params }: PageProps) {
     }
   }
 
+  if (stackIdFromRoute && !summaryMode) {
+    try {
+      const { step, label } = await loadStackWizardStep(stackIdFromRoute)
+      initialStackStep = step
+      initialStackLabel = label
+    } catch (error) {
+      console.error(`Unable to preload questions for stack "${stackIdFromRoute}"`, error)
+      notFound()
+    }
+  }
+
   return (
     <StackWizardShell>
       {summaryMode ? (
         <StackSummaryPage stackId={stackIdFromRoute} mode={summaryMode} />
       ) : (
-        <StackWizardClient stackIdFromRoute={stackIdFromRoute} />
+        <StackWizardClient
+          stackIdFromRoute={stackIdFromRoute}
+          initialStackLabel={initialStackLabel}
+          initialStackStep={initialStackStep}
+        />
       )}
     </StackWizardShell>
   )

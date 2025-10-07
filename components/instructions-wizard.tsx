@@ -24,20 +24,38 @@ const suffixSteps = getSuffixSteps()
 
 export function InstructionsWizard({
   initialStackId,
+  initialStackLabel = null,
+  initialStackStep = null,
   onStackSelected,
   onStackCleared,
   autoStartAfterStackSelection = true,
   onComplete,
 }: InstructionsWizardProps) {
-  const [currentStepIndex, setCurrentStepIndex] = useState(0)
+  const [currentStepIndex, setCurrentStepIndex] = useState(() => (initialStackStep ? 1 : 0))
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0)
-  const [responses, setResponses] = useState<Responses>({})
-  const [dynamicSteps, setDynamicSteps] = useState<WizardStep[]>([])
-  const [isStackFastTrackPromptVisible, setIsStackFastTrackPromptVisible] = useState(false)
+  const [responses, setResponses] = useState<Responses>(() =>
+    initialStackId ? { [STACK_QUESTION_ID]: initialStackId } : {}
+  )
+  const [dynamicSteps, setDynamicSteps] = useState<WizardStep[]>(() =>
+    initialStackStep ? [initialStackStep] : []
+  )
+  const [isStackFastTrackPromptVisible, setIsStackFastTrackPromptVisible] = useState(() => {
+    if (!initialStackStep) {
+      return false
+    }
+
+    if (autoStartAfterStackSelection) {
+      return false
+    }
+
+    return initialStackStep.questions.length > 0
+  })
   const [pendingConfirmation, setPendingConfirmation] = useState<WizardConfirmationIntent | null>(null)
   const [autoFilledQuestionMap, setAutoFilledQuestionMap] = useState<Record<string, boolean>>({})
-  const hasAppliedInitialStack = useRef<string | null>(null)
-  const [activeStackLabel, setActiveStackLabel] = useState<string | null>(null)
+  const hasAppliedInitialStack = useRef<string | null>(
+    initialStackStep && initialStackId ? initialStackId : null
+  )
+  const [activeStackLabel, setActiveStackLabel] = useState<string | null>(initialStackLabel)
 
   const wizardSteps = useMemo(() => [stacksStep, ...dynamicSteps, ...suffixSteps], [dynamicSteps])
   const currentStep = wizardSteps[currentStepIndex] ?? null
@@ -138,6 +156,40 @@ export function InstructionsWizard({
     []
   )
 
+  const applyStackStep = useCallback(
+    (step: WizardStep, label: string | null, options?: { skipFastTrackPrompt?: boolean; stackId?: string }) => {
+      const skipFastTrackPrompt = options?.skipFastTrackPrompt ?? false
+      const nextStackId = options?.stackId
+
+      setActiveStackLabel(label)
+      setDynamicSteps([step])
+      setIsStackFastTrackPromptVisible(!skipFastTrackPrompt && step.questions.length > 0)
+
+      setResponses((prev) => {
+        const next: Responses = { ...prev }
+
+        if (nextStackId) {
+          next[STACK_QUESTION_ID] = nextStackId
+        }
+
+        step.questions.forEach((question) => {
+          if (question.id === STACK_QUESTION_ID) {
+            return
+          }
+
+          delete next[question.id]
+        })
+
+        return next
+      })
+
+      setCurrentStepIndex(1)
+      setCurrentQuestionIndex(0)
+      setAutoFilledQuestionMap({})
+    },
+    []
+  )
+
   const loadStackQuestions = useCallback(
     async (
       stackId: string,
@@ -146,42 +198,42 @@ export function InstructionsWizard({
     ) => {
       try {
         const { step, label } = await loadStackWizardStep(stackId, stackLabelFromAnswer)
-        setActiveStackLabel(label)
-
-        setDynamicSteps([step])
-        setIsStackFastTrackPromptVisible(!options?.skipFastTrackPrompt && step.questions.length > 0)
-
-        setResponses((prev) => {
-          const next: Responses = { ...prev }
-          step.questions.forEach((question) => {
-            delete next[question.id]
-          })
-          return next
+        applyStackStep(step, label, {
+          skipFastTrackPrompt: options?.skipFastTrackPrompt,
+          stackId,
         })
-        setCurrentStepIndex(1)
-        setCurrentQuestionIndex(0)
-        setAutoFilledQuestionMap({})
       } catch (error) {
         console.error(`Unable to load questions for stack "${stackId}"`, error)
         setDynamicSteps([])
         setIsStackFastTrackPromptVisible(false)
+        setActiveStackLabel(null)
       }
     },
-    []
+    [applyStackStep]
   )
 
   useEffect(() => {
     if (!initialStackId) {
-      return
-    }
-
-    if (hasAppliedInitialStack.current === initialStackId) {
+      hasAppliedInitialStack.current = null
       return
     }
 
     const stackAnswer = stackQuestion?.answers.find((answer) => answer.value === initialStackId)
 
     if (!stackAnswer) {
+      return
+    }
+
+    if (initialStackStep) {
+      hasAppliedInitialStack.current = initialStackId
+      applyStackStep(initialStackStep, initialStackLabel ?? stackAnswer.label ?? null, {
+        skipFastTrackPrompt: autoStartAfterStackSelection,
+        stackId: stackAnswer.value,
+      })
+      return
+    }
+
+    if (hasAppliedInitialStack.current === initialStackId) {
       return
     }
 
@@ -195,7 +247,14 @@ export function InstructionsWizard({
     void loadStackQuestions(stackAnswer.value, stackAnswer.label, {
       skipFastTrackPrompt: autoStartAfterStackSelection,
     })
-  }, [initialStackId, loadStackQuestions, autoStartAfterStackSelection])
+  }, [
+    initialStackId,
+    initialStackStep,
+    initialStackLabel,
+    applyStackStep,
+    loadStackQuestions,
+    autoStartAfterStackSelection,
+  ])
 
   useEffect(() => {
     if (!selectedStackId) {
