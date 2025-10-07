@@ -1,6 +1,7 @@
 "use client"
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react"
+import { createPortal } from "react-dom"
 import type { ChangeEvent, MouseEvent } from "react"
 import { Copy, Download, X } from "lucide-react"
 
@@ -15,6 +16,7 @@ export default function FinalOutputView({ fileName, fileContent, mimeType, onClo
   const dialogRef = useRef<HTMLDivElement | null>(null)
   const [baselineContent, setBaselineContent] = useState(fileContent ?? "")
   const [currentContent, setCurrentContent] = useState(fileContent ?? "")
+  const [isMounted, setIsMounted] = useState(false)
 
   const normalizedFileName = useMemo(() => {
     const trimmed = fileName?.trim()
@@ -36,6 +38,18 @@ export default function FinalOutputView({ fileName, fileContent, mimeType, onClo
   }, [baselineContent, normalizedFileName])
 
   useEffect(() => {
+    setIsMounted(true)
+
+    return () => {
+      setIsMounted(false)
+    }
+  }, [])
+
+  useEffect(() => {
+    if (!isMounted) {
+      return undefined
+    }
+
     const previousOverflow = document.body.style.overflow
     document.body.style.overflow = "hidden"
 
@@ -52,10 +66,11 @@ export default function FinalOutputView({ fileName, fileContent, mimeType, onClo
       if (resetTimerRef.current !== null) {
         window.clearTimeout(resetTimerRef.current)
       }
+
       document.body.style.overflow = previousOverflow
       window.removeEventListener("keydown", handleKeyDown)
     }
-  }, [onClose])
+  }, [onClose, isMounted])
 
   const handleCopyClick = useCallback(async () => {
     if (!currentContent) {
@@ -135,7 +150,7 @@ export default function FinalOutputView({ fileName, fileContent, mimeType, onClo
   const displayedContent = currentContent && currentContent.length > 0 ? currentContent : ""
   const restoreDisabled = displayedContent === baselineContent
 
-  return (
+  const modalContent = (
     <div
       className="fixed inset-0 z-50 flex items-center justify-center bg-background/80 p-4 backdrop-blur-sm overscroll-contain"
       role="dialog"
@@ -213,4 +228,10 @@ export default function FinalOutputView({ fileName, fileContent, mimeType, onClo
       </div>
     </div>
   )
+
+  if (!isMounted || typeof document === "undefined") {
+    return null
+  }
+
+  return createPortal(modalContent, document.body)
 }
