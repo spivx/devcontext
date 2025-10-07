@@ -1,8 +1,7 @@
-@import "tailwindcss/preflight";
+@import "tailwindcss";
 @import "tw-animate-css";
 
 @custom-variant dark (&:is(.dark *));
-@tailwind utilities;
 
 :root {
   --background: oklch(0.9383 0.0042 236.4993);
@@ -191,5 +190,123 @@
   body {
     @apply bg-background text-foreground;
     letter-spacing: var(--tracking-normal);
+  }
+}
+@layer components {
+  .repo-scan-loader {
+    @apply flex flex-col items-center gap-4 text-sm text-muted-foreground;
+  }
+
+  .repo-scan-loader__orb {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 6rem;
+    height: 6rem;
+    filter: drop-shadow(0 0 12px color-mix(in srgb, var(--color-primary) 40%, transparent));
+  }
+
+  .repo-scan-loader__core {
+    position: relative;
+    width: 2.75rem;
+    height: 2.75rem;
+    border-radius: 9999px;
+    background: radial-gradient(
+      circle at 35% 30%,
+      color-mix(in srgb, var(--color-primary) 96%, transparent) 0%,
+      var(--color-primary) 70%,
+      color-mix(in srgb, var(--color-primary) 45%, transparent) 100%
+    );
+    box-shadow: 0 0 28px color-mix(in srgb, var(--color-primary) 65%, transparent);
+    animation: repo-scan-core-glow 2.6s ease-in-out infinite;
+  }
+
+  .repo-scan-loader__pulse {
+    position: absolute;
+    inset: 0;
+    border-radius: 9999px;
+    border: 1px solid color-mix(in srgb, var(--color-primary) 60%, transparent);
+    animation: repo-scan-pulse 2.4s ease-out infinite;
+  }
+
+  .repo-scan-loader__pulse--delayed {
+    animation-delay: 0.8s;
+  }
+
+  .repo-scan-loader__orbit {
+    position: absolute;
+    inset: 0;
+    animation: repo-scan-orbit 3.2s linear infinite;
+  }
+
+  .repo-scan-loader__satellite {
+    position: absolute;
+    top: 0;
+    left: 50%;
+    width: 0.9rem;
+    height: 0.9rem;
+    border-radius: 9999px;
+    transform: translate(-50%, -50%);
+    background: color-mix(in srgb, var(--color-primary) 72%, var(--color-primary-foreground) 28%);
+    box-shadow: 0 0 16px color-mix(in srgb, var(--color-primary) 60%, transparent);
+  }
+
+  .repo-scan-loader__satellite--secondary {
+    top: auto;
+    bottom: 0;
+    transform: translate(-50%, 50%);
+    animation: repo-scan-satellite 3.2s ease-in-out infinite;
+  }
+
+  .repo-scan-loader__label {
+    font-size: 0.875rem;
+    color: var(--color-muted-foreground);
+    text-align: center;
+  }
+}
+
+@keyframes repo-scan-pulse {
+  0% {
+    transform: scale(0.65);
+    opacity: 0.9;
+  }
+  60% {
+    opacity: 0.4;
+  }
+  100% {
+    transform: scale(1.4);
+    opacity: 0;
+  }
+}
+
+@keyframes repo-scan-orbit {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes repo-scan-core-glow {
+  0%,
+  100% {
+    box-shadow: 0 0 20px color-mix(in srgb, var(--color-primary) 55%, transparent);
+  }
+  50% {
+    box-shadow: 0 0 32px color-mix(in srgb, var(--color-primary) 85%, transparent);
+  }
+}
+
+@keyframes repo-scan-satellite {
+  0%,
+  100% {
+    transform: translate(-50%, 50%) scale(0.9);
+    opacity: 0.8;
+  }
+  50% {
+    transform: translate(-50%, 70%) scale(1.1);
+    opacity: 1;
   }
 }

@@ -96,9 +96,6 @@ export const metadata: Metadata = {
   creator: "DevContext",
   publisher: "DevContext",
   category: "Technology",
-  alternates: {
-    canonical: siteUrl,
-  },
   openGraph: {
     title: siteTitle,
     description: siteDescription,

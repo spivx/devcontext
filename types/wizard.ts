@@ -79,6 +79,8 @@ export type WizardConfirmationIntent = "reset"
 
 export type InstructionsWizardProps = {
     initialStackId?: string | null
+    initialStackLabel?: string | null
+    initialStackStep?: WizardStep | null
     onStackSelected?: (stackId: string, stackLabel?: string) => void
     onStackCleared?: () => void
     autoStartAfterStackSelection?: boolean

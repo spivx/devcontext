@@ -19,6 +19,23 @@ export function AnimatedBackground() {
   return (
     <div className="pointer-events-none absolute inset-0 overflow-hidden">
       <motion.div
+        className="absolute inset-0 opacity-70 mix-blend-screen"
+        style={{
+          backgroundImage:
+            "radial-gradient(40% 40% at 20% 30%, var(--chart-1), transparent), radial-gradient(45% 45% at 80% 20%, var(--chart-2), transparent), radial-gradient(55% 55% at 50% 80%, var(--chart-3), transparent)",
+          backgroundSize: "140% 140%",
+        }}
+        animate={{
+          backgroundPosition: [
+            "0% 0%",
+            "55% 35%",
+            "35% 75%",
+            "0% 0%",
+          ],
+        }}
+        transition={{ duration: 28, repeat: Infinity, ease: "linear" }}
+      />
+      <motion.div
         className="absolute inset-0 bg-gradient-to-br from-primary/20 via-transparent to-accent/20"
         animate={{ opacity: [0.5, 0.85, 0.65], rotate: [0, 2, -1, 0] }}
         transition={{ duration: 18, repeat: Infinity, ease: "easeInOut" }}

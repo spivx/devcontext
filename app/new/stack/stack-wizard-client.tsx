@@ -3,6 +3,7 @@
 import { useRouter } from "next/navigation"
 
 import { InstructionsWizard } from "@/components/instructions-wizard"
+import type { WizardStep } from "@/types/wizard"
 
 const buildStackPath = (stackId?: string | null, view?: "summary" | "default" | "user") => {
   if (!stackId) {
@@ -26,9 +27,15 @@ const buildStackPath = (stackId?: string | null, view?: "summary" | "default" | 
 
 type StackWizardClientProps = {
   stackIdFromRoute: string | null
+  initialStackLabel?: string | null
+  initialStackStep?: WizardStep | null
 }
 
-export function StackWizardClient({ stackIdFromRoute }: StackWizardClientProps) {
+export function StackWizardClient({
+  stackIdFromRoute,
+  initialStackLabel = null,
+  initialStackStep = null,
+}: StackWizardClientProps) {
   const router = useRouter()
   const initialStackId = stackIdFromRoute
 
@@ -51,6 +58,8 @@ export function StackWizardClient({ stackIdFromRoute }: StackWizardClientProps) 
   return (
     <InstructionsWizard
       initialStackId={initialStackId}
+      initialStackLabel={initialStackLabel}
+      initialStackStep={initialStackStep}
       onStackSelected={handleStackSelected}
       onStackCleared={handleStackCleared}
       onComplete={handleWizardComplete}

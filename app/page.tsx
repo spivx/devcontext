@@ -1,9 +1,17 @@
+import type { Metadata } from "next"
 import Link from "next/link"
 
 import { AnimatedBackground } from "@/components/AnimatedBackground"
 import { Hero } from "@/components/Hero"
 import { Button } from "@/components/ui/button"
 import { Github } from "lucide-react"
+import { absoluteUrl } from "@/lib/site-metadata"
+
+export const metadata: Metadata = {
+  alternates: {
+    canonical: absoluteUrl("/"),
+  },
+}
 
 export default function LandingPage() {
   return (

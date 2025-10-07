@@ -3,14 +3,28 @@ import type { Metadata } from "next"
 
 import stacksData from "@/data/stacks.json"
 import type { DataQuestionSource } from "@/types/wizard"
+import { absoluteUrl } from "@/lib/site-metadata"
 
 const stackQuestionSet = stacksData as DataQuestionSource[]
 const stackQuestion = stackQuestionSet[0]
 const stackAnswers = stackQuestion?.answers ?? []
 
+const pageTitle = "Choose Your Stack | DevContext"
+const pageDescription = "Explore framework-specific instructions flows for React, Vue, Svelte, Python, and more."
+const canonicalUrl = absoluteUrl("/stacks")
+
 export const metadata: Metadata = {
-  title: "Choose Your Stack | DevContext",
-  description: "Explore framework-specific instructions flows for React, Vue, Svelte, Python, and more.",
+  title: pageTitle,
+  description: pageDescription,
+  alternates: {
+    canonical: canonicalUrl,
+  },
+  openGraph: {
+    title: pageTitle,
+    description: pageDescription,
+    url: canonicalUrl,
+    type: "website",
+  },
 }
 
 export default function StacksIndexPage() {
