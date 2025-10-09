@@ -17,7 +17,9 @@ test('wizard supports filtering, defaults, and reset', async ({ page }) => {
 
   await expect(page.getByTestId('wizard-question-heading')).toHaveText('What language do you use?')
 
-  await page.getByRole('button', { name: 'Back' }).click()
+  const backButton = page.getByRole('button', { name: 'Back' })
+  await expect(backButton).toBeEnabled()
+  await backButton.click()
   await expect(page.getByTestId('wizard-question-heading')).toHaveText('What build tooling do you use?')
 
   await page.getByRole('button', { name: 'Start Over' }).click()

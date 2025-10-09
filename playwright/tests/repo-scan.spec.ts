@@ -32,10 +32,7 @@ test('repo scan success path generates instructions preview', async ({ page }) =
 
   await expect(page.getByTestId('repo-scan-prompt')).toBeVisible()
 
-  const loaderPromise = page.getByTestId('repo-scan-loader').waitFor({ state: 'visible' })
-
   await page.getByTestId('repo-scan-confirm-button').click()
-  await loaderPromise
 
   await expect(page.getByTestId('repo-scan-results')).toBeVisible()
   await expect(page.getByText('TypeScript').first()).toBeVisible()

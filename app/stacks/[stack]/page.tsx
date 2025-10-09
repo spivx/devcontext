@@ -102,8 +102,9 @@ export function generateStaticParams() {
     .map((answer) => ({ stack: answer.value }))
 }
 
-export function generateMetadata({ params }: { params: { stack: string } }): Metadata {
-  const slug = params.stack.toLowerCase()
+export async function generateMetadata({ params }: { params: Promise<{ stack: string }> }): Promise<Metadata> {
+  const resolvedParams = await params
+  const slug = resolvedParams.stack.toLowerCase()
   const stackEntry = stackAnswers.find((answer) => answer.value === slug)
 
   if (!stackEntry) {
@@ -126,8 +127,9 @@ export function generateMetadata({ params }: { params: { stack: string } }): Met
   }
 }
 
-export default function StackLandingPage({ params }: { params: { stack: string } }) {
-  const slug = params.stack.toLowerCase()
+export default async function StackLandingPage({ params }: { params: Promise<{ stack: string }> }) {
+  const resolvedParams = await params
+  const slug = resolvedParams.stack.toLowerCase()
   const stackEntry = stackAnswers.find((answer) => answer.value === slug)
 
   if (!stackEntry) {
