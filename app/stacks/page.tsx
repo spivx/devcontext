@@ -30,12 +30,19 @@ export const metadata: Metadata = {
 export default function StacksIndexPage() {
   return (
     <main className="mx-auto flex min-h-screen max-w-4xl flex-col gap-10 px-6 py-16 text-foreground">
-      <header className="space-y-4 text-center">
-        <h1 className="text-4xl font-semibold tracking-tight md:text-5xl">Framework instructions presets</h1>
-        <p className="mx-auto max-w-2xl text-base text-muted-foreground md:text-lg">
-          Jump straight into the DevContext wizard with copy tailored to your stack. Each page outlines what we cover and links directly
-          into the guided flow.
-        </p>
+      <header className="space-y-6">
+        <div className="flex items-center justify-between">
+          <Link href="/" className="text-sm font-semibold text-foreground transition hover:text-primary">
+            DevContext
+          </Link>
+        </div>
+        <div className="space-y-4 text-center">
+          <h1 className="text-4xl font-semibold tracking-tight md:text-5xl">Framework instructions presets</h1>
+          <p className="mx-auto max-w-2xl text-base text-muted-foreground md:text-lg">
+            Jump straight into the DevContext wizard with copy tailored to your stack. Each page outlines what we cover and links directly
+            into the guided flow.
+          </p>
+        </div>
       </header>
 
       <section className="grid gap-6 md:grid-cols-2">
@@ -61,7 +68,7 @@ export default function StacksIndexPage() {
                   href={href}
                   className="inline-flex items-center justify-center rounded-lg border border-border/80 bg-background/80 px-4 py-2 text-sm font-semibold transition hover:border-primary/40 hover:text-primary"
                 >
-                  View {answer.label} instructions
+                  Preview {answer.label} preset
                 </Link>
               </div>
             </article>
