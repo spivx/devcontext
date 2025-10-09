@@ -10,6 +10,7 @@ export default function RepoScanLoader({ message = "Scanning repository…", cla
             role="status"
             aria-live="polite"
             className={`repo-scan-loader ${className}`.trim()}
+            data-testid="repo-scan-loader"
             {...rest}
         >
             <div className="repo-scan-loader__orb" aria-hidden="true">

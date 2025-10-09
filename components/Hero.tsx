@@ -67,6 +67,7 @@ export function Hero() {
       variants={containerVariants}
       initial="hidden"
       animate="show"
+      data-testid="hero-section"
     >
       <motion.div className="space-y-10" variants={itemVariants}>
         <motion.div
@@ -126,6 +127,7 @@ export function Hero() {
                       type="button"
                       onClick={() => handleStackClick(stack.value)}
                       className="group inline-flex items-center gap-3 rounded-full border border-border/70 bg-background/90 px-4 py-2 text-sm font-medium text-foreground shadow-sm transition hover:-translate-y-0.5 hover:border-primary/40 hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/60"
+                      data-testid={`hero-stack-${stack.value}`}
                     >
                       <span
                         className="flex h-8 w-8 items-center justify-center rounded-full ring-1 ring-border/40"
@@ -160,6 +162,7 @@ export function Hero() {
                   type="button"
                   onClick={handleMoreStacks}
                   className="inline-flex items-center gap-2 rounded-full border border-border/70 bg-background/80 px-4 py-2 text-sm font-semibold text-foreground shadow-sm transition hover:-translate-y-0.5 hover:border-primary/40 hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/60"
+                  data-testid="hero-more-stacks"
                 >
                   More stacks
                   <ArrowRight className="h-3.5 w-3.5" />
@@ -177,7 +180,11 @@ export function Hero() {
               </span>
             </div>
 
-            <form onSubmit={handleGithubSubmit} className={`${selectionCardClass} flex flex-col gap-4`}>
+            <form
+              onSubmit={handleGithubSubmit}
+              className={`${selectionCardClass} flex flex-col gap-4`}
+              data-testid="hero-scan-form"
+            >
               <div className="space-y-2 text-left">
                 <p className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">
                   Scan a GitHub repository
@@ -193,8 +200,9 @@ export function Hero() {
                   onChange={(event) => setGithubRepo(event.target.value)}
                   placeholder="github.com/owner/repo"
                   className="w-full rounded-xl border border-border/70 bg-background px-4 py-2 text-sm text-foreground shadow-sm transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/60 sm:min-w-[260px]"
+                  data-testid="hero-repo-input"
                 />
-                <Button type="submit" size="sm" className="gap-2">
+                <Button type="submit" size="sm" className="gap-2" data-testid="hero-scan-button">
                   Scan repo
                   <Github className="h-4 w-4" />
                 </Button>

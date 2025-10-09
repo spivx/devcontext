@@ -17,6 +17,7 @@ export type InstructionsAnswerCardProps = {
   disabled?: boolean
   disabledLabel?: string
   onClick?: () => void
+  testId?: string
 } & Omit<ComponentPropsWithoutRef<"button">, "children">
 
 export function InstructionsAnswerCard({
@@ -31,6 +32,7 @@ export function InstructionsAnswerCard({
   disabled = false,
   disabledLabel,
   onClick,
+  testId,
   ...buttonProps
 }: InstructionsAnswerCardProps) {
   const [isTooltipOpen, setIsTooltipOpen] = useState(false)
@@ -51,6 +53,7 @@ export function InstructionsAnswerCard({
       type="button"
       onClick={onClick}
       aria-disabled={disabled}
+      data-testid={testId}
       className={cn(
         "group relative flex h-full items-center justify-between rounded-2xl border border-border/60 bg-background/90 px-5 py-4 text-left transition-all hover:border-primary/40 hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
         disabled && "cursor-not-allowed opacity-60 hover:border-border/60 hover:shadow-none focus-visible:ring-0",

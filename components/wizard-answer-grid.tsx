@@ -7,11 +7,15 @@ type WizardAnswerGridProps = {
   answers: WizardAnswer[]
   onAnswerClick: (answer: WizardAnswer) => void
   isSelected: (value: string) => boolean
+  questionId?: string | null
 }
 
-export function WizardAnswerGrid({ answers, onAnswerClick, isSelected }: WizardAnswerGridProps) {
+export function WizardAnswerGrid({ answers, onAnswerClick, isSelected, questionId }: WizardAnswerGridProps) {
   return (
-    <div className="mt-6 grid gap-3 sm:grid-cols-2">
+    <div
+      className="mt-6 grid gap-3 sm:grid-cols-2"
+      data-testid={questionId ? `answer-grid-${questionId}` : "answer-grid"}
+    >
       {answers.map((answer) => {
         const iconDescriptor = getIconDescriptor(answer.icon ?? answer.value)
         const iconHex = iconDescriptor
@@ -66,6 +70,7 @@ export function WizardAnswerGrid({ answers, onAnswerClick, isSelected }: WizardA
             selected={isSelected(answer.value)}
             disabled={answer.disabled}
             disabledLabel={answer.disabledLabel}
+            testId={questionId ? `answer-option-${questionId}-${answer.value}` : `answer-option-${answer.value}`}
           />
         )
       })}

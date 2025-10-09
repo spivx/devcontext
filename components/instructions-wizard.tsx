@@ -541,7 +541,10 @@ export function InstructionsWizard({
   }
 
   const wizardLayout = (
-    <div className="mx-auto flex w-full max-w-4xl flex-col gap-6">
+    <div
+      className="mx-auto flex w-full max-w-4xl flex-col gap-6"
+      data-testid="instructions-wizard"
+    >
       <div className="flex items-center justify-start">
         <Link
           href="/"
@@ -552,7 +555,10 @@ export function InstructionsWizard({
       </div>
 
       {isStackFastTrackPromptVisible ? (
-        <section className="rounded-3xl border border-border/80 bg-card/95 p-6 shadow-lg">
+        <section
+          className="rounded-3xl border border-border/80 bg-card/95 p-6 shadow-lg"
+          data-testid="wizard-fast-track"
+        >
           <div className="flex flex-col gap-6">
             <div className="space-y-4">
               <div className="space-y-2">
@@ -574,7 +580,10 @@ export function InstructionsWizard({
           </div>
         </section>
       ) : (
-        <section className="rounded-3xl border border-border/80 bg-card/95 p-6 shadow-lg">
+        <section
+          className="rounded-3xl border border-border/80 bg-card/95 p-6 shadow-lg"
+          data-testid="wizard-question-section"
+        >
           <div className="flex flex-col gap-4">
             <div className="flex flex-wrap items-center gap-2">
               <Button
@@ -595,7 +604,10 @@ export function InstructionsWizard({
               </Button>
             </div>
 
-            <h1 className="text-3xl font-semibold text-foreground">
+            <h1
+              className="text-3xl font-semibold text-foreground"
+              data-testid="wizard-question-heading"
+            >
               {currentQuestion.question}
             </h1>
 
@@ -635,6 +647,7 @@ export function InstructionsWizard({
               answers={filteredAnswers}
               onAnswerClick={handleAnswerClick}
               isSelected={isAnswerSelected}
+              questionId={currentQuestion?.id ?? null}
             />
           )}
 

@@ -142,7 +142,10 @@ export default function StackLandingPage({ params }: { params: { stack: string }
   const defaultSummaryUrl = `/new/stack/${slug}/default/summary`
 
   return (
-    <main className="mx-auto flex min-h-screen max-w-3xl flex-col gap-10 px-6 py-16 text-foreground">
+    <main
+      className="mx-auto flex min-h-screen max-w-3xl flex-col gap-10 px-6 py-16 text-foreground"
+      data-testid="stack-detail-page"
+    >
       <header className="space-y-6">
         <div className="flex items-center justify-between">
           <Link href="/" className="text-sm font-semibold text-foreground transition hover:text-primary">

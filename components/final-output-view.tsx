@@ -158,6 +158,7 @@ export default function FinalOutputView({ fileName, fileContent, mimeType, onClo
       aria-labelledby="final-output-title"
       aria-describedby="final-output-description"
       onClick={handleBackdropClick}
+      data-testid="final-output-dialog"
     >
       <div
         ref={dialogRef}
@@ -215,6 +216,7 @@ export default function FinalOutputView({ fileName, fileContent, mimeType, onClo
               className="min-h-0 h-full w-full resize-none rounded-2xl bg-transparent p-6 font-mono text-sm leading-relaxed text-foreground focus:outline-none"
               aria-label="Generated instructions content"
               placeholder="No content available."
+              data-testid="final-output-textarea"
             />
           </div>
         </div>
