@@ -23,7 +23,10 @@ export function WizardConfirmationDialog({ intent, onCancel, onConfirm }: Wizard
   const { title, description, confirmLabel } = copyByIntent[intent]
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-background/80 p-4 backdrop-blur-sm">
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center bg-background/80 p-4 backdrop-blur-sm"
+      data-testid="wizard-confirmation-dialog"
+    >
       <div className="w-full max-w-md space-y-4 rounded-2xl border border-border/70 bg-card/95 p-6 shadow-2xl">
         <div className="space-y-2">
           <h3 className="text-lg font-semibold text-foreground">{title}</h3>
@@ -33,7 +36,11 @@ export function WizardConfirmationDialog({ intent, onCancel, onConfirm }: Wizard
           <Button variant="ghost" onClick={onCancel}>
             Keep My Answers
           </Button>
-          <Button variant="destructive" onClick={onConfirm}>
+          <Button
+            variant="destructive"
+            onClick={onConfirm}
+            data-testid="wizard-confirmation-confirm"
+          >
             {confirmLabel}
           </Button>
         </div>

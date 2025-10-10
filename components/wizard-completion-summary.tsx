@@ -28,7 +28,10 @@ export function WizardCompletionSummary({
   const selectedOption = fileOptions.find((file) => file.id === selectedFileId) ?? null
 
   return (
-    <div className="space-y-6 rounded-3xl border border-border/80 bg-card/95 p-8 shadow-lg">
+    <div
+      className="space-y-6 rounded-3xl border border-border/80 bg-card/95 p-8 shadow-lg"
+      data-testid="wizard-completion-summary"
+    >
       <div className="space-y-3">
         <div className="space-y-4">
           <div className="space-y-2">
@@ -73,7 +76,7 @@ export function WizardCompletionSummary({
             </span>
           ) : null}
         </div>
-        <div className="grid gap-3 md:grid-cols-3">
+        <div className="grid gap-3 md:grid-cols-3" data-testid="wizard-file-options">
           {fileOptions.map((file) => {
             const isSelected = file.id === selectedFileId
             return (
@@ -85,6 +88,7 @@ export function WizardCompletionSummary({
                   ? "border-primary bg-primary/10 shadow-lg shadow-primary/20"
                   : "border-border/60 bg-background/95 hover:-translate-y-0.5 hover:border-primary/40 hover:shadow-md"
                   }`}
+                data-testid={`wizard-file-option-${file.id}`}
               >
                 <span className="text-sm font-semibold text-foreground">{file.label}</span>
                 <span className="text-xs text-muted-foreground">{file.filename}</span>
@@ -94,11 +98,12 @@ export function WizardCompletionSummary({
         </div>
       </div>
 
-      <div className="space-y-3">
+      <div className="space-y-3" data-testid="wizard-summary-entries">
         {summary.map((entry) => (
           <div
             key={entry.id}
             className="rounded-2xl border border-border/70 bg-background/90 p-5"
+            data-testid={`wizard-summary-entry-${entry.id}`}
           >
             <div className="flex flex-wrap items-start justify-between gap-3">
               <p className="text-sm font-medium text-muted-foreground">{entry.question}</p>

@@ -29,7 +29,10 @@ export const metadata: Metadata = {
 
 export default function StacksIndexPage() {
   return (
-    <main className="mx-auto flex min-h-screen max-w-4xl flex-col gap-10 px-6 py-16 text-foreground">
+    <main
+      className="mx-auto flex min-h-screen max-w-4xl flex-col gap-10 px-6 py-16 text-foreground"
+      data-testid="stacks-index-page"
+    >
       <header className="space-y-6">
         <div className="flex items-center justify-between">
           <Link href="/" className="text-sm font-semibold text-foreground transition hover:text-primary">
@@ -52,6 +55,7 @@ export default function StacksIndexPage() {
             <article
               key={answer.value}
               className="flex flex-col gap-4 rounded-2xl border border-border/70 bg-card/95 p-6 shadow-sm transition hover:-translate-y-1 hover:shadow-lg"
+              data-testid={`stack-card-${answer.value}`}
             >
               <div className="space-y-2">
                 <h2 className="text-2xl font-semibold tracking-tight">{answer.label}</h2>

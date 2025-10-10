@@ -148,7 +148,10 @@ export default function RepoScanClient({ initialRepoUrl }: RepoScanClientProps) 
     }, [scanResult])
 
     return (
-        <div className="relative flex min-h-screen flex-col bg-background text-foreground">
+        <div
+            className="relative flex min-h-screen flex-col bg-background text-foreground"
+            data-testid="repo-scan-page"
+        >
             <div className="absolute inset-0 bg-gradient-to-b from-background via-background/95 to-background" aria-hidden="true" />
             <header className="relative z-10 flex items-center justify-between px-6 py-6 lg:px-12 lg:py-8">
                 <Link href="/" className="text-sm font-semibold text-foreground transition hover:text-primary">
@@ -178,28 +181,42 @@ export default function RepoScanClient({ initialRepoUrl }: RepoScanClientProps) 
                                 </div>
                             </div>
                         ) : promptVisible ? (
-                            <div className="space-y-4">
+                            <div className="space-y-4" data-testid="repo-scan-prompt">
                                 <h3 className="text-xl font-semibold text-foreground">Scan {repoSlug ?? repoUrlForScan}?</h3>
                                 <p className="text-sm text-muted-foreground">We will detect languages, frameworks, tooling, and testing info.</p>
-                                <Button onClick={handleStartScan} className="w-full sm:w-auto">Yes, scan this repo</Button>
+                                <Button
+                                    onClick={handleStartScan}
+                                    className="w-full sm:w-auto"
+                                    data-testid="repo-scan-confirm-button"
+                                >
+                                    Yes, scan this repo
+                                </Button>
                             </div>
                         ) : isLoading ? (
                             <div className="flex justify-center py-16">
                                 <RepoScanLoader />
                             </div>
                         ) : error ? (
-                            <div className="flex flex-col items-center gap-3 py-10 text-center">
+                            <div
+                                className="flex flex-col items-center gap-3 py-10 text-center"
+                                data-testid="repo-scan-error"
+                            >
                                 <AlertTriangle className="size-8 text-destructive" aria-hidden="true" />
                                 <div>
                                     <p className="text-base font-semibold text-foreground">Unable to scan repository</p>
                                     <p className="mt-1 text-sm text-muted-foreground">{error}</p>
                                 </div>
                                 {canRetry ? (
-                                    <Button onClick={handleRetryScan}>Try again</Button>
+                                    <Button
+                                        onClick={handleRetryScan}
+                                        data-testid="repo-scan-retry-button"
+                                    >
+                                        Try again
+                                    </Button>
                                 ) : null}
                             </div>
                         ) : scanResult ? (
-                            <div className="space-y-8">
+                            <div className="space-y-8" data-testid="repo-scan-results">
                                 <section className="space-y-2">
                                     <h3 className="text-lg font-semibold text-foreground">Detected snapshot</h3>
                                     <p className="text-sm text-muted-foreground">
@@ -291,7 +308,10 @@ export default function RepoScanClient({ initialRepoUrl }: RepoScanClientProps) 
                                         </div>
                                     </div>
                                 ) : null}
-                                <div className="rounded-2xl border border-border/60 bg-background/70 p-5">
+                                <div
+                                    className="rounded-2xl border border-border/60 bg-background/70 p-5"
+                                    data-testid="repo-scan-raw-json"
+                                >
                                     <h3 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">Raw response</h3>
                                     <pre className="mt-3 max-h-72 overflow-auto rounded-md bg-muted p-3 text-xs text-muted-foreground">
                                         {JSON.stringify(scanResult, null, 2)}

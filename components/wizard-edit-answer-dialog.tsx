@@ -25,7 +25,10 @@ export function WizardEditAnswerDialog({ question, value, onAnswerSelect, onClos
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-background/80 p-6 pt-24 backdrop-blur-sm">
+    <div
+      className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-background/80 p-6 pt-24 backdrop-blur-sm"
+      data-testid="wizard-edit-answer-dialog"
+    >
       <div className="w-full max-w-2xl space-y-6 rounded-2xl border border-border/70 bg-card/95 p-6 shadow-2xl">
         <div className="flex items-start justify-between gap-4">
           <div className="space-y-2">
@@ -68,7 +71,12 @@ export function WizardEditAnswerDialog({ question, value, onAnswerSelect, onClos
             No options match &ldquo;{query}&rdquo;. Try a different search.
           </p>
         ) : (
-          <WizardAnswerGrid answers={answers} onAnswerClick={onAnswerSelect} isSelected={isSelected} />
+          <WizardAnswerGrid
+            answers={answers}
+            onAnswerClick={onAnswerSelect}
+            isSelected={isSelected}
+            questionId={question.id}
+          />
         )}
       </div>
     </div>

@@ -7,13 +7,14 @@ import { absoluteUrl } from "@/lib/site-metadata"
 import type { RepoScanRouteParams } from "@/types/repo-scan"
 
 type RepoScanPageProps = {
-    params: RepoScanRouteParams
+    params: Promise<RepoScanRouteParams>
 }
 
 const toSlug = (repoUrl: string) => repoUrl.replace(/^https:\/\/github.com\//, "")
 
-export function generateMetadata({ params }: RepoScanPageProps): Metadata {
-    const decoded = decodeRepoRouteParam(params.repoUrl)
+export async function generateMetadata({ params }: RepoScanPageProps): Promise<Metadata> {
+    const resolvedParams = await params
+    const decoded = decodeRepoRouteParam(resolvedParams.repoUrl)
     const normalized = decoded ? normalizeGitHubRepoInput(decoded) ?? decoded : null
     const repoSlug = normalized ? toSlug(normalized) : null
     const title = repoSlug ? `Repo scan · ${repoSlug}` : "Repo scan"
@@ -47,8 +48,9 @@ export function generateMetadata({ params }: RepoScanPageProps): Metadata {
     }
 }
 
-export default function RepoScanPage({ params }: RepoScanPageProps) {
-    const decoded = decodeRepoRouteParam(params.repoUrl)
+export default async function RepoScanPage({ params }: RepoScanPageProps) {
+    const resolvedParams = await params
+    const decoded = decodeRepoRouteParam(resolvedParams.repoUrl)
     const normalized = decoded ? normalizeGitHubRepoInput(decoded) ?? decoded : null
 
     return <RepoScanClient initialRepoUrl={normalized ?? decoded ?? null} />

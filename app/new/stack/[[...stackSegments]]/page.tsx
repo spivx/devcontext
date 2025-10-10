@@ -20,7 +20,7 @@ type MetadataProps = {
 }
 
 type PageProps = {
-  params: PageParams
+  params: Promise<PageParams>
 }
 
 export async function generateMetadata({ params }: MetadataProps): Promise<Metadata> {
@@ -92,7 +92,8 @@ export async function generateMetadata({ params }: MetadataProps): Promise<Metad
 }
 
 export default async function StackRoutePage({ params }: PageProps) {
-  const { stackSegments } = params
+  const resolvedParams = await params
+  const { stackSegments } = resolvedParams
   let stackIdFromRoute: string | null = null
   let summaryMode: "default" | "user" | null = null
 

@@ -240,7 +240,10 @@ export function StackSummaryPage({ stackId, mode }: StackSummaryPageProps) {
 
   if (isLoading) {
     return (
-      <div className="flex flex-1 items-center justify-center text-sm text-muted-foreground">
+      <div
+        className="flex flex-1 items-center justify-center text-sm text-muted-foreground"
+        data-testid="stack-summary-loading"
+      >
         Preparing your summary…
       </div>
     )
@@ -248,7 +251,10 @@ export function StackSummaryPage({ stackId, mode }: StackSummaryPageProps) {
 
   if (errorMessage) {
     return (
-      <div className="flex flex-1 flex-col items-center justify-center gap-4 text-center">
+      <div
+        className="flex flex-1 flex-col items-center justify-center gap-4 text-center"
+        data-testid="stack-summary-error"
+      >
         <p className="text-base text-muted-foreground">{errorMessage}</p>
         <Button asChild>
           <Link href={stackId ? `/new/stack/${stackId}` : "/new/stack"}>Back to wizard</Link>
@@ -262,7 +268,10 @@ export function StackSummaryPage({ stackId, mode }: StackSummaryPageProps) {
   }
 
   return (
-    <div className="mx-auto flex w-full max-w-5xl flex-col gap-6">
+    <div
+      className="mx-auto flex w-full max-w-5xl flex-col gap-6"
+      data-testid="stack-summary-page"
+    >
       <section className="rounded-3xl border border-border/80 bg-card/95 p-8 shadow-lg">
         <div className="space-y-4">
           <div className="space-y-2">
