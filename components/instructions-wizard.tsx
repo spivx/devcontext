@@ -297,22 +297,32 @@ export function InstructionsWizard({
       setIsStackFastTrackPromptVisible(false)
     }
 
-    const isFirstQuestionInStep = currentQuestionIndex === 0
-    const isFirstStep = currentStepIndex === 0
+    setCurrentQuestionIndex((prevQuestionIndex) => {
+      if (prevQuestionIndex > 0) {
+        return prevQuestionIndex - 1
+      }
 
-    if (isFirstQuestionInStep && isFirstStep) {
-      return
-    }
+      let targetStepIndex = currentStepIndex
 
-    if (isFirstQuestionInStep) {
-      const previousStepIndex = Math.max(currentStepIndex - 1, 0)
-      const previousStep = wizardSteps[previousStepIndex]
-      setCurrentStepIndex(previousStepIndex)
-      setCurrentQuestionIndex(previousStep.questions.length - 1)
-      return
-    }
+      setCurrentStepIndex((prevStepIndex) => {
+        if (prevStepIndex === 0) {
+          targetStepIndex = prevStepIndex
+          return prevStepIndex
+        }
 
-    setCurrentQuestionIndex((prev) => Math.max(prev - 1, 0))
+        const nextStepIndex = Math.max(prevStepIndex - 1, 0)
+        targetStepIndex = nextStepIndex
+        return nextStepIndex
+      })
+
+      const targetStep = wizardSteps[targetStepIndex] ?? null
+
+      if (targetStep && targetStep.questions.length > 0) {
+        return targetStep.questions.length - 1
+      }
+
+      return 0
+    })
   }
 
   const applyDefaultsAcrossWizard = useCallback(() => {
