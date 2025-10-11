@@ -54,7 +54,7 @@ test("wizard accepts custom free text answers and shows them in the summary", as
           console.warn("Unable to parse wizard state", error)
           return "PARSE_ERROR"
         }
-      }, { questionId: "react-fileStructure" }),
+      }, { questionId: "react-tooling" }),
     { timeout: 15000 }
   ).toBe(customAnswer)
 
@@ -64,5 +64,5 @@ test("wizard accepts custom free text answers and shows them in the summary", as
   })
 
   expect(storedState).not.toBeNull()
-  expect(storedState!.freeTextResponses?.["react-fileStructure"]).toBe(customAnswer)
+  expect(storedState!.freeTextResponses?.["react-tooling"]).toBe(customAnswer)
 })

@@ -19,8 +19,8 @@ test('wizard supports filtering, defaults, and reset', async ({ page }) => {
 
   const questionHeading = page.getByTestId('wizard-question-heading')
 
-  await page.getByRole('button', { name: /Use default/ }).click()
-  await expect(questionHeading).toHaveText('What language do you use?')
+  await page.getByRole('button', { name: 'Use default (Vite)' }).click()
+  await expect(page.getByTestId('answer-option-react-language-typescript')).toBeVisible()
 
   await page.getByRole('button', { name: 'Start Over' }).click()
   await expect(page.getByTestId('wizard-confirmation-dialog')).toBeVisible()
