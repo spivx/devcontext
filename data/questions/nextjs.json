@@ -46,6 +46,15 @@
                 "example": "npm install next react react-dom"
             }
         ],
+        "freeText": {
+            "enabled": true,
+            "suggestions": [
+                "Nx workspace",
+                "Blitz toolkit",
+                "Custom esbuild pipeline",
+                "Remix coexistence"
+            ]
+        },
         "explanation": "Choose the tooling you rely on for bootstrapping and evolving the project."
     },
     {
@@ -95,6 +104,15 @@
                 "example": "app/(marketing)/page.tsx + pages/api/health.ts"
             }
         ],
+        "freeText": {
+            "enabled": true,
+            "suggestions": [
+                "Feature-sliced routing",
+                "Monorepo modules",
+                "Pages for marketing only",
+                "src/modules structure"
+            ]
+        },
         "explanation": "Routing choice impacts data fetching patterns, layouts, and deployment expectations."
     },
     {
@@ -131,6 +149,15 @@
                 "example": "npx create-next-app@latest my-app"
             }
         ],
+        "freeText": {
+            "enabled": true,
+            "suggestions": [
+                "TypeScript strict mode",
+                "JavaScript with JSDoc",
+                "Flow types",
+                "Hybrid JS/TS"
+            ]
+        },
         "explanation": "Language choice impacts type safety, linting, and Copilot suggestions."
     },
     {
@@ -181,6 +208,15 @@
                 "example": "npm install styled-components"
             }
         ],
+        "freeText": {
+            "enabled": true,
+            "suggestions": [
+                "Vanilla Extract",
+                "Tailwind + Radix",
+                "Chakra UI theme",
+                "UnoCSS"
+            ]
+        },
         "explanation": "Styling stack influences rendering performance and component ergonomics."
     },
     {
@@ -231,6 +267,15 @@
                 "example": "const ThemeContext = createContext('light')"
             }
         ],
+        "freeText": {
+            "enabled": true,
+            "suggestions": [
+                "Recoil",
+                "Jotai",
+                "Apollo cache only",
+                "Segment-specific contexts"
+            ]
+        },
         "explanation": "State tooling guides component structure and cross-page coordination."
     },
     {
@@ -281,6 +326,15 @@
                 "example": "const queryClient = new QueryClient()"
             }
         ],
+        "freeText": {
+            "enabled": true,
+            "suggestions": [
+                "Server Actions only",
+                "GraphQL clients",
+                "REST with revalidateTag",
+                "Edge runtime fetch"
+            ]
+        },
         "explanation": "Data strategy shapes caching, hydration, and API integration patterns."
     },
     {
@@ -329,6 +383,15 @@
                 "example": "async function authorize(credentials) { /* validate */ }"
             }
         ],
+        "freeText": {
+            "enabled": true,
+            "suggestions": [
+                "AWS Cognito",
+                "Firebase Auth",
+                "Magic links only",
+                "Edge middleware tokens"
+            ]
+        },
         "explanation": "Auth strategy drives session handling, middleware, and deployment needs."
     },
     {
@@ -377,6 +440,15 @@
                 "example": "if (!emailRegex.test(payload.email)) throw new Error('Invalid email')"
             }
         ],
+        "freeText": {
+            "enabled": true,
+            "suggestions": [
+                "Superstruct",
+                "class-validator",
+                "Form-only validators",
+                "Backend-only validation"
+            ]
+        },
         "explanation": "Validation approach affects reliability of Server Actions and API routes."
     },
     {
@@ -426,6 +498,15 @@
                 "example": "import pino from 'pino'"
             }
         ],
+        "freeText": {
+            "enabled": true,
+            "suggestions": [
+                "Datadog RUM",
+                "Logflare",
+                "New Relic",
+                "Console logging only"
+            ]
+        },
         "explanation": "Logging strategy determines observability and incident response workflows."
     },
     {
@@ -462,6 +543,15 @@
                 "example": "npm install --save-dev vitest @testing-library/react"
             }
         ],
+        "freeText": {
+            "enabled": true,
+            "suggestions": [
+                "Testing Library only",
+                "RTL + Jest DOM",
+                "Integration tests in Node",
+                "No unit tests"
+            ]
+        },
         "explanation": "Unit testing ensures components and helpers behave correctly in isolation."
     },
     {
@@ -498,6 +588,15 @@
                 "example": "npm install --save-dev cypress"
             }
         ],
+        "freeText": {
+            "enabled": true,
+            "suggestions": [
+                "Nightwatch",
+                "TestCafe",
+                "Manual smoke tests",
+                "QA automation team"
+            ]
+        },
         "explanation": "E2E coverage validates full Next.js flows from routing to data."
     }
 ]

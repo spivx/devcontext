@@ -25,7 +25,16 @@
                 "label": "Performance",
                 "example": "Optimize code for runtime speed and bundle size."
             }
-        ]
+        ],
+        "freeText": {
+            "enabled": true,
+            "suggestions": [
+                "Developer velocity",
+                "Long-term maintainability",
+                "Regulatory compliance",
+                "Performance-first roadmap"
+            ]
+        }
     },
     {
         "id": "codeStyle",
@@ -49,7 +58,16 @@
                 "label": "Custom team rules",
                 "example": "See internal style guide."
             }
-        ]
+        ],
+        "freeText": {
+            "enabled": true,
+            "suggestions": [
+                "Google TypeScript style guide",
+                "Internal lint rules",
+                "Prettier defaults only",
+                "Custom JavaScript guidelines"
+            ]
+        }
     },
     {
         "id": "variableNaming",
@@ -68,7 +86,16 @@
                 "example": "const user_name = 'john'",
                 "docs": "https://en.wikipedia.org/wiki/Snake_case"
             }
-        ]
+        ],
+        "freeText": {
+            "enabled": true,
+            "suggestions": [
+                "camelCase with descriptive names",
+                "snake_case for shared libs",
+                "Prefix booleans with is/has",
+                "No abbreviations"
+            ]
+        }
     },
     {
         "id": "fileNaming",
@@ -99,7 +126,16 @@
                 "example": "user_profile.tsx",
                 "docs": "https://en.wikipedia.org/wiki/Snake_case"
             }
-        ]
+        ],
+        "freeText": {
+            "enabled": true,
+            "suggestions": [
+                "Feature-based naming",
+                "No spaces in filenames",
+                "Match backend naming",
+                "Use index files sparingly"
+            ]
+        }
     },
     {
         "id": "componentNaming",
@@ -118,7 +154,16 @@
                 "example": "export function loginForm() {}",
                 "docs": "https://en.wikipedia.org/wiki/Camel_case"
             }
-        ]
+        ],
+        "freeText": {
+            "enabled": true,
+            "suggestions": [
+                "PascalCase with suffix",
+                "Domain-specific prefixes",
+                "Export anonymous components",
+                "Use Async prefix for lazy components"
+            ]
+        }
     },
     {
         "id": "exports",
@@ -137,7 +182,16 @@
                 "example": "export default function Button() {}",
                 "docs": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/export#default_exports"
             }
-        ]
+        ],
+        "freeText": {
+            "enabled": true,
+            "suggestions": [
+                "Named exports everywhere",
+                "Default exports for pages",
+                "Prefer factory exports",
+                "Export objects with namespaces"
+            ]
+        }
     },
     {
         "id": "comments",
@@ -160,7 +214,16 @@
                 "label": "Inline explanations",
                 "example": "// Explain why, not what"
             }
-        ]
+        ],
+        "freeText": {
+            "enabled": true,
+            "suggestions": [
+                "Document intent over implementation",
+                "Use JSDoc for public APIs",
+                "Prefer ADRs for major changes",
+                "No inline comments"
+            ]
+        }
     },
     {
         "id": "collaboration",
@@ -183,6 +246,15 @@
                 "label": "Documentation required",
                 "example": "New APIs must be documented in /docs."
             }
-        ]
+        ],
+        "freeText": {
+            "enabled": true,
+            "suggestions": [
+                "Two approvals required",
+                "Link Jira tickets in PRs",
+                "Use feature branch naming",
+                "Async standups in Slack"
+            ]
+        }
     }
 ]

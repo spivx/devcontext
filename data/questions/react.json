@@ -33,8 +33,67 @@
                     "Less customizable without eject"
                 ],
                 "example": "npx create-react-app my-app"
+            },
+            {
+                "value": "nx",
+                "label": "Nx",
+                "icon": "nx",
+                "docs": "https://nx.dev/getting-started/intro",
+                "pros": [
+                    "Great for monorepos with shared utilities",
+                    "Built-in generators and task caching"
+                ],
+                "cons": [
+                    "Higher initial setup complexity"
+                ],
+                "example": "npx create-nx-workspace@latest my-workspace"
+            },
+            {
+                "value": "turborepo",
+                "label": "Turborepo",
+                "icon": "turborepo",
+                "docs": "https://turbo.build/repo/docs",
+                "pros": [
+                    "Parallel and incremental builds",
+                    "Integrates tightly with Vercel deployments"
+                ],
+                "cons": [
+                    "Requires configuring your preferred bundler"
+                ],
+                "example": "npx create-turbo@latest my-monorepo"
+            },
+            {
+                "value": "webpack",
+                "label": "Custom Webpack",
+                "icon": "webpack",
+                "docs": "https://webpack.js.org/concepts/",
+                "pros": [
+                    "Full control over the build pipeline",
+                    "Massive plugin and loader ecosystem"
+                ],
+                "cons": [
+                    "Manual configuration and maintenance overhead"
+                ],
+                "example": "npm install --save-dev webpack webpack-cli webpack-dev-server"
+            },
+            {
+                "value": "razzle",
+                "label": "Razzle",
+                "docs": "https://razzlejs.org/docs/getting-started",
+                "pros": [
+                    "Zero-config server and client rendering",
+                    "Built-in support for React Router"
+                ],
+                "cons": [
+                    "Smaller community and fewer recent updates"
+                ],
+                "example": "npx create-razzle-app my-app"
             }
         ],
+        "freeText": {
+            "enabled": true,
+            "suggestions": []
+        },
         "explanation": "Choose the build tool / project scaffolder you\u2019re using."
     },
     {
@@ -70,8 +129,71 @@
                     "No static typing"
                 ],
                 "example": "npx create-vite@latest my-app --template react"
+            },
+            {
+                "value": "typescript-strict",
+                "label": "TypeScript (strict mode)",
+                "icon": "/icons/typescript.svg",
+                "docs": "https://www.typescriptlang.org/tsconfig/#strict",
+                "pros": [
+                    "Maximum type safety and early error detection",
+                    "Improves Copilot suggestions with precise types"
+                ],
+                "cons": [
+                    "Requires more explicit annotations in complex areas"
+                ],
+                "example": "Add \"strict\": true to compilerOptions in tsconfig.json"
+            },
+            {
+                "value": "javascript-jsdoc",
+                "label": "JavaScript with JSDoc",
+                "icon": "/icons/javascript.svg",
+                "docs": "https://www.typescriptlang.org/docs/handbook/type-checking-javascript-files.html",
+                "pros": [
+                    "Gradual typing without leaving .js files",
+                    "Enhances IntelliSense while keeping build simple"
+                ],
+                "cons": [
+                    "Type comments can clutter implementation code",
+                    "Limited deep type support compared to TypeScript"
+                ],
+                "example": "/** @param {number} count */ function increment(count) { return count + 1; }"
+            },
+            {
+                "value": "flow",
+                "label": "Flow",
+                "icon": "flow",
+                "docs": "https://flow.org/en/docs/getting-started/",
+                "pros": [
+                    "Optional static typing for React apps",
+                    "Powerful inference with minimal annotations"
+                ],
+                "cons": [
+                    "Smaller ecosystem compared to TypeScript",
+                    "Requires Babel or build tooling to strip types"
+                ],
+                "example": "// @flow\nfunction greet(name: string): string {\n  return `Hello ${name}`;\n}"
+            },
+            {
+                "value": "reasonml",
+                "label": "ReasonML",
+                "icon": "reason",
+                "docs": "https://reasonml.github.io/docs/en/quickstart",
+                "pros": [
+                    "Expressive functional language with JSX interop",
+                    "Strong type system and pattern matching"
+                ],
+                "cons": [
+                    "Smaller hiring pool and ecosystem",
+                    "Requires compilation via ReScript toolchain"
+                ],
+                "example": "[@react.component]\nlet make = (~name) => <div>{React.string(name)}</div>;"
             }
         ],
+        "freeText": {
+            "enabled": true,
+            "suggestions": []
+        },
         "explanation": "Language choice impacts type safety and Copilot suggestions."
     },
     {
@@ -117,8 +239,70 @@
                     "Adds boilerplate files per component"
                 ],
                 "example": "components/Button/Button.tsx + components/Button/index.tsx"
+            },
+            {
+                "value": "feature-sliced",
+                "label": "Feature-sliced design",
+                "icon": "/icons/folder-tree.svg",
+                "docs": "https://feature-sliced.design/docs/get-started/overview",
+                "pros": [
+                    "Domain-driven slices keep modules cohesive",
+                    "Supports scaling with shared layering conventions"
+                ],
+                "cons": [
+                    "Requires team alignment on slice boundaries"
+                ],
+                "example": "src/entities/user/ui/ProfileCard/index.tsx"
+            },
+            {
+                "value": "atomic-design",
+                "label": "Atomic design folders",
+                "icon": "/icons/layout.svg",
+                "docs": "https://bradfrost.com/blog/post/atomic-web-design/",
+                "pros": [
+                    "Enforces a consistent component hierarchy",
+                    "Encourages reuse of UI primitives"
+                ],
+                "cons": [
+                    "Rigid layers can feel heavyweight for small apps"
+                ],
+                "example": "components/atoms/Button/Button.tsx"
+            },
+            {
+                "value": "component-tests-colocated",
+                "label": "Components with co-located tests",
+                "icon": "/icons/folder-tree.svg",
+                "docs": "https://kentcdodds.com/blog/colocate-tests",
+                "pros": [
+                    "Tests live beside implementation for quick discovery",
+                    "Keeps refactors and specs in sync"
+                ],
+                "cons": [
+                    "Adds nested folders to the tree",
+                    "Requires tooling to ignore *.test files in production bundles"
+                ],
+                "example": "Button/Button.tsx + Button/Button.test.tsx"
+            },
+            {
+                "value": "next-app-router",
+                "label": "Next.js app router",
+                "icon": "nextdotjs",
+                "docs": "https://nextjs.org/docs/app/building-your-application/routing",
+                "pros": [
+                    "File-system routing with nested layouts",
+                    "Server and client components by default"
+                ],
+                "cons": [
+                    "Specific to Next.js projects",
+                    "Requires understanding React Server Components"
+                ],
+                "example": "app/dashboard/(marketing)/page.tsx"
             }
         ],
+        "freeText": {
+            "enabled": true,
+            "suggestions": []
+        },
         "explanation": "Component organization affects maintainability as the project grows."
     },
     {
@@ -154,8 +338,71 @@
                     "Verbose imports"
                 ],
                 "example": "import styles from './Button.module.css'"
+            },
+            {
+                "value": "styled-components",
+                "label": "Styled Components",
+                "icon": "styledcomponents",
+                "docs": "https://styled-components.com/docs",
+                "pros": [
+                    "Component-scoped styles with tagged template literals",
+                    "Dynamic styling based on props"
+                ],
+                "cons": [
+                    "Adds runtime overhead",
+                    "SSR requires additional configuration"
+                ],
+                "example": "const Button = styled.button`\n  background: #1d4ed8;\n  color: white;\n`;"
+            },
+            {
+                "value": "emotion",
+                "label": "Emotion",
+                "icon": "emotion",
+                "docs": "https://emotion.sh/docs/introduction",
+                "pros": [
+                    "Flexible CSS-in-JS with object or string styles",
+                    "Great TypeScript support"
+                ],
+                "cons": [
+                    "Runtime styling can impact performance on low-end devices"
+                ],
+                "example": "const className = css`\n  font-weight: 600;\n`;"
+            },
+            {
+                "value": "vanilla-extract",
+                "label": "Vanilla Extract",
+                "icon": "vanillaextract",
+                "docs": "https://vanilla-extract.style/documentation/getting-started",
+                "pros": [
+                    "Zero-runtime CSS-in-TypeScript",
+                    "Static extraction keeps bundles lean"
+                ],
+                "cons": [
+                    "Requires build tooling configuration",
+                    "Less ergonomic for highly dynamic styles"
+                ],
+                "example": "// button.css.ts\nexport const root = style({ padding: '0.75rem' });"
+            },
+            {
+                "value": "sass-modules",
+                "label": "Sass modules",
+                "icon": "sass",
+                "docs": "https://sass-lang.com/documentation",
+                "pros": [
+                    "Powerful nesting and variables",
+                    "Scoped imports avoid global leaks"
+                ],
+                "cons": [
+                    "Build step required",
+                    "Mixins can hide complexity"
+                ],
+                "example": "import styles from './Button.module.scss'"
             }
         ],
+        "freeText": {
+            "enabled": true,
+            "suggestions": []
+        },
         "explanation": "Styling choice impacts developer experience and bundle size."
     },
     {
@@ -191,8 +438,59 @@
                     "Less mature than Jest"
                 ],
                 "example": "npm install --save-dev vitest @testing-library/react"
+            },
+            {
+                "value": "react-testing-library",
+                "label": "React Testing Library",
+                "icon": "testinglibrary",
+                "docs": "https://testing-library.com/docs/react-testing-library/intro/",
+                "pros": [
+                    "Encourages tests from the user perspective",
+                    "Works with Jest, Vitest, and other runners"
+                ],
+                "cons": [
+                    "Requires pairing with an assertion library",
+                    "Focused on DOM tests rather than class instance details"
+                ],
+                "example": "render(<Button />); expect(screen.getByRole('button')).toBeEnabled();"
+            },
+            {
+                "value": "react-testing-library-jest-dom",
+                "label": "React Testing Library + jest-dom",
+                "icon": "testinglibrary",
+                "docs": "https://testing-library.com/docs/ecosystem-jest-dom/",
+                "pros": [
+                    "Provides intuitive DOM matchers like toBeInTheDocument",
+                    "Seamless integration with RTL setup"
+                ],
+                "cons": [
+                    "Tied to Jest-compatible environments",
+                    "Adds extra globals to manage in TypeScript"
+                ],
+                "example": "expect(screen.getByRole('alert')).toBeInTheDocument();"
+            },
+            {
+                "value": "mocha-enzyme",
+                "label": "Mocha + Enzyme",
+                "icon": "mocha",
+                "docs": "https://enzymejs.github.io/enzyme/docs/installation/",
+                "pros": [
+                    "Supports legacy Enzyme shallow rendering patterns",
+                    "Flexible assertion and mocking choices"
+                ],
+                "cons": [
+                    "Adapters lag behind the latest React releases",
+                    "More setup to integrate with Babel and JSX"
+                ],
+                "example": "npm install --save-dev mocha enzyme enzyme-adapter-react-17"
             }
         ],
+        "freeText": {
+            "enabled": true,
+            "suggestions": [
+                "No unit tests"
+            ]
+        },
         "explanation": "Unit testing ensures components work as expected in isolation."
     },
     {
@@ -228,8 +526,68 @@
                 ],
                 "example": "npm install --save-dev playwright",
                 "isDefault": true
+            },
+            {
+                "value": "nightwatch",
+                "label": "Nightwatch",
+                "icon": "nightwatch",
+                "docs": "https://nightwatchjs.org/guide/",
+                "pros": [
+                    "Built on WebDriver and Selenium ecosystem",
+                    "Simple syntax for cross-browser smoke tests"
+                ],
+                "cons": [
+                    "Slower startup due to Selenium drivers"
+                ],
+                "example": "npm install --save-dev nightwatch"
+            },
+            {
+                "value": "testcafe",
+                "label": "TestCafe",
+                "icon": "testcafe",
+                "docs": "https://testcafe.io/documentation",
+                "pros": [
+                    "Runs tests without browser plugins",
+                    "Automatic waits reduce flaky assertions"
+                ],
+                "cons": [
+                    "Smaller plugin ecosystem compared to Cypress"
+                ],
+                "example": "npx testcafe chrome e2e/**/*.test.ts"
+            },
+            {
+                "value": "webdriverio",
+                "label": "WebdriverIO",
+                "icon": "webdriverio",
+                "docs": "https://webdriver.io/docs/gettingstarted",
+                "pros": [
+                    "Supports WebDriver and DevTools protocols",
+                    "Rich plugin and service ecosystem"
+                ],
+                "cons": [
+                    "Requires configuration to optimize performance"
+                ],
+                "example": "npx wdio config"
+            },
+            {
+                "value": "manual-qa",
+                "label": "Manual QA only",
+                "docs": "https://www.atlassian.com/continuous-delivery/software-testing/manual-testing",
+                "pros": [
+                    "No automation maintenance overhead",
+                    "Great for exploratory test sessions"
+                ],
+                "cons": [
+                    "Not scalable for regression coverage",
+                    "Higher risk of human error"
+                ],
+                "example": "Run smoke-test checklist on staging before releases"
             }
         ],
+        "freeText": {
+            "enabled": true,
+            "suggestions": []
+        },
         "explanation": "E2E testing ensures workflows function correctly in the browser."
     }
 ]

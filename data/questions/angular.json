@@ -45,7 +45,16 @@
                 ],
                 "example": "ng add @angular-builders/custom-webpack"
             }
-        ]
+        ],
+        "freeText": {
+            "enabled": true,
+            "suggestions": [
+                "Angular Universal setup",
+                "Nx workspace generators",
+                "Custom esbuild pipeline",
+                "Monorepo with Turborepo"
+            ]
+        }
     },
     {
         "id": "angular-language",
@@ -93,7 +102,16 @@
                 ],
                 "example": "ng new my-app --no-standalone --defaults"
             }
-        ]
+        ],
+        "freeText": {
+            "enabled": true,
+            "suggestions": [
+                "TypeScript strict with template checks",
+                "JavaScript transitional",
+                "Flow experimentation",
+                "Hybrid TS/JS modules"
+            ]
+        }
     },
     {
         "id": "angular-fileStructure",
@@ -143,7 +161,16 @@
                 ],
                 "example": "libs/dashboard/ui/src/lib/widget.component.ts"
             }
-        ]
+        ],
+        "freeText": {
+            "enabled": true,
+            "suggestions": [
+                "Domain-driven modules",
+                "Core/shared library split",
+                "Nx libs per feature",
+                "Standalone components only"
+            ]
+        }
     },
     {
         "id": "angular-styling",
@@ -191,7 +218,16 @@
                 ],
                 "example": "ng add @angular/material"
             }
-        ]
+        ],
+        "freeText": {
+            "enabled": true,
+            "suggestions": [
+                "CSS Modules via webpack",
+                "Styled Components",
+                "Windi CSS",
+                "Scoped styles only"
+            ]
+        }
     },
     {
         "id": "angular-stateManagement",
@@ -240,7 +276,16 @@
                 ],
                 "example": "userService.user$.pipe(map(user => !!user))"
             }
-        ]
+        ],
+        "freeText": {
+            "enabled": true,
+            "suggestions": [
+                "Akita state management",
+                "ComponentStore",
+                "BehaviorSubject services",
+                "Apollo cache only"
+            ]
+        }
     },
     {
         "id": "angular-apiLayer",
@@ -288,7 +333,16 @@
                 ],
                 "example": "ng-openapi-gen --config openapi.json"
             }
-        ]
+        ],
+        "freeText": {
+            "enabled": true,
+            "suggestions": [
+                "gRPC-web clients",
+                "GraphQL codegen",
+                "REST helpers in /core/api",
+                "Supabase client"
+            ]
+        }
     },
     {
         "id": "angular-validation",
@@ -335,7 +389,16 @@
                 ],
                 "example": "const schema = z.object({ email: z.string().email() })"
             }
-        ]
+        ],
+        "freeText": {
+            "enabled": true,
+            "suggestions": [
+                "Custom validators in shared lib",
+                "Use class-validator",
+                "Central schema package",
+                "Backend-only validation"
+            ]
+        }
     },
     {
         "id": "angular-logging",
@@ -381,7 +444,16 @@
                 ],
                 "example": "this.logger.info('User created', payload)"
             }
-        ]
+        ],
+        "freeText": {
+            "enabled": true,
+            "suggestions": [
+                "LogRocket sessions",
+                "Elastic APM agent",
+                "New Relic browser agent",
+                "Console logging only"
+            ]
+        }
     },
     {
         "id": "angular-testingUT",
@@ -430,7 +502,16 @@
                 ],
                 "example": "npm install --save-dev vitest @nx/vite"
             }
-        ]
+        ],
+        "freeText": {
+            "enabled": true,
+            "suggestions": [
+                "Angular Testing Library",
+                "Spectator",
+                "No unit tests",
+                "Jest + RTL"
+            ]
+        }
     },
     {
         "id": "angular-testingE2E",
@@ -478,6 +559,15 @@
                 ],
                 "example": "npx wdio run wdio.conf.ts"
             }
-        ]
+        ],
+        "freeText": {
+            "enabled": true,
+            "suggestions": [
+                "Nightwatch",
+                "Protractor legacy",
+                "Manual smoke tests",
+                "TestCafe"
+            ]
+        }
     }
 ]

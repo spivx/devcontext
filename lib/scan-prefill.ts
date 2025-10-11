@@ -3,7 +3,7 @@ import { buildStepsForStack } from "@/lib/wizard-summary-data"
 import { STACK_QUESTION_ID } from "@/lib/wizard-config"
 import { persistWizardState } from "@/lib/wizard-storage"
 import type { RepoScanSummary } from "@/types/repo-scan"
-import type { Responses, WizardQuestion, WizardResponses } from "@/types/wizard"
+import type { FreeTextResponses, Responses, WizardQuestion, WizardResponses } from "@/types/wizard"
 
 const normalizeValueForQuestion = (value: string | null, question: WizardQuestion) => {
   if (!value) {
@@ -29,6 +29,7 @@ export const prefillWizardFromScan = async (scan: RepoScanSummary) => {
   const responses: Responses = {
     [STACK_QUESTION_ID]: stack,
   }
+  const freeTextResponses: FreeTextResponses = {}
   const autoFilledMap: Record<string, boolean> = {}
 
   const setIfPresent = (question: WizardQuestion, allResponses: WizardResponses) => {
@@ -56,6 +57,7 @@ export const prefillWizardFromScan = async (scan: RepoScanSummary) => {
     stackId: stack,
     stackLabel,
     responses,
+    freeTextResponses,
     autoFilledMap,
     updatedAt: Date.now(),
   })
@@ -65,4 +67,3 @@ export const prefillWizardFromScan = async (scan: RepoScanSummary) => {
     stackLabel,
   }
 }
-

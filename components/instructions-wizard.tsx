@@ -1,12 +1,21 @@
 "use client"
 
-import { useCallback, useEffect, useMemo, useRef, useState } from "react"
+import { useCallback, useEffect, useMemo, useRef, useState, type ChangeEvent, type FormEvent } from "react"
 import Link from "next/link"
 
 import { Button } from "@/components/ui/button"
-import { Undo2 } from "lucide-react"
+import { Input } from "@/components/ui/input"
+import { CheckCircle2, Undo2 } from "lucide-react"
 
-import type { InstructionsWizardProps, Responses, WizardAnswer, WizardQuestion, WizardStep, WizardConfirmationIntent } from "@/types/wizard"
+import type {
+  InstructionsWizardProps,
+  Responses,
+  WizardAnswer,
+  WizardQuestion,
+  WizardStep,
+  WizardConfirmationIntent,
+  FreeTextResponses,
+} from "@/types/wizard"
 import { buildFilterPlaceholder, useAnswerFilter } from "@/hooks/use-answer-filter"
 import {
   STACK_QUESTION_ID,
@@ -36,6 +45,7 @@ export function InstructionsWizard({
   const [responses, setResponses] = useState<Responses>(() =>
     initialStackId ? { [STACK_QUESTION_ID]: initialStackId } : {}
   )
+  const [freeTextResponses, setFreeTextResponses] = useState<FreeTextResponses>({})
   const [dynamicSteps, setDynamicSteps] = useState<WizardStep[]>(() =>
     initialStackStep ? [initialStackStep] : []
   )
@@ -77,6 +87,20 @@ export function InstructionsWizard({
   const filterInputId = currentQuestion ? `answer-filter-${currentQuestion.id}` : "answer-filter"
 
   const currentAnswerValue = currentQuestion ? responses[currentQuestion.id] : undefined
+  const currentFreeTextValue = useMemo(() => {
+    if (!currentQuestion) {
+      return ""
+    }
+
+    const value = freeTextResponses[currentQuestion.id]
+    return typeof value === "string" ? value : ""
+  }, [currentQuestion, freeTextResponses])
+  const freeTextConfig = currentQuestion?.freeText ?? null
+  const freeTextInputId = currentQuestion ? `free-text-${currentQuestion.id}` : "free-text"
+  const canSubmitFreeText = Boolean(freeTextConfig?.enabled && currentFreeTextValue.trim().length > 0)
+  const hasSavedCustomFreeText = Boolean(freeTextConfig?.enabled && currentFreeTextValue.trim().length > 0)
+
+  const savedCustomFreeTextValue = currentFreeTextValue.trim()
 
   const defaultAnswer = useMemo(
     () => currentQuestion?.answers.find((answer) => answer.isDefault) ?? null,
@@ -140,7 +164,13 @@ export function InstructionsWizard({
   }, [])
 
   const persistStateIfPossible = useCallback(
-    (nextResponses: Responses, nextAutoFilled: Record<string, boolean>, stackId: string | null, stackLabel?: string | null) => {
+    (
+      nextResponses: Responses,
+      nextFreeText: FreeTextResponses,
+      nextAutoFilled: Record<string, boolean>,
+      stackId: string | null,
+      stackLabel?: string | null
+    ) => {
       if (!stackId) {
         return
       }
@@ -149,6 +179,7 @@ export function InstructionsWizard({
         stackId,
         stackLabel: stackLabel ?? undefined,
         responses: nextResponses,
+        freeTextResponses: nextFreeText,
         autoFilledMap: nextAutoFilled,
         updatedAt: Date.now(),
       })
@@ -181,6 +212,28 @@ export function InstructionsWizard({
         })
 
         return next
+      })
+
+      setFreeTextResponses((prev) => {
+        if (Object.keys(prev).length === 0) {
+          return prev
+        }
+
+        let didMutate = false
+        const next = { ...prev }
+
+        step.questions.forEach((question) => {
+          if (question.id === STACK_QUESTION_ID) {
+            return
+          }
+
+          if (next[question.id] !== undefined) {
+            delete next[question.id]
+            didMutate = true
+          }
+        })
+
+        return didMutate ? next : prev
       })
 
       setCurrentStepIndex(1)
@@ -261,8 +314,15 @@ export function InstructionsWizard({
       return
     }
 
-    persistStateIfPossible(responses, autoFilledQuestionMap, selectedStackId, activeStackLabel)
-  }, [responses, autoFilledQuestionMap, selectedStackId, activeStackLabel, persistStateIfPossible])
+    persistStateIfPossible(responses, freeTextResponses, autoFilledQuestionMap, selectedStackId, activeStackLabel)
+  }, [
+    responses,
+    freeTextResponses,
+    autoFilledQuestionMap,
+    selectedStackId,
+    activeStackLabel,
+    persistStateIfPossible,
+  ])
 
   const handleWizardCompletion = useCallback(() => {
     if (!selectedStackId) {
@@ -354,6 +414,8 @@ export function InstructionsWizard({
       return next
     })
 
+    setFreeTextResponses((prev) => (Object.keys(prev).length > 0 ? {} : prev))
+
     markQuestionsAutoFilled(autoFilledIds)
     setIsStackFastTrackPromptVisible(false)
     handleWizardCompletion()
@@ -444,6 +506,125 @@ export function InstructionsWizard({
     void handleQuestionAnswerSelection(currentQuestion, answer)
   }
 
+  const handleFreeTextChange = useCallback(
+    (event: ChangeEvent<HTMLInputElement>) => {
+      const question = currentQuestion
+
+      if (!question) {
+        return
+      }
+
+      const { value } = event.target
+      let didChange = false
+
+      setFreeTextResponses((prev) => {
+        const existing = prev[question.id]
+
+        if (value.length === 0) {
+          if (existing === undefined) {
+            return prev
+          }
+
+          const next = { ...prev }
+          delete next[question.id]
+          didChange = true
+          return next
+        }
+
+        if (existing === value) {
+          return prev
+        }
+
+        didChange = true
+        return {
+          ...prev,
+          [question.id]: value,
+        }
+      })
+
+      if (didChange) {
+        clearAutoFilledFlag(question.id)
+      }
+    },
+    [clearAutoFilledFlag, currentQuestion]
+  )
+
+  const hasSelectionForQuestion = useCallback(
+    (question: WizardQuestion) => {
+      const value = responses[question.id]
+
+      if (question.allowMultiple) {
+        return Array.isArray(value) && value.length > 0
+      }
+
+      return typeof value === "string" && value.length > 0
+    },
+    [responses]
+  )
+
+  const commitFreeTextValue = (
+    question: WizardQuestion,
+    rawValue: string,
+    options?: { allowAutoAdvance?: boolean }
+  ) => {
+    const allowAutoAdvance = options?.allowAutoAdvance ?? true
+    const trimmedValue = rawValue.trim()
+    const existingValue = typeof freeTextResponses[question.id] === "string" ? freeTextResponses[question.id] : ""
+
+    if (trimmedValue === existingValue) {
+      if (allowAutoAdvance && trimmedValue.length > 0 && !hasSelectionForQuestion(question)) {
+        setTimeout(() => {
+          advanceToNextQuestion()
+        }, 0)
+      }
+
+      return
+    }
+
+    setFreeTextResponses((prev) => {
+      if (trimmedValue.length === 0) {
+        if (!(question.id in prev)) {
+          return prev
+        }
+
+        const next = { ...prev }
+        delete next[question.id]
+        return next
+      }
+
+      return {
+        ...prev,
+        [question.id]: trimmedValue,
+      }
+    })
+
+    clearAutoFilledFlag(question.id)
+
+    if (allowAutoAdvance && trimmedValue.length > 0 && !hasSelectionForQuestion(question)) {
+      setTimeout(() => {
+        advanceToNextQuestion()
+      }, 0)
+    }
+  }
+
+  const handleFreeTextSubmit = (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault()
+
+    if (!currentQuestion) {
+      return
+    }
+
+    commitFreeTextValue(currentQuestion, currentFreeTextValue)
+  }
+
+  const handleFreeTextClear = () => {
+    if (!currentQuestion) {
+      return
+    }
+
+    commitFreeTextValue(currentQuestion, "", { allowAutoAdvance: false })
+  }
+
   const applyDefaultAnswer = async () => {
     if (!defaultAnswer || defaultAnswer.disabled || !currentQuestion) {
       return
@@ -478,6 +659,7 @@ export function InstructionsWizard({
   const resetWizardState = () => {
     const stackIdToClear = selectedStackId
     setResponses({})
+    setFreeTextResponses({})
     setDynamicSteps([])
     setCurrentStepIndex(0)
     setCurrentQuestionIndex(0)
@@ -660,6 +842,56 @@ export function InstructionsWizard({
               questionId={currentQuestion?.id ?? null}
             />
           )}
+
+          {freeTextConfig?.enabled ? (
+            <div className="mt-6 space-y-3 rounded-2xl border border-border/60 bg-background/80 p-4">
+              <div className="space-y-1">
+                <p className="text-sm font-semibold text-foreground">Need something else?</p>
+                <p className="text-xs text-muted-foreground">
+                  {hasSavedCustomFreeText
+                    ? "Your custom answer below is what we'll keep when generating the AI context file."
+                    : "Whatever you type here replaces the presets and goes straight into the AI context file."}
+                </p>
+              </div>
+              <form
+                className="flex flex-col gap-2 sm:flex-row sm:items-center"
+                onSubmit={handleFreeTextSubmit}
+              >
+                <Input
+                  id={freeTextInputId}
+                  value={currentFreeTextValue}
+                  onChange={handleFreeTextChange}
+                  placeholder="Type your custom preference"
+                  className="sm:flex-1"
+                  autoComplete="off"
+                />
+                <div className="flex gap-2">
+                  <Button type="submit" size="sm" disabled={!canSubmitFreeText}>
+                    Save custom answer
+                  </Button>
+                  {currentFreeTextValue.length > 0 ? (
+                    <Button type="button" size="sm" variant="ghost" onClick={handleFreeTextClear}>
+                      Clear
+                    </Button>
+                  ) : null}
+                </div>
+              </form>
+              {hasSavedCustomFreeText ? (
+                <p className="flex items-center gap-2 text-xs font-semibold text-emerald-600 dark:text-emerald-400">
+                  <CheckCircle2 className="h-3.5 w-3.5" />
+                  <span>
+                    We'll use
+                    {" "}
+                    <code className="rounded bg-muted px-1.5 py-0.5 text-[0.7rem] font-medium">
+                      {savedCustomFreeTextValue}
+                    </code>
+                    {" "}
+                    for this question when we generate your context file.
+                  </span>
+                </p>
+              ) : null}
+            </div>
+          ) : null}
 
           <div className="mt-6 flex flex-wrap items-center justify-between gap-3">
             <div className="text-xs text-muted-foreground">

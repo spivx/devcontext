@@ -1,4 +1,4 @@
-import type { FileOutputConfig, Responses, WizardStep } from "@/types/wizard"
+import type { FileOutputConfig, FreeTextResponses, Responses, WizardStep } from "@/types/wizard"
 
 type SummaryQuestionDetails = {
   id: string
@@ -55,6 +55,7 @@ export const buildCompletionSummary = (
   selectedFileFormatLabel: string | null,
   steps: WizardStep[],
   responses: Responses,
+  freeTextResponses: FreeTextResponses,
   autoFilledMap: Record<string, boolean> = {},
   includeFileEntry = true
 ): CompletionSummaryEntry[] => {
@@ -77,11 +78,19 @@ export const buildCompletionSummary = (
         return value === answer.value
       })
 
+      const freeTextValue = typeof freeTextResponses[question.id] === "string"
+        ? freeTextResponses[question.id]?.trim()
+        : ""
+      const customAnswer = freeTextValue.length > 0 ? `Custom: ${freeTextValue}` : null
+      const answerSummaries = customAnswer
+        ? [customAnswer]
+        : selectedAnswers.map((answer) => answer.label)
+
       summary.push({
         id: question.id,
         question: question.question,
-        hasSelection: selectedAnswers.length > 0,
-        answers: selectedAnswers.map((answer) => answer.label),
+        hasSelection: answerSummaries.length > 0,
+        answers: answerSummaries,
         isAutoFilled: Boolean(autoFilledMap[question.id]),
         isReadOnlyOnSummary: Boolean(question.isReadOnlyOnSummary),
       })

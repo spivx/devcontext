@@ -17,7 +17,16 @@
                 "docs": "https://web.dev/infinite-scroll-without-chaos/",
                 "isDefault": false
             }
-        ]
+        ],
+        "freeText": {
+            "enabled": true,
+            "suggestions": [
+                "Cache responses for 5 minutes",
+                "Use SWR for caching",
+                "Batch API requests",
+                "Enable GraphQL persisted queries"
+            ]
+        }
     },
     {
         "id": "reactPerf",
@@ -36,6 +45,15 @@
                 "example": "import('chart.js') only when needed",
                 "docs": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/import#dynamic_imports"
             }
-        ]
+        ],
+        "freeText": {
+            "enabled": true,
+            "suggestions": [
+                "Audit with React Profiler monthly",
+                "Avoid inline anonymous handlers",
+                "Use Suspense boundaries",
+                "Lazy load heavy widgets"
+            ]
+        }
     }
 ]

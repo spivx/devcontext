@@ -16,7 +16,16 @@
                 "example": "Fetch secrets from a secure vault",
                 "docs": "https://developer.hashicorp.com/vault/docs"
             }
-        ]
+        ],
+        "freeText": {
+            "enabled": true,
+            "suggestions": [
+                "Use OAuth via Auth0",
+                "Rotate secrets monthly",
+                "Short-lived access tokens",
+                "SSO with SAML"
+            ]
+        }
     },
     {
         "id": "validation",
@@ -35,7 +44,16 @@
                 "example": "Use Yup schemas for forms and requests",
                 "docs": "https://github.com/jquense/yup"
             }
-        ]
+        ],
+        "freeText": {
+            "enabled": true,
+            "suggestions": [
+                "Server-side validation only",
+                "Use class-validator",
+                "Centralize schemas in /schemas",
+                "Leverage Ajv"
+            ]
+        }
     },
     {
         "id": "logging",
@@ -54,6 +72,15 @@
                 "example": "Use JSON logs with context fields",
                 "docs": "https://12factor.net/logs"
             }
-        ]
+        ],
+        "freeText": {
+            "enabled": true,
+            "suggestions": [
+                "Scrub PII before logging",
+                "Correlate logs with trace IDs",
+                "Send logs to Datadog",
+                "Use warn/error levels only"
+            ]
+        }
     }
 ]

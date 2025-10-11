@@ -47,6 +47,15 @@
                 "example": "npm init quasar"
             }
         ],
+        "freeText": {
+            "enabled": true,
+            "suggestions": [
+                "Nuxt CLI",
+                "VitePress",
+                "Custom webpack",
+                "Laravel Mix"
+            ]
+        },
         "explanation": "Choose the bundler or CLI that created your Vue project."
     },
     {
@@ -77,13 +86,22 @@
                 "pros": [
                     "Lower barrier",
                     "Less setup"
-                ],
+               ],
                 "cons": [
                     "No static checks"
                 ],
                 "example": "<script setup>\nimport { ref } from 'vue'\nconst count = ref(0)\n</script>"
             }
         ],
+        "freeText": {
+            "enabled": true,
+            "suggestions": [
+                "TypeScript strict",
+                "JS with JSDoc",
+                "Hybrid TS/JS",
+                "Script setup only"
+            ]
+        },
         "explanation": "Language choice affects linting rules and code completion hints."
     },
     {
@@ -132,6 +150,15 @@
                 "example": "src/components/Button/index.ts"
             }
         ],
+        "freeText": {
+            "enabled": true,
+            "suggestions": [
+                "Domain-driven modules",
+                "Atomic design",
+                "Colocate tests",
+                "ui/ and features/ split"
+            ]
+        },
         "explanation": "Component structure informs import paths and refactors."
     },
     {
@@ -182,6 +209,15 @@
                 "example": "const count = useCounterStore()"
             }
         ],
+        "freeText": {
+            "enabled": true,
+            "suggestions": [
+                "Pinia with persistedstate",
+                "Apollo cache",
+                "RxJS store",
+                "LocalStorage only"
+            ]
+        },
         "explanation": "State strategy affects reactivity helpers and file imports."
     },
     {
@@ -219,6 +255,15 @@
                 "example": "const wrapper = shallowMount(MyComponent)"
             }
         ],
+        "freeText": {
+            "enabled": true,
+            "suggestions": [
+                "Cypress component testing",
+                "Playwright component mode",
+                "No automated tests",
+                "Testing Library only"
+            ]
+        },
         "explanation": "Testing stack drives available helpers and globals."
     }
 ]

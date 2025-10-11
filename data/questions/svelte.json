@@ -32,6 +32,15 @@
                 "example": "npx create-elder-app my-app"
             }
         ],
+        "freeText": {
+            "enabled": true,
+            "suggestions": [
+                "Routify",
+                "Sapper legacy",
+                "Custom Vite + SSR",
+                "Static Svelte SPA"
+            ]
+        },
         "explanation": "Tooling choice affects routing, adapters, and default file layout."
     },
     {
@@ -59,6 +68,15 @@
                 "example": "<script>\nlet count = 0\n</script>"
             }
         ],
+        "freeText": {
+            "enabled": true,
+            "suggestions": [
+                "TypeScript strict",
+                "JavaScript with JSDoc",
+                "Mixed TS/JS components",
+                "TypeScript disabled in libs"
+            ]
+        },
         "explanation": "Language selection informs linting and generated types."
     },
     {
@@ -92,6 +110,15 @@
                 "example": "configureStore({ reducer })"
             }
         ],
+        "freeText": {
+            "enabled": true,
+            "suggestions": [
+                "Svelte store modules",
+                "MobX",
+                "Apollo cache",
+                "Custom event bus"
+            ]
+        },
         "explanation": "State pick influences helper imports and best practices."
     },
     {
@@ -126,6 +153,15 @@
                 "example": "export const button = style({ background: vars.color.primary })"
             }
         ],
+        "freeText": {
+            "enabled": true,
+            "suggestions": [
+                "Windi CSS",
+                "Styled Components",
+                "CSS Modules",
+                "Design tokens via CSS vars"
+            ]
+        },
         "explanation": "Styling approach impacts bundler config and component ergonomics."
     },
     {
@@ -153,6 +189,15 @@
                 "example": "test('homepage loads', async ({ page }) => {...})"
             }
         ],
+        "freeText": {
+            "enabled": true,
+            "suggestions": [
+                "Cypress component tests",
+                "No automated tests",
+                "Jest with Svelte",
+                "Playwright component mode"
+            ]
+        },
         "explanation": "Testing setup defines scripts, globals, and CI expectations."
     }
 ]
