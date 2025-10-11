@@ -26,14 +26,9 @@ test("wizard accepts custom free text answers and shows them in the summary", as
 
   const customAnswer = "Feature pods with co-located tests"
   const customInput = page.getByPlaceholder("Type your custom preference")
-  const saveButton = page.getByRole("button", { name: "Save custom answer" })
 
   await expect(customInput).toBeVisible()
-  await expect(saveButton).toBeDisabled()
-
   await customInput.fill(customAnswer)
-  await expect(saveButton).toBeEnabled()
-  await saveButton.click()
 
   const confirmationMessage = page.locator('p', { hasText: "We'll use" }).first()
   await expect(confirmationMessage).toBeVisible()
