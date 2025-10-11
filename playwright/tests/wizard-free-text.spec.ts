@@ -30,30 +30,33 @@ test("wizard accepts custom free text answers and shows them in the summary", as
   await expect(customInput).toBeVisible()
   await customInput.fill(customAnswer)
 
-  const confirmationMessage = page.locator('p', { hasText: "We'll use" }).first()
+  await expect(questionHeading).toHaveText("What build tooling do you use?")
+
+  const confirmationMessage = page.getByTestId("custom-answer-confirmation")
   await expect(confirmationMessage).toBeVisible()
   await expect(confirmationMessage).toContainText(customAnswer)
   await expect(confirmationMessage).toContainText(
     "for this question when we generate your context file."
   )
 
-  await page.waitForFunction(
-    ({ questionId, expected }) => {
-      const raw = window.localStorage.getItem("devcontext:wizard:react")
-      if (!raw) {
-        return false
-      }
+  await expect.poll(
+    () =>
+      page.evaluate(({ questionId }) => {
+        const raw = window.localStorage.getItem("devcontext:wizard:react")
+        if (!raw) {
+          return null
+        }
 
-      try {
-        const state = JSON.parse(raw)
-        return state.freeTextResponses?.[questionId] === expected
-      } catch (error) {
-        console.warn("Unable to parse wizard state", error)
-        return false
-      }
-    },
-    { questionId: "react-fileStructure", expected: customAnswer }
-  )
+        try {
+          const state = JSON.parse(raw)
+          return state.freeTextResponses?.[questionId] ?? null
+        } catch (error) {
+          console.warn("Unable to parse wizard state", error)
+          return "PARSE_ERROR"
+        }
+      }, { questionId: "react-fileStructure" }),
+    { timeout: 15000 }
+  ).toBe(customAnswer)
 
   const storedState = await page.evaluate(() => {
     const raw = window.localStorage.getItem("devcontext:wizard:react")

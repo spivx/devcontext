@@ -151,7 +151,10 @@ export function WizardEditAnswerDialog({
               </div>
             </form>
             {hasPersistedCustomAnswer ? (
-              <p className="flex items-center gap-2 text-xs font-semibold text-emerald-600 dark:text-emerald-400">
+              <p
+                className="flex items-center gap-2 text-xs font-semibold text-emerald-600 dark:text-emerald-400"
+                data-testid="custom-answer-confirmation"
+              >
                 <CheckCircle2 className="h-3.5 w-3.5" />
                 <span>
                   We'll use
