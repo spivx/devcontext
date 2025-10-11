@@ -16,7 +16,14 @@ import {
 } from "@/lib/wizard-config"
 import { loadWizardState, persistWizardState } from "@/lib/wizard-storage"
 import { buildDefaultSummaryData, buildStepsForStack } from "@/lib/wizard-summary-data"
-import type { FileOutputConfig, Responses, WizardQuestion, WizardAnswer, WizardStep } from "@/types/wizard"
+import type {
+  FileOutputConfig,
+  FreeTextResponses,
+  Responses,
+  WizardQuestion,
+  WizardAnswer,
+  WizardStep,
+} from "@/types/wizard"
 import type { GeneratedFileResult } from "@/types/output"
 import { WizardEditAnswerDialog } from "@/components/wizard-edit-answer-dialog"
 
@@ -30,6 +37,7 @@ type StackSummaryPageProps = {
 export function StackSummaryPage({ stackId, mode }: StackSummaryPageProps) {
   const [wizardSteps, setWizardSteps] = useState<WizardStep[] | null>(null)
   const [responses, setResponses] = useState<Responses | null>(null)
+  const [freeTextResponses, setFreeTextResponses] = useState<FreeTextResponses>({})
   const [autoFilledMap, setAutoFilledMap] = useState<Record<string, boolean>>({})
   const [stackLabel, setStackLabel] = useState<string | null>(null)
   const [autoFillNotice, setAutoFillNotice] = useState<string | null>(null)
@@ -53,7 +61,13 @@ export function StackSummaryPage({ stackId, mode }: StackSummaryPageProps) {
       setErrorMessage(null)
       try {
         if (mode === "default") {
-          const { steps, responses: defaultResponses, autoFilledMap: defaultsMap, stackLabel: label } =
+          const {
+            steps,
+            responses: defaultResponses,
+            freeTextResponses: defaultFreeTextResponses,
+            autoFilledMap: defaultsMap,
+            stackLabel: label,
+          } =
             await buildDefaultSummaryData(stackId)
 
           if (!isActive) {
@@ -62,6 +76,7 @@ export function StackSummaryPage({ stackId, mode }: StackSummaryPageProps) {
 
           setWizardSteps(steps)
           setResponses(defaultResponses)
+          setFreeTextResponses(defaultFreeTextResponses)
           setAutoFilledMap(defaultsMap)
           setStackLabel(label)
           setAutoFillNotice("We applied the recommended defaults for you. Tweak any section before generating.")
@@ -70,6 +85,7 @@ export function StackSummaryPage({ stackId, mode }: StackSummaryPageProps) {
             stackId,
             stackLabel: label,
             responses: defaultResponses,
+            freeTextResponses: defaultFreeTextResponses,
             autoFilledMap: defaultsMap,
             updatedAt: Date.now(),
           })
@@ -85,6 +101,7 @@ export function StackSummaryPage({ stackId, mode }: StackSummaryPageProps) {
           if (!storedState) {
             setWizardSteps(steps)
             setResponses(null)
+            setFreeTextResponses({})
             setAutoFilledMap({})
             setStackLabel(computedLabel)
             setAutoFillNotice(null)
@@ -99,6 +116,7 @@ export function StackSummaryPage({ stackId, mode }: StackSummaryPageProps) {
 
           setWizardSteps(steps)
           setResponses(normalizedResponses)
+          setFreeTextResponses(storedState.freeTextResponses ?? {})
           setAutoFilledMap(storedState.autoFilledMap ?? {})
           setStackLabel(storedState.stackLabel ?? computedLabel)
           setAutoFillNotice(null)
@@ -133,10 +151,11 @@ export function StackSummaryPage({ stackId, mode }: StackSummaryPageProps) {
       null,
       wizardSteps,
       responses,
+      freeTextResponses,
       autoFilledMap,
       false
     )
-  }, [wizardSteps, responses, autoFilledMap])
+  }, [wizardSteps, responses, freeTextResponses, autoFilledMap])
 
   const handleGenerate = useCallback(
     async (fileOption: FileOutputConfig) => {
@@ -148,7 +167,7 @@ export function StackSummaryPage({ stackId, mode }: StackSummaryPageProps) {
       setGeneratedFile(null)
 
       try {
-        const payload = serializeWizardResponses(wizardSteps, responses, fileOption.id)
+        const payload = serializeWizardResponses(wizardSteps, responses, freeTextResponses, fileOption.id)
 
         const result = await generateInstructions({
           stackSegment: stackId,
@@ -167,7 +186,7 @@ export function StackSummaryPage({ stackId, mode }: StackSummaryPageProps) {
         setIsGeneratingMap((prev) => ({ ...prev, [fileOption.id]: false }))
       }
     },
-    [wizardSteps, responses, stackId]
+    [wizardSteps, responses, freeTextResponses, stackId]
   )
 
   const summaryHeader = stackLabel ??
@@ -187,9 +206,56 @@ export function StackSummaryPage({ stackId, mode }: StackSummaryPageProps) {
     setEditingQuestionId(questionId)
   }
 
-  const handleCloseEdit = () => {
+  const handleCloseEdit = useCallback(() => {
     setEditingQuestionId(null)
-  }
+  }, [])
+
+  const applyFreeTextUpdate = useCallback(
+    (question: WizardQuestion, submittedValue: string) => {
+      if (!responses) {
+        return
+      }
+
+      const trimmed = submittedValue.trim()
+      const nextFreeText: FreeTextResponses = (() => {
+        if (trimmed.length === 0) {
+          if (!(question.id in freeTextResponses)) {
+            return { ...freeTextResponses }
+          }
+
+          const next = { ...freeTextResponses }
+          delete next[question.id]
+          return next
+        }
+
+        return {
+          ...freeTextResponses,
+          [question.id]: trimmed,
+        }
+      })()
+
+      const nextAutoFilledMap = { ...autoFilledMap }
+      delete nextAutoFilledMap[question.id]
+
+      setFreeTextResponses(nextFreeText)
+      setAutoFilledMap(nextAutoFilledMap)
+      setAutoFillNotice(null)
+
+      if (stackId) {
+        persistWizardState({
+          stackId,
+          stackLabel: stackLabel ?? summaryHeader,
+          responses,
+          freeTextResponses: nextFreeText,
+          autoFilledMap: nextAutoFilledMap,
+          updatedAt: Date.now(),
+        })
+      }
+
+      handleCloseEdit()
+    },
+    [responses, freeTextResponses, autoFilledMap, stackId, stackLabel, summaryHeader, handleCloseEdit]
+  )
 
   const applyAnswerUpdate = useCallback(
     (question: WizardQuestion, answer: WizardAnswer) => {
@@ -226,6 +292,7 @@ export function StackSummaryPage({ stackId, mode }: StackSummaryPageProps) {
           stackId,
           stackLabel: stackLabel ?? summaryHeader,
           responses: currentResponses,
+          freeTextResponses,
           autoFilledMap: currentAutoMap,
           updatedAt: Date.now(),
         })
@@ -235,7 +302,7 @@ export function StackSummaryPage({ stackId, mode }: StackSummaryPageProps) {
         handleCloseEdit()
       }
     },
-    [responses, autoFilledMap, stackId, stackLabel, summaryHeader]
+    [responses, freeTextResponses, autoFilledMap, stackId, stackLabel, summaryHeader, handleCloseEdit]
   )
 
   if (isLoading) {
@@ -386,11 +453,16 @@ export function StackSummaryPage({ stackId, mode }: StackSummaryPageProps) {
             return null
           }
           const currentValue = responses ? responses[editingQuestion.id] : undefined
+          const currentFreeText = typeof freeTextResponses[editingQuestion.id] === "string"
+            ? freeTextResponses[editingQuestion.id]
+            : ""
           return (
             <WizardEditAnswerDialog
               question={editingQuestion}
               value={currentValue}
               onAnswerSelect={(answer) => applyAnswerUpdate(editingQuestion, answer)}
+              freeTextValue={currentFreeText}
+              onFreeTextSave={(nextValue) => applyFreeTextUpdate(editingQuestion, nextValue)}
               onClose={handleCloseEdit}
             />
           )

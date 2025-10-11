@@ -1,9 +1,10 @@
-import type { Responses } from "@/types/wizard"
+import type { FreeTextResponses, Responses } from "@/types/wizard"
 
 export type StoredWizardState = {
   stackId: string
   stackLabel?: string
   responses: Responses
+  freeTextResponses?: FreeTextResponses
   autoFilledMap: Record<string, boolean>
   updatedAt: number
 }

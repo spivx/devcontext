@@ -1,4 +1,4 @@
-import type { Responses, WizardStep } from "@/types/wizard"
+import type { FreeTextResponses, Responses, WizardStep } from "@/types/wizard"
 import {
   STACK_QUESTION_ID,
   getSuffixSteps,
@@ -9,17 +9,20 @@ import {
 export type DefaultSummaryData = {
   steps: WizardStep[]
   responses: Responses
+  freeTextResponses: FreeTextResponses
   autoFilledMap: Record<string, boolean>
   stackLabel: string
 }
 
 const buildDefaultsForSteps = (steps: WizardStep[], stackId: string): {
   responses: Responses
+  freeTextResponses: FreeTextResponses
   autoFilledMap: Record<string, boolean>
 } => {
   const responses: Responses = {
     [STACK_QUESTION_ID]: stackId,
   }
+  const freeTextResponses: FreeTextResponses = {}
   const autoFilledMap: Record<string, boolean> = {}
 
   steps.forEach((step) => {
@@ -43,17 +46,18 @@ const buildDefaultsForSteps = (steps: WizardStep[], stackId: string): {
     })
   })
 
-  return { responses, autoFilledMap }
+  return { responses, freeTextResponses, autoFilledMap }
 }
 
 export const buildDefaultSummaryData = async (stackId: string): Promise<DefaultSummaryData> => {
   const { step, label } = await loadStackWizardStep(stackId)
   const steps: WizardStep[] = [stacksStep, step, ...getSuffixSteps()]
-  const { responses, autoFilledMap } = buildDefaultsForSteps(steps, stackId)
+  const { responses, freeTextResponses, autoFilledMap } = buildDefaultsForSteps(steps, stackId)
 
   return {
     steps,
     responses,
+    freeTextResponses,
     autoFilledMap,
     stackLabel: label,
   }

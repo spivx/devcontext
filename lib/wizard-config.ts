@@ -85,6 +85,7 @@ export const loadStackWizardStep = async (stackId: string, stackLabel?: string):
     question: question.question,
     allowMultiple: question.allowMultiple,
     responseKey: question.responseKey,
+    freeText: question.freeText,
     answers: question.answers.map(mapAnswerSourceToWizard),
   }))
 

@@ -33,6 +33,15 @@
                 "example": "app = Flask(__name__)"
             }
         ],
+        "freeText": {
+            "enabled": true,
+            "suggestions": [
+                "Django REST Framework",
+                "Flask + Blueprints",
+                "Starlette",
+                "No framework (scripts only)"
+            ]
+        },
         "explanation": "Framework choice informs project structure, CLI commands, and deployment guidance."
     },
     {
@@ -66,6 +75,15 @@
                 "example": "def create_user(payload): ..."
             }
         ],
+        "freeText": {
+            "enabled": true,
+            "suggestions": [
+                "MyPy strict",
+                "Pyright enforcement",
+                "Gradual typed packages",
+                "Untyped prototypes"
+            ]
+        },
         "explanation": "Typing policy guides lint rules, CI checks, and editor setup."
     },
     {
@@ -99,6 +117,15 @@
                 "example": "uv pip install fastapi"
             }
         ],
+        "freeText": {
+            "enabled": true,
+            "suggestions": [
+                "Pipenv",
+                "Conda environments",
+                "Poetry + uv lock",
+                "System pip only"
+            ]
+        },
         "explanation": "Package tooling defines scripts, lockfiles, and reproducibility guidance."
     },
     {
@@ -132,6 +159,15 @@
                 "example": "behave features/"
             }
         ],
+        "freeText": {
+            "enabled": true,
+            "suggestions": [
+                "pytest + factoryboy",
+                "Hypothesis property tests",
+                "No automated tests",
+                "Robot Framework"
+            ]
+        },
         "explanation": "Testing strategy controls fixtures, assertions, and coverage expectations."
     },
     {
@@ -165,6 +201,15 @@
                 "example": "# Document conventions in README"
             }
         ],
+        "freeText": {
+            "enabled": true,
+            "suggestions": [
+                "PyLint only",
+                "Two-space indentation",
+                "Pre-commit hooks",
+                "Custom formatting scripts"
+            ]
+        },
         "explanation": "Lint command shapes pre-commit hooks and CI tasks."
     }
 ]

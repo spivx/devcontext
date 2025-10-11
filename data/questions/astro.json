@@ -33,6 +33,15 @@
                 "example": "npx astro add svelte"
             }
         ],
+        "freeText": {
+            "enabled": true,
+            "suggestions": [
+                "Preact components",
+                "SolidJS islands",
+                "Alpine.js widgets",
+                "HTMX partials"
+            ]
+        },
         "explanation": "Primary integration influences hydration directives and linting."
     },
     {
@@ -66,6 +75,15 @@
                 "example": "export const revalidate = 60"
             }
         ],
+        "freeText": {
+            "enabled": true,
+            "suggestions": [
+                "Client-side only",
+                "Edge SSR",
+                "On-demand rebuilds",
+                "Static marketing pages"
+            ]
+        },
         "explanation": "Rendering model informs content strategy and hosting provider."
     },
     {
@@ -99,6 +117,15 @@
                 "example": "src/pages/posts/post-1.md"
             }
         ],
+        "freeText": {
+            "enabled": true,
+            "suggestions": [
+                "Headless CMS via GraphQL",
+                "Notion sync",
+                "Markdown in /content/blog",
+                "Sanity dataset"
+            ]
+        },
         "explanation": "Content strategy shapes file organization and build scripts."
     },
     {
@@ -135,6 +162,15 @@
                 "example": "wrangler pages deploy dist"
             }
         ],
+        "freeText": {
+            "enabled": true,
+            "suggestions": [
+                "GitHub Pages",
+                "Azure Static Web Apps",
+                "Render",
+                "Self-hosted Node server"
+            ]
+        },
         "explanation": "Hosting target sets adapter, environment variables, and CI strategy."
     }
 ]

@@ -75,6 +75,7 @@ export const buildStepFromQuestionSet = (
             isReadOnlyOnSummary: question.isReadOnlyOnSummary,
             enableFilter: question.enableFilter,
             answers: question.answers.map(mapAnswerSourceToWizard),
+            freeText: question.freeText,
         })),
 })
 

@@ -16,7 +16,16 @@
                 "example": "Use Redux Toolkit for app-wide state",
                 "docs": "https://redux-toolkit.js.org/introduction/getting-started"
             }
-        ]
+        ],
+        "freeText": {
+            "enabled": true,
+            "suggestions": [
+                "Zustand",
+                "MobX",
+                "Recoil",
+                "Context + reducers"
+            ]
+        }
     },
     {
         "id": "apiLayer",
@@ -34,7 +43,16 @@
                 "docs": "https://react.dev/learn/reusing-logic-with-custom-hooks",
                 "isDefault": true
             }
-        ]
+        ],
+        "freeText": {
+            "enabled": true,
+            "suggestions": [
+                "GraphQL via Apollo",
+                "REST helpers in /lib/api",
+                "tRPC procedures",
+                "Direct fetch in components"
+            ]
+        }
     },
     {
         "id": "folders",
@@ -51,6 +69,15 @@
                 "label": "Domain-driven folders",
                 "example": "src/domain/order/components/OrderCard.tsx"
             }
-        ]
+        ],
+        "freeText": {
+            "enabled": true,
+            "suggestions": [
+                "Atomic design folders",
+                "Keep /pages flat",
+                "Use src/features only",
+                "Layered architecture"
+            ]
+        }
     }
 ]

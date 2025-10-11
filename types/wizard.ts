@@ -17,6 +17,11 @@ export type DataAnswerSource = {
     format?: string
 }
 
+export type QuestionFreeTextConfig = {
+    enabled: boolean
+    suggestions?: string[]
+}
+
 export type DataQuestionSource = {
     id: string
     question: string
@@ -25,6 +30,7 @@ export type DataQuestionSource = {
     isReadOnlyOnSummary?: boolean
     enableFilter?: boolean
     answers: DataAnswerSource[]
+    freeText?: QuestionFreeTextConfig
 }
 
 export type FileOutputConfig = {
@@ -63,6 +69,7 @@ export type WizardQuestion = {
     isReadOnlyOnSummary?: boolean
     enableFilter?: boolean
     answers: WizardAnswer[]
+    freeText?: QuestionFreeTextConfig
 }
 
 export type WizardStep = {
@@ -88,6 +95,7 @@ export type InstructionsWizardProps = {
 }
 
 export type Responses = Record<string, string | string[] | null | undefined>
+export type FreeTextResponses = Record<string, string | null | undefined>
 export interface WizardResponses {
     stackSelection: string | null;
     tooling: string | null;

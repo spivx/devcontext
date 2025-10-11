@@ -31,6 +31,15 @@
                 "example": "import { createRequestHandler } from '@remix-run/express'"
             }
         ],
+        "freeText": {
+            "enabled": true,
+            "suggestions": [
+                "Cloudflare Workers",
+                "AWS Lambda",
+                "Self-hosted Node",
+                "Docker on Fargate"
+            ]
+        },
         "explanation": "Runtime influences adapter config and streaming support."
     },
     {
@@ -63,6 +72,15 @@
                 "example": "useEffect(() => fetch('/api/data'))"
             }
         ],
+        "freeText": {
+            "enabled": true,
+            "suggestions": [
+                "GraphQL loaders",
+                "Supabase client",
+                "Loader caching",
+                "Proxy to legacy API"
+            ]
+        },
         "explanation": "Data loaders determine cache headers and request shape."
     },
     {
@@ -98,6 +116,15 @@
                 "example": "const Button = styled.button`...`"
             }
         ],
+        "freeText": {
+            "enabled": true,
+            "suggestions": [
+                "Vanilla Extract",
+                "UnoCSS",
+                "Tailwind + DaisyUI",
+                "Design tokens via CSS vars"
+            ]
+        },
         "explanation": "Styling impacts how you emit <link> tags and manage critical CSS."
     },
     {
@@ -125,6 +152,15 @@
                 "example": "jest.mock('@remix-run/react')"
             }
         ],
+        "freeText": {
+            "enabled": true,
+            "suggestions": [
+                "Cypress component tests",
+                "Playwright",
+                "No automated tests",
+                "Unit tests only"
+            ]
+        },
         "explanation": "Testing toolkit influences route mocks and fixture structure."
     }
 ]

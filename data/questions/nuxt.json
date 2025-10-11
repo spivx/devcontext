@@ -30,6 +30,15 @@
                 "example": "export default defineCachedEventHandler(handler, { swr: true })"
             }
         ],
+        "freeText": {
+            "enabled": true,
+            "suggestions": [
+                "Edge-only rendering",
+                "Client-side only",
+                "Prerender marketing pages",
+                "Nightly rebuild schedule"
+            ]
+        },
         "explanation": "Rendering mode determines deployment targets and caching patterns."
     },
     {
@@ -63,6 +72,15 @@
                 "example": "const client = new GraphQLClient(endpoint)"
             }
         ],
+        "freeText": {
+            "enabled": true,
+            "suggestions": [
+                "useAsyncData",
+                "Direct axios calls",
+                "Supabase client",
+                "GraphQL codegen"
+            ]
+        },
         "explanation": "Fetching strategy affects runtime config and environment variables."
     },
     {
@@ -97,6 +115,15 @@
                 "example": "<style scoped>...</style>"
             }
         ],
+        "freeText": {
+            "enabled": true,
+            "suggestions": [
+                "Windi CSS",
+                "Design tokens via CSS vars",
+                "Sass modules",
+                "Tailwind + DaisyUI"
+            ]
+        },
         "explanation": "Styling choice influences runtime head bleed and bundle size."
     },
     {
@@ -132,6 +159,15 @@
                 "example": "node .output/server/index.mjs"
             }
         ],
+        "freeText": {
+            "enabled": true,
+            "suggestions": [
+                "Cloudflare Pages",
+                "AWS Amplify",
+                "Azure Static Web Apps",
+                "Self-hosted Kubernetes"
+            ]
+        },
         "explanation": "Deployment target signals adapter, environment variables, and caching policies."
     }
 ]

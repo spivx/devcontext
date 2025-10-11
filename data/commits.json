@@ -21,7 +21,16 @@
                 "label": "Custom team rules",
                 "example": "LOGIN: implemented login endpoint"
             }
-        ]
+        ],
+        "freeText": {
+            "enabled": true,
+            "suggestions": [
+                "Prefix with ticket ID",
+                "Use semantic-release format",
+                "Limit subject to 50 chars",
+                "Use imperative mood"
+            ]
+        }
     },
     {
         "id": "prRules",
@@ -43,6 +52,15 @@
                 "label": "Update changelog",
                 "example": "Each PR should update CHANGELOG.md with notable changes."
             }
-        ]
+        ],
+        "freeText": {
+            "enabled": true,
+            "suggestions": [
+                "Include screenshots for UI",
+                "Assign PRs to QA",
+                "Pair review required",
+                "Link Jira tickets"
+            ]
+        }
     }
 ]

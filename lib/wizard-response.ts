@@ -1,4 +1,4 @@
-import type { Responses, WizardResponses, WizardStep } from "@/types/wizard"
+import type { FreeTextResponses, Responses, WizardResponses, WizardStep } from "@/types/wizard"
 
 const createBaseResponses = (): WizardResponses => ({
   stackSelection: null,
@@ -34,6 +34,7 @@ export const createInitialWizardResponses = () => createBaseResponses()
 export const serializeWizardResponses = (
   steps: WizardStep[],
   responses: Responses,
+  freeTextResponses: FreeTextResponses,
   outputFileId: string | null
 ): WizardResponses => {
   const questionsAndAnswers = createBaseResponses()
@@ -48,17 +49,36 @@ export const serializeWizardResponses = (
 
       const answer = responses[question.id]
       const targetKey = responseKey as keyof WizardResponses
+      const freeTextValue = typeof freeTextResponses[question.id] === "string"
+        ? freeTextResponses[question.id]?.trim()
+        : ""
+      const entries: string[] = []
 
       if (answer !== null && answer !== undefined) {
         if (question.allowMultiple && Array.isArray(answer)) {
-          questionsAndAnswers[targetKey] = answer.join(", ")
+          entries.push(
+            ...answer
+              .filter((entry): entry is string => typeof entry === "string")
+              .map((entry) => entry)
+          )
         } else if (!question.allowMultiple && typeof answer === "string") {
-          questionsAndAnswers[targetKey] = answer
+          entries.push(answer)
         } else {
-          questionsAndAnswers[targetKey] = Array.isArray(answer)
-            ? answer.join(", ")
-            : (answer as string)
+          entries.push(
+            ...(Array.isArray(answer)
+              ? answer.map((entry) => String(entry))
+              : [String(answer)])
+          )
         }
+      }
+
+      if (freeTextValue.length > 0) {
+        questionsAndAnswers[targetKey] = freeTextValue
+        return
+      }
+
+      if (entries.length > 0) {
+        questionsAndAnswers[targetKey] = entries.join(", ")
       } else {
         questionsAndAnswers[targetKey] = null
       }
