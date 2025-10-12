@@ -367,29 +367,6 @@ export function StackSummaryPage({ stackId, mode }: StackSummaryPageProps) {
         </div>
       </section>
 
-      <div className="rounded-3xl border border-border/80 bg-card/95 p-8 shadow-lg">
-        <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-          <div className="space-y-2">
-            <h1 className="text-3xl font-semibold text-foreground">{summaryHeader} instructions overview</h1>
-            <p className="text-sm text-muted-foreground">
-              Share this page to sync on conventions, or jump back into the wizard to fine-tune answers.
-            </p>
-          </div>
-          <div className="flex flex-wrap gap-2">
-            <Button asChild variant="outline">
-              <Link href={`/new/stack/${stackId}`}>
-                Choose different options
-              </Link>
-            </Button>
-          </div>
-        </div>
-        {autoFillNotice ? (
-          <div className="mt-6 rounded-2xl border border-primary/30 bg-primary/10 p-4 text-sm font-medium text-primary">
-            {autoFillNotice}
-          </div>
-        ) : null}
-      </div>
-
       <section className="space-y-4 rounded-3xl border border-border/80 bg-card/95 p-8 shadow-lg">
         <div className="space-y-2">
           <h2 className="text-2xl font-semibold text-foreground">Selections in this summary</h2>
@@ -397,6 +374,11 @@ export function StackSummaryPage({ stackId, mode }: StackSummaryPageProps) {
             Reopen any question from the wizard to change these selections.
           </p>
         </div>
+        {autoFillNotice ? (
+          <div className="rounded-2xl border border-primary/30 bg-primary/10 p-4 text-sm font-medium text-primary">
+            {autoFillNotice}
+          </div>
+        ) : null}
         <div className="space-y-3">
           {summaryEntries.map((entry) => (
             <div
