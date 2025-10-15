@@ -1,6 +1,6 @@
 ---
 # Configuration for Copilot in this project
-applyTo: "**/*.{ts,tsx,js,jsx,md}"  # apply to all code files by default
+applyTo: "{{applyToGlob}}"  # apply to relevant code files by default
 ---
 
 # Copilot Instructions
@@ -39,10 +39,10 @@ Regenerate whenever your JSON configuration changes (stack, naming, testing, etc
 - Code style: follow **{{codeStyle}}**  
 
 ### File and Folder Structure
-- Component / UI layout: **{{fileStructure}}**  
-- Styling approach: **{{styling}}**  
-- State management: **{{stateManagement}}**  
-- API layer organization: **{{apiLayer}}**  
+- Module / feature layout: **{{fileStructure}}**  
+- Styling approach (if applicable): **{{styling}}**  
+- State management / shared context: **{{stateManagement}}**  
+- API / service layer organization: **{{apiLayer}}**  
 - Folder strategy: **{{folders}}**
 
 
@@ -63,19 +63,20 @@ Regenerate whenever your JSON configuration changes (stack, naming, testing, etc
 
 ---
 
-## 5. Performance & Data Loading
+## 5. Performance & Data Handling
 
 - Data fetching: **{{dataFetching}}**  
-- React performance optimizations: **{{reactPerf}}**
+- Performance focus: **{{reactPerf}}**
 
 **Do**
-- Use pagination or limit queries.  
-- Memoize expensive computations.  
-- Lazy-load non-critical modules.  
+- Use pagination or streaming for large datasets.  
+- Cache or memoize expensive work when it matters.  
+- Offload non-critical processing to background tasks.  
 
 **Don’t**
-- Fetch all data at once.  
-- Put heavy logic in render without memoization.  
+- Load entire datasets eagerly without need.  
+- Block hot execution paths with heavy synchronous work.  
+- Skip instrumentation that would surface performance regressions.  
 
 ---
 
@@ -89,7 +90,7 @@ Regenerate whenever your JSON configuration changes (stack, naming, testing, etc
 - Never commit secrets; use environment variables.  
 - Validate all incoming data (API and client).  
 - Do not log secrets or PII.  
-- Use structured/contextual logs instead of raw `console.log`.  
+- Use structured/contextual logs instead of raw print/log statements.  
 
 ---
 
@@ -112,10 +113,10 @@ Regenerate whenever your JSON configuration changes (stack, naming, testing, etc
 
 ## 8. Copilot Usage Guidance
 
-- Use Copilot for boilerplate (hooks, component scaffolds).  
+- Use Copilot for boilerplate (e.g., scaffolds, repetitive wiring).  
 - Provide context in comments/prompts.  
 - Reject completions that break naming, structure, or validation rules.  
-- Ask clarifying questions in comments (e.g., “// Should this live in services?”).  
+- Ask clarifying questions in comments (e.g., “# Should this live in services?”).  
 - Prefer completions that respect folder boundaries and import paths.  
 
 **Don’t rely on Copilot for**
@@ -130,7 +131,7 @@ Regenerate whenever your JSON configuration changes (stack, naming, testing, etc
 Recommended editor configuration:
 
 - Use `.editorconfig` for indentation/line endings.  
-- Enable linting/formatting (ESLint, Prettier, or Biome).  
+- Enable linting/formatting (ESLint, Prettier, Ruff, Black, etc.).  
 - Set `editor.formatOnSave = true`.  
 - Suggested integrations:
   - VS Code: `dbaeumer.vscode-eslint`, `esbenp.prettier-vscode`  

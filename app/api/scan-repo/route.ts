@@ -121,7 +121,10 @@ const detectTooling = (paths: string[], pkg: PackageJson | null): { tooling: str
 
     const matchers: Array<{ pattern: RegExp; value: string; target: Set<string> }> = [
         { pattern: /^requirements\.txt$/, value: "pip", target: tooling },
-        { pattern: /^pyproject\.toml$/, value: "Poetry", target: tooling },
+        { pattern: /^poetry\.lock$/, value: "Poetry", target: tooling },
+        { pattern: /^pipfile$/, value: "Pipenv", target: tooling },
+        { pattern: /^pipfile\.lock$/, value: "Pipenv", target: tooling },
+        { pattern: /^pyproject\.toml$/, value: "PyProject", target: tooling },
         { pattern: /pom\.xml$/, value: "Maven", target: tooling },
         { pattern: /build\.gradle(\.kts)?$/, value: "Gradle", target: tooling },
         { pattern: /(^|\/)dockerfile$/, value: "Docker", target: tooling },
@@ -138,6 +141,15 @@ const detectTooling = (paths: string[], pkg: PackageJson | null): { tooling: str
         { pattern: /vite\.config\.(js|cjs|mjs|ts)?$/, value: "Vite", target: tooling },
         { pattern: /rollup\.config\.(js|cjs|mjs|ts)?$/, value: "Rollup", target: tooling },
         { pattern: /tailwind\.config\.(js|cjs|mjs|ts)?$/, value: "Tailwind CSS", target: tooling },
+        { pattern: /(^|\/)ruff\.toml$/, value: "Ruff", target: tooling },
+        { pattern: /(^|\/)\.ruff\.toml$/, value: "Ruff", target: tooling },
+        { pattern: /(^|\/)black\.toml$/, value: "black", target: tooling },
+        { pattern: /(^|\/)\.flake8$/, value: "flake8", target: tooling },
+        { pattern: /(^|\/)flake8\.cfg$/, value: "flake8", target: tooling },
+        { pattern: /(^|\/)mypy\.ini$/, value: "mypy", target: tooling },
+        { pattern: /(^|\/)\.mypy\.ini$/, value: "mypy", target: tooling },
+        { pattern: /(^|\/)setup\.cfg$/, value: "setup.cfg", target: tooling },
+        { pattern: /(^|\/)\.pre-commit-config\.ya?ml$/, value: "pre-commit", target: tooling },
         { pattern: /jest\.config\.(js|cjs|mjs|ts|json)?$/, value: "Jest", target: testing },
         { pattern: /vitest\.(config|setup)/, value: "Vitest", target: testing },
         { pattern: /(^|\/)cypress\//, value: "Cypress", target: testing },
@@ -145,6 +157,9 @@ const detectTooling = (paths: string[], pkg: PackageJson | null): { tooling: str
         { pattern: /playwright\.config\.(js|cjs|mjs|ts)?$/, value: "Playwright", target: testing },
         { pattern: /karma\.conf(\.js)?$/, value: "Karma", target: testing },
         { pattern: /mocha\./, value: "Mocha", target: testing },
+        { pattern: /(^|\/)pytest\.ini$/, value: "pytest", target: testing },
+        { pattern: /(^|\/)conftest\.py$/, value: "pytest", target: testing },
+        { pattern: /(^|\/)tox\.ini$/, value: "tox", target: testing },
     ]
 
     for (const { pattern, value, target } of matchers) {

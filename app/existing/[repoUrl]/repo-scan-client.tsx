@@ -14,6 +14,7 @@ import { generateFromRepoScan } from "@/lib/scan-generate"
 import FinalOutputView from "@/components/final-output-view"
 import RepoScanLoader from "@/components/repo-scan-loader"
 import type { GeneratedFileResult } from "@/types/output"
+import { inferStackFromScan } from "@/lib/scan-to-wizard"
 
 const buildQuery = (url: string) => `/api/scan-repo?url=${encodeURIComponent(url)}`
 
@@ -99,10 +100,38 @@ export default function RepoScanClient({ initialRepoUrl }: RepoScanClientProps) 
             return []
         }
 
-        return Object.entries(scanResult.structure).map(([key, value]) => ({
-            key,
-            value,
-        }))
+        const stack = inferStackFromScan(scanResult)
+        const stackCategory = (() => {
+            if (stack === "python") return "python"
+            if (["nextjs", "react", "angular", "vue", "svelte", "nuxt", "astro", "remix"].includes(stack)) {
+                return "frontend"
+            }
+            return "general"
+        })()
+
+        const metadata: Record<
+            keyof RepoScanSummary["structure"],
+            { label: string; categories: Array<"any" | "frontend" | "python" | "general"> }
+        > = {
+            src: { label: "src", categories: ["any"] },
+            components: { label: "components", categories: ["frontend"] },
+            tests: { label: "tests", categories: ["any"] },
+            apps: { label: "apps", categories: ["frontend", "general"] },
+            packages: { label: "packages", categories: ["frontend", "general"] },
+        }
+
+        return (Object.entries(scanResult.structure) as Array<[keyof RepoScanSummary["structure"], boolean]>)
+            .map(([key, value]) => {
+                const details = metadata[key] ?? { label: key, categories: ["general"] }
+                const showEntry = value || details.categories.includes("any") || details.categories.includes(stackCategory)
+                return showEntry
+                    ? {
+                        key: details.label,
+                        value,
+                    }
+                    : null
+            })
+            .filter((entry): entry is { key: string; value: boolean } => Boolean(entry))
     }, [scanResult])
 
     const handleStartScan = () => {

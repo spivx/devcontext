@@ -58,7 +58,7 @@ This guide provides conventions and best practices for building AI agent applica
 
 ### Performance & Monitoring
 - Logging: **{{logging}}**
-- Performance considerations: **{{reactPerf}}**
+- Performance focus: **{{reactPerf}}**
 - Additional concerns:
   - Monitor token usage and cost efficiency.  
   - Handle API rate limits gracefully.  
