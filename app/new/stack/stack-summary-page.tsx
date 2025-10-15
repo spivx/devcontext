@@ -435,9 +435,10 @@ export function StackSummaryPage({ stackId, mode }: StackSummaryPageProps) {
             return null
           }
           const currentValue = responses ? responses[editingQuestion.id] : undefined
-          const currentFreeText = typeof freeTextResponses[editingQuestion.id] === "string"
-            ? freeTextResponses[editingQuestion.id]
-            : ""
+          const storedFreeTextValue = freeTextResponses[editingQuestion.id]
+          const currentFreeText = typeof storedFreeTextValue === "string"
+            ? storedFreeTextValue
+            : undefined
           return (
             <WizardEditAnswerDialog
               question={editingQuestion}

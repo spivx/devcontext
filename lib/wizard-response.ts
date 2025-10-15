@@ -49,8 +49,9 @@ export const serializeWizardResponses = (
 
       const answer = responses[question.id]
       const targetKey = responseKey as keyof WizardResponses
-      const freeTextValue = typeof freeTextResponses[question.id] === "string"
-        ? freeTextResponses[question.id]?.trim()
+      const rawFreeTextValue = freeTextResponses[question.id]
+      const freeTextValue = typeof rawFreeTextValue === "string"
+        ? rawFreeTextValue.trim()
         : ""
       const entries: string[] = []
 

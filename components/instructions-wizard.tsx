@@ -883,7 +883,7 @@ export function InstructionsWizard({
                 >
                   <CheckCircle2 className="h-3.5 w-3.5" />
                   <span>
-                    We'll use
+                    We&apos;ll use
                     {" "}
                     <code className="rounded bg-muted px-1.5 py-0.5 text-[0.7rem] font-medium">
                       {savedCustomFreeTextValue}
