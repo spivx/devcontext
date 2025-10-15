@@ -1,3 +1,4 @@
+import { collectConventionValues, normalizeConventionValue } from "@/lib/convention-values"
 import { applyConventionRules, loadStackConventions } from "@/lib/conventions"
 import { buildStepsForStack } from "@/lib/wizard-summary-data"
 import type { RepoScanSummary } from "@/types/repo-scan"
@@ -8,32 +9,6 @@ const STACK_FALLBACK = "react"
 
 const toLowerArray = (values: string[] | undefined | null) =>
   Array.isArray(values) ? values.map((value) => value.toLowerCase()) : []
-
-const normalizeString = (value: string) => value.trim().toLowerCase()
-
-const collectConventionValues = (
-  conventions: LoadedConvention,
-  key: keyof WizardResponses,
-): string[] => {
-  const values: string[] = []
-  const pushValue = (candidate: unknown) => {
-    if (typeof candidate !== "string") return
-    const normalizedCandidate = normalizeString(candidate)
-    if (normalizedCandidate.length === 0) return
-    if (values.some((existing) => normalizeString(existing) === normalizedCandidate)) {
-      return
-    }
-    values.push(candidate)
-  }
-
-  pushValue(conventions.defaults[key])
-
-  conventions.rules.forEach((rule) => {
-    pushValue(rule.set?.[key])
-  })
-
-  return values
-}
 
 const detectFromScanList = (
   scanList: string[] | undefined | null,
@@ -48,10 +23,10 @@ const detectFromScanList = (
     return null
   }
 
-  const normalizedScan = scanList.map((value) => normalizeString(value))
+  const normalizedScan = scanList.map((value) => normalizeConventionValue(value))
 
   for (const candidate of candidates) {
-    if (normalizedScan.includes(normalizeString(candidate))) {
+    if (normalizedScan.includes(normalizeConventionValue(candidate))) {
       return candidate
     }
   }
