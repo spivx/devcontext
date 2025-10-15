@@ -78,8 +78,9 @@ export const buildCompletionSummary = (
         return value === answer.value
       })
 
-      const freeTextValue = typeof freeTextResponses[question.id] === "string"
-        ? freeTextResponses[question.id]?.trim()
+      const storedFreeTextValue = freeTextResponses[question.id]
+      const freeTextValue = typeof storedFreeTextValue === "string"
+        ? storedFreeTextValue.trim()
         : ""
       const customAnswer = freeTextValue.length > 0 ? `Custom: ${freeTextValue}` : null
       const answerSummaries = customAnswer
