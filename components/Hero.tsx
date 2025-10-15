@@ -91,14 +91,14 @@ export function Hero() {
           className="mx-auto max-w-4xl text-4xl font-semibold tracking-tight text-foreground md:text-6xl md:leading-tight"
           variants={itemVariants}
         >
-          Repo-aware AI coding guidelines assistant for Copilot &amp; Cursor
+          Wizard or Repo Scan. Your context, ready.
         </motion.h1>
 
         <motion.p
           className="mx-auto max-w-2xl text-sm text-muted-foreground md:text-lg"
           variants={itemVariants}
         >
-          Generate AI-ready Copilot instructions, Cursor rules, and developer onboarding docs in minutes—start from curated stacks or drop a repo into the GitHub analyzer.
+          Start from scratch with a guided wizard or analyze a public GitHub repo. DevContext detects languages, frameworks, tooling, and tests to generate Copilot instructions, Cursor rules, and onboarding docs you can edit and export.
         </motion.p>
 
 
@@ -187,10 +187,10 @@ export function Hero() {
             >
               <div className="space-y-2 text-left">
                 <p className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">
-                  Scan a GitHub repository
+                  Scan a public GitHub repository
                 </p>
                 <p className="text-sm text-muted-foreground">
-                  Paste an owner/repo or URL and we&apos;ll prefill the wizard with detected tech, tooling, and guardrail suggestions.
+                  Paste an owner/repo or URL; we&apos;ll prefill the wizard with detected languages, frameworks, tooling, and tests.
                 </p>
               </div>
               <div className="flex w-full flex-col gap-2 sm:flex-row">
