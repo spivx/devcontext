@@ -84,21 +84,21 @@ export function Hero() {
           variants={itemVariants}
         >
           <span className="inline-flex h-1.5 w-1.5 rounded-full bg-primary" />
-          Less setup. Sharper AI outputs.
+          Guided setup for AI coding guidelines.
         </motion.span>
 
         <motion.h1
           className="mx-auto max-w-4xl text-4xl font-semibold tracking-tight text-foreground md:text-6xl md:leading-tight"
           variants={itemVariants}
         >
-          Build concise AI coding guardrails your team will actually use
+          Repo-aware AI coding guidelines assistant for Copilot &amp; Cursor
         </motion.h1>
 
         <motion.p
           className="mx-auto max-w-2xl text-sm text-muted-foreground md:text-lg"
           variants={itemVariants}
         >
-          Jump in with a ready-made stack template, explore the full wizard, or drop a GitHub repo for an automatic scan.
+          Generate AI-ready Copilot instructions, Cursor rules, and developer onboarding docs in minutes—start from curated stacks or drop a repo into the GitHub analyzer.
         </motion.p>
 
 
@@ -110,7 +110,7 @@ export function Hero() {
                 Start fast with popular stacks
               </p>
               <p className="text-sm text-muted-foreground">
-                Pick a curated quickstart and we&apos;ll pre-fill the wizard with stack defaults.
+                Pick a curated quickstart and we&apos;ll pre-fill the wizard with stack defaults and suggested AI guardrails.
               </p>
               <div className="flex flex-wrap gap-3">
                 {popularStacks.map((stack) => {
@@ -190,7 +190,7 @@ export function Hero() {
                   Scan a GitHub repository
                 </p>
                 <p className="text-sm text-muted-foreground">
-                  Paste an owner/repo or URL and we&apos;ll prefill the wizard with detected tech and tooling.
+                  Paste an owner/repo or URL and we&apos;ll prefill the wizard with detected tech, tooling, and guardrail suggestions.
                 </p>
               </div>
               <div className="flex w-full flex-col gap-2 sm:flex-row">

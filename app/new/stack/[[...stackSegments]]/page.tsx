@@ -5,6 +5,7 @@ import stacksData from "@/data/stacks.json"
 import type { DataQuestionSource, WizardStep } from "@/types/wizard"
 import { StackWizardShell } from "@/components/stack-wizard-shell"
 import { loadStackWizardStep } from "@/lib/wizard-config"
+import { absoluteUrl } from "@/lib/site-metadata"
 import { StackWizardClient } from "../stack-wizard-client"
 import { StackSummaryPage } from "../stack-summary-page"
 
@@ -58,6 +59,7 @@ export async function generateMetadata({ params }: MetadataProps): Promise<Metad
   }
 
   const canonicalPath = `/new/stack${segments.length > 0 ? `/${segments.join("/")}` : ""}`
+  const canonicalUrl = absoluteUrl(canonicalPath)
   const ogImage = "/og-image.png"
   const imageAlt = stackLabel ? `${stackLabel} DevContext wizard preview` : "DevContext wizard interface preview"
 
@@ -65,12 +67,12 @@ export async function generateMetadata({ params }: MetadataProps): Promise<Metad
     title,
     description,
     alternates: {
-      canonical: canonicalPath,
+      canonical: canonicalUrl,
     },
     openGraph: {
       title,
       description,
-      url: canonicalPath,
+      url: canonicalUrl,
       type: "website",
       siteName: "DevContext",
       images: [

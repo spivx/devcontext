@@ -2,21 +2,23 @@ import type { Metadata } from "next"
 
 import { StackWizardShell } from "@/components/stack-wizard-shell"
 import { StackWizardClient } from "@/app/new/stack/stack-wizard-client"
+import { absoluteUrl } from "@/lib/site-metadata"
 
 const title = "Launch the DevContext Wizard"
 const description =
   "Start a guided flow to assemble AI-ready coding instruction files. Pick your stack, customize conventions, and export Copilot, Cursor, or agents guidelines in minutes."
+const canonicalUrl = absoluteUrl("/new")
 
 export const metadata: Metadata = {
   title,
   description,
   alternates: {
-    canonical: "/new",
+    canonical: canonicalUrl,
   },
   openGraph: {
     title,
     description,
-    url: "/new",
+    url: canonicalUrl,
     type: "website",
     siteName: "DevContext",
     images: [
