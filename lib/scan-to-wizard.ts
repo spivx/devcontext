@@ -17,6 +17,8 @@ const pickStack = (scan: RepoScanSummary): string => {
   return "react"
 }
 
+export const inferStackFromScan = (scan: RepoScanSummary): string => pickStack(scan)
+
 const pickLanguage = (scan: RepoScanSummary): string | null => {
   const languages = (scan.languages ?? []).map((l) => l.toLowerCase())
   if (languages.includes("typescript")) return "typescript"
@@ -27,6 +29,8 @@ const pickLanguage = (scan: RepoScanSummary): string | null => {
 
 const pickTestingUT = (scan: RepoScanSummary): string | null => {
   const testing = (scan.testing ?? []).map((t) => t.toLowerCase())
+  if (testing.includes("pytest")) return "pytest"
+  if (testing.includes("unittest")) return "unittest"
   if (testing.includes("vitest")) return "vitest"
   if (testing.includes("jest")) return "jest"
   return null
@@ -42,6 +46,7 @@ const pickTestingE2E = (scan: RepoScanSummary): string | null => {
 const pickStyling = (scan: RepoScanSummary, stack: string): string => {
   const tooling = (scan.tooling ?? []).map((t) => t.toLowerCase())
   if (tooling.includes("tailwind css") || tooling.includes("tailwind")) return "tailwind"
+  if (stack === "python") return "Not applicable (backend Python project)"
   return stack === "nextjs" ? "tailwind" : "cssmodules"
 }
 
@@ -68,7 +73,15 @@ const pickComponentNaming = (scan: RepoScanSummary): string => {
   return detected === "camelcase" ? "camelCase" : "PascalCase"
 }
 
-const pickCodeStyle = (scan: RepoScanSummary): string => {
+const pickCodeStyle = (scan: RepoScanSummary, stack: string): string => {
+  if (stack === "python") {
+    const tooling = (scan.tooling ?? []).map((t) => t.toLowerCase())
+    if (tooling.includes("ruff")) return "ruff"
+    if (tooling.includes("black")) return "black"
+    if (tooling.includes("pyproject.toml")) return "pep8"
+    if (tooling.includes("pipenv")) return "pep8"
+    return "pep8"
+  }
   const detected = (scan as any).codeStylePreference as string | undefined | null
   if (!detected) return "airbnb"
   if (detected === "standardjs") return "standardjs"
@@ -77,6 +90,13 @@ const pickCodeStyle = (scan: RepoScanSummary): string => {
 }
 
 const pickFileStructure = (scan: RepoScanSummary, stack: string): string => {
+  if (stack === "python") {
+    const hasSrc = scan.structure?.src ?? false
+    const hasPackagesDir = scan.structure?.packages ?? false
+    if (hasSrc) return "src layout (src/<package>)"
+    if (hasPackagesDir) return "packages directory (monorepo-style)"
+    return "top-level modules"
+  }
   if (stack === "nextjs") {
     // Prefer App Router by default; hybrid/pages if hints present (see enriched fields if any)
     const routing = (scan as any).routing as string | undefined
@@ -91,30 +111,35 @@ const pickFileStructure = (scan: RepoScanSummary, stack: string): string => {
 const pickStateMgmt = (scan: RepoScanSummary, stack: string): string => {
   const detected = ((scan as any).stateMgmt as string | undefined) ?? null
   if (detected) return detected
+  if (stack === "python") return "Not applicable"
   return stack === "nextjs" ? "zustand" : "context-hooks"
 }
 
 const pickDataFetching = (scan: RepoScanSummary, stack: string): string => {
   const detected = ((scan as any).dataFetching as string | undefined) ?? null
   if (detected) return detected
+  if (stack === "python") return "Not applicable"
   return stack === "nextjs" ? "server-components" : "swr"
 }
 
 const pickAuth = (scan: RepoScanSummary, stack: string): string => {
   const detected = ((scan as any).auth as string | undefined) ?? null
   if (detected) return detected
+  if (stack === "python") return "TODO: document auth/session strategy"
   return stack === "nextjs" ? "next-auth" : "env"
 }
 
-const pickValidation = (scan: RepoScanSummary): string => {
+const pickValidation = (scan: RepoScanSummary, stack: string): string => {
   const detected = ((scan as any).validation as string | undefined) ?? null
   if (detected) return detected
+  if (stack === "python") return "TODO: specify validation library (Pydantic, Marshmallow, etc.)"
   return "zod"
 }
 
 const pickLogging = (scan: RepoScanSummary, stack: string): string => {
   const detected = ((scan as any).logging as string | undefined) ?? null
   if (detected) return detected
+  if (stack === "python") return "TODO: describe logging approach (structlog, stdlib logging)"
   return stack === "nextjs" ? "sentry" : "structured"
 }
 
@@ -135,6 +160,7 @@ const pickPrRules = (scan: RepoScanSummary): string => {
 const buildToolingSummary = (scan: RepoScanSummary, stack: string): string => {
   const parts = scan.tooling ?? []
   if (parts.length > 0) return parts.join(" + ")
+  if (stack === "python") return "pip"
   return stack === "nextjs" ? "create-next-app" : stack === "react" ? "vite" : "custom-config"
 }
 
@@ -156,7 +182,7 @@ export function buildResponsesFromScan(scan: RepoScanSummary): ScanToWizardResul
     testingUT: pickTestingUT(scan),
     testingE2E: pickTestingE2E(scan),
     projectPriority: "maintainability",
-    codeStyle: pickCodeStyle(scan),
+    codeStyle: pickCodeStyle(scan, stack),
     variableNaming: "camelCase",
     fileNaming: pickFileNaming(scan),
     componentNaming: pickComponentNaming(scan),
@@ -169,11 +195,34 @@ export function buildResponsesFromScan(scan: RepoScanSummary): ScanToWizardResul
     dataFetching: pickDataFetching(scan, stack),
     reactPerf: "memoHooks",
     auth: pickAuth(scan, stack),
-    validation: pickValidation(scan),
+    validation: pickValidation(scan, stack),
     logging: pickLogging(scan, stack),
     commitStyle: pickCommitStyle(scan),
     prRules: pickPrRules(scan),
     outputFile: null,
+  }
+
+  if (stack === "python") {
+    responses.tooling = responses.tooling ?? "pip"
+    responses.language =
+      responses.language && responses.language.toLowerCase() === "python" ? "Python" : responses.language ?? "Python"
+    responses.variableNaming = "snake_case"
+    responses.fileNaming = "snake_case"
+    responses.componentNaming = "Not applicable"
+    responses.exports = "module exports"
+    responses.comments = "docstrings"
+    responses.stateManagement = "Not applicable"
+    responses.apiLayer = "TODO: document primary framework (FastAPI, Django, Flask, etc.)"
+    responses.folders = "by-module"
+    responses.dataFetching = "Not applicable"
+    responses.reactPerf = "Not applicable"
+    responses.testingUT = responses.testingUT ?? "pytest"
+    responses.testingE2E = "TODO: outline integration / end-to-end coverage"
+    responses.styling = "Not applicable (backend Python project)"
+    responses.codeStyle = responses.codeStyle ?? "pep8"
+    responses.auth = responses.auth ?? "TODO: document auth/session strategy"
+    responses.validation = responses.validation ?? "TODO: specify validation library (Pydantic, Marshmallow, etc.)"
+    responses.logging = responses.logging ?? "TODO: describe logging approach (structlog, stdlib logging)"
   }
 
   return { stack, responses }

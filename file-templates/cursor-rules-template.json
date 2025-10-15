@@ -27,7 +27,7 @@
         },
         "performance": {
             "dataFetching": "{{dataFetching}}",
-            "reactOptimizations": "{{reactPerf}}"
+            "focus": "{{reactPerf}}"
         },
         "security": {
             "auth": "{{auth}}",

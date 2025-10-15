@@ -47,9 +47,9 @@ const stackGuidanceBySlug: Record<string, string> = {
     "Keep links, forms, and nested routes aligned with Remix conventions to benefit from built-in optimizations.",
   ]),
   python: asMarkdownList([
-    "Call out whether FastAPI, Django, or Flask is the project's default framework.",
-    "Define typing expectations (mypy, Ruff, or dynamic) to keep contributions consistent.",
-    "Describe package management commands (Poetry, pip-tools, uv) for installing and locking dependencies.",
+    "TODO: Call out whether FastAPI, Django, or Flask is the project's default framework.",
+    "TODO: Define typing expectations (mypy, Ruff, or dynamic) to keep contributions consistent.",
+    "TODO: Describe package management commands (Poetry, pip-tools, uv) for installing and locking dependencies.",
   ]),
 }
 

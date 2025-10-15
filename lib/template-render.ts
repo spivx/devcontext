@@ -5,6 +5,20 @@ import type { WizardResponses } from '@/types/wizard'
 import { getTemplateConfig, type TemplateKey } from '@/lib/template-config'
 import { getStackGuidance } from '@/lib/stack-guidance'
 
+const determineApplyToGlob = (responses: WizardResponses, stackSlug?: string): string => {
+  const normalizedStack = (responses.stackSelection || stackSlug || '').trim().toLowerCase()
+
+  if (normalizedStack === 'python') {
+    return '**/*.{py,pyi,md}'
+  }
+
+  if (['nextjs', 'react', 'angular', 'vue', 'svelte', 'nuxt', 'astro', 'remix'].includes(normalizedStack)) {
+    return '**/*.{ts,tsx,js,jsx,md}'
+  }
+
+  return '**/*.{ts,tsx,js,jsx,md}'
+}
+
 function mapOutputFileToTemplateType(outputFile: string): string {
   const mapping: Record<string, string> = {
     'instructions-md': 'copilot-instructions',
@@ -132,6 +146,7 @@ export async function renderTemplate({
   const stackGuidanceSlug = responses.stackSelection || framework
   const stackGuidance = getStackGuidance(stackGuidanceSlug)
   replaceStaticPlaceholder('stackGuidance', stackGuidance)
+  replaceStaticPlaceholder('applyToGlob', determineApplyToGlob(responses, stackGuidanceSlug))
 
   return {
     content: generatedContent,
@@ -139,4 +154,3 @@ export async function renderTemplate({
     isJson: isJsonTemplate,
   }
 }
-
