@@ -6,8 +6,9 @@ import type {
     RepoScanSummary,
     RepoStructureSummary,
 } from "@/types/repo-scan"
-import { inferStackFromScan } from "@/lib/scan-to-wizard"
+import { collectConventionValues, normalizeConventionValue } from "@/lib/convention-values"
 import { loadStackConventions } from "@/lib/conventions"
+import { inferStackFromScan } from "@/lib/scan-to-wizard"
 
 const GITHUB_API_BASE_URL = "https://api.github.com"
 const GITHUB_HOSTNAMES = new Set(["github.com", "www.github.com"])
@@ -114,7 +115,10 @@ const detectStructure = (paths: string[]): RepoStructureSummary => {
     }
 }
 
-const detectTooling = (paths: string[], pkg: PackageJson | null): { tooling: string[]; testing: string[]; frameworks: string[] } => {
+const detectTooling = async (
+    paths: string[],
+    pkg: PackageJson | null,
+): Promise<{ tooling: string[]; testing: string[]; frameworks: string[] }> => {
     const tooling = new Set<string>()
     const testing = new Set<string>()
     const frameworks = new Set<string>()
@@ -276,10 +280,85 @@ const detectTooling = (paths: string[], pkg: PackageJson | null): { tooling: str
         }
     }
 
+    await detectPythonTestingSignals(paths, pkg, testing)
+
     return {
         tooling: dedupeAndSort(tooling),
         testing: dedupeAndSort(testing),
         frameworks: dedupeAndSort(frameworks),
+    }
+}
+
+type TestingConventionValues = {
+    unit: string[]
+    e2e: string[]
+}
+
+const testingConventionCache = new Map<string, TestingConventionValues>()
+
+const getTestingConventionValues = async (stackId: string): Promise<TestingConventionValues> => {
+    const normalized = stackId.trim().toLowerCase()
+    if (testingConventionCache.has(normalized)) {
+        return testingConventionCache.get(normalized)!
+    }
+
+    const { conventions } = await loadStackConventions(normalized)
+    const values: TestingConventionValues = {
+        unit: collectConventionValues(conventions, "testingUT"),
+        e2e: collectConventionValues(conventions, "testingE2E"),
+    }
+    testingConventionCache.set(normalized, values)
+    return values
+}
+
+const findConventionValue = (values: string[], target: string): string | null => {
+    const normalizedTarget = normalizeConventionValue(target)
+    return values.find((value) => normalizeConventionValue(value) === normalizedTarget) ?? null
+}
+
+const BEHAVE_DEPENDENCIES = ["behave", "behave-django", "behave-webdriver"]
+
+export const detectPythonTestingSignals = async (
+    paths: string[],
+    pkg: PackageJson | null,
+    testing: Set<string>,
+): Promise<void> => {
+    const { unit } = await getTestingConventionValues("python")
+    if (unit.length === 0) {
+        return
+    }
+
+    const behaveValue = findConventionValue(unit, "behave")
+    const unittestValue = findConventionValue(unit, "unittest")
+
+    if (!behaveValue && !unittestValue) {
+        return
+    }
+
+    const lowerCasePaths = paths.map((path) => path.toLowerCase())
+
+    if (behaveValue) {
+        const hasFeaturesDir = lowerCasePaths.some((path) => path.startsWith("features/") || path.includes("/features/"))
+        const hasStepsDir = lowerCasePaths.some((path) => path.includes("/steps/"))
+        const hasEnvironment = lowerCasePaths.some((path) => path.endsWith("/environment.py") || path.endsWith("environment.py"))
+        const hasDependency = pkg ? dependencyHas(pkg, BEHAVE_DEPENDENCIES) : false
+
+        if (hasDependency || (hasFeaturesDir && (hasStepsDir || hasEnvironment))) {
+            testing.add(behaveValue)
+        }
+    }
+
+    if (unittestValue) {
+        const hasUnitFiles = lowerCasePaths.some((path) => {
+            if (!/(^|\/)(tests?|testcases|specs)\//.test(path)) {
+                return false
+            }
+            return /(^|\/)(test_[^/]+|[^/]+_test)\.py$/.test(path)
+        })
+
+        if (hasUnitFiles) {
+            testing.add(unittestValue)
+        }
     }
 }
 
@@ -770,7 +849,7 @@ export async function GET(request: NextRequest): Promise<NextResponse<RepoScanRe
 
         const packageJson = hasPackageJson ? await readPackageJson(owner, repo, defaultBranch, headers) : null
 
-        const { tooling, testing, frameworks } = detectTooling(paths, packageJson)
+        const { tooling, testing, frameworks } = await detectTooling(paths, packageJson)
 
         if (lowestRateLimit !== null && lowestRateLimit < 5) {
             warnings.push(`GitHub API rate limit is low (remaining: ${lowestRateLimit}).`)
