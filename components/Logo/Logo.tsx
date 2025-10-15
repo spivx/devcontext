@@ -11,11 +11,12 @@ export default function Logo({ width = 350, height = 350 }: LogoProps) {
         <div className="flex flex-col items-center justify-center">
             <Image
                 src={logoSrc}
-                alt="devcontext logo"
+                alt="DevContext logo"
                 width={width}
                 height={height}
                 priority
-                className="mb-2"
+                sizes="(max-width: 768px) 90vw, 520px"
+                className="mb-2 h-auto w-full"
             />
 
         </div>

@@ -74,7 +74,7 @@ export function Hero() {
           className="mx-auto w-full max-w-[420px] md:max-w-[520px]"
           variants={itemVariants}
         >
-          <div className="origin-center scale-[1.22] md:scale-[1.32]">
+          <div className="origin-center scale-100 md:scale-[1.32]">
             <Logo width={700} height={700} />
           </div>
         </motion.div>
