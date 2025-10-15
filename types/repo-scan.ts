@@ -6,6 +6,12 @@ export type RepoStructureSummary = {
     packages: boolean
 }
 
+export type RepoScanConventionsMeta = {
+    stack: string
+    hasCustomConventions: boolean
+    structureRelevant: Array<keyof RepoStructureSummary>
+}
+
 export type RepoScanSummary = {
     repo: string
     defaultBranch: string
@@ -36,6 +42,7 @@ export type RepoScanSummary = {
     componentNamingStyle?: string | null
     codeStylePreference?: string | null
     commitMessageStyle?: string | null
+    conventions?: RepoScanConventionsMeta | null
 }
 
 export type RepoScanErrorResponse = {

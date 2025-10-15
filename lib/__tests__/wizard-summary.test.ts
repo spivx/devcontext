@@ -41,6 +41,7 @@ describe("buildCompletionSummary", () => {
       responses,
       freeTextResponses,
       {},
+      {},
       false
     )
 
@@ -67,6 +68,7 @@ describe("buildCompletionSummary", () => {
       [baseStep],
       responses,
       freeTextResponses,
+      {},
       {},
       false
     )

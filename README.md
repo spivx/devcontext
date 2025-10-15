@@ -15,6 +15,9 @@ Build high-signal agent and instruction files from community-proven best practic
 4. Answer topic prompts across general, architecture, performance, security, commits, and more—or lean on the recommended defaults when you need a fast decision.
 5. Review a completion summary that highlights what made it into your file and which areas still need decisions.
 
+## Architecture docs
+- [Scan → Wizard Flow](docs/scan-flow.md) – how repository scans feed conventions, defaults, and final instruction files.
+
 ## Community knowledge base
 - Every topic originates from the developer community—playbooks, real-world retrospectives, and shared tooling habits.
 - JSON entries in `data/` capture those insights: each answer carries labels, examples, pros/cons, tags, and authoritative `docs` links.

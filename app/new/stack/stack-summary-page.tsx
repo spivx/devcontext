@@ -39,6 +39,7 @@ export function StackSummaryPage({ stackId, mode }: StackSummaryPageProps) {
   const [responses, setResponses] = useState<Responses | null>(null)
   const [freeTextResponses, setFreeTextResponses] = useState<FreeTextResponses>({})
   const [autoFilledMap, setAutoFilledMap] = useState<Record<string, boolean>>({})
+  const [defaultedMap, setDefaultedMap] = useState<Record<string, boolean>>({})
   const [stackLabel, setStackLabel] = useState<string | null>(null)
   const [autoFillNotice, setAutoFillNotice] = useState<string | null>(null)
   const [isLoading, setIsLoading] = useState(true)
@@ -66,6 +67,7 @@ export function StackSummaryPage({ stackId, mode }: StackSummaryPageProps) {
             responses: defaultResponses,
             freeTextResponses: defaultFreeTextResponses,
             autoFilledMap: defaultsMap,
+            defaultedMap: defaultsAppliedMap,
             stackLabel: label,
           } =
             await buildDefaultSummaryData(stackId)
@@ -78,6 +80,7 @@ export function StackSummaryPage({ stackId, mode }: StackSummaryPageProps) {
           setResponses(defaultResponses)
           setFreeTextResponses(defaultFreeTextResponses)
           setAutoFilledMap(defaultsMap)
+          setDefaultedMap(defaultsAppliedMap)
           setStackLabel(label)
           setAutoFillNotice("We applied the recommended defaults for you. Tweak any section before generating.")
 
@@ -87,6 +90,7 @@ export function StackSummaryPage({ stackId, mode }: StackSummaryPageProps) {
             responses: defaultResponses,
             freeTextResponses: defaultFreeTextResponses,
             autoFilledMap: defaultsMap,
+            defaultedMap: defaultsAppliedMap,
             updatedAt: Date.now(),
           })
         } else {
@@ -103,6 +107,7 @@ export function StackSummaryPage({ stackId, mode }: StackSummaryPageProps) {
             setResponses(null)
             setFreeTextResponses({})
             setAutoFilledMap({})
+            setDefaultedMap({})
             setStackLabel(computedLabel)
             setAutoFillNotice(null)
             setErrorMessage("We couldn't find saved answers for this stack. Complete the wizard to generate your own summary.")
@@ -118,6 +123,7 @@ export function StackSummaryPage({ stackId, mode }: StackSummaryPageProps) {
           setResponses(normalizedResponses)
           setFreeTextResponses(storedState.freeTextResponses ?? {})
           setAutoFilledMap(storedState.autoFilledMap ?? {})
+          setDefaultedMap(storedState.defaultedMap ?? {})
           setStackLabel(storedState.stackLabel ?? computedLabel)
           setAutoFillNotice(null)
         }
@@ -153,9 +159,10 @@ export function StackSummaryPage({ stackId, mode }: StackSummaryPageProps) {
       responses,
       freeTextResponses,
       autoFilledMap,
+      defaultedMap,
       false
     )
-  }, [wizardSteps, responses, freeTextResponses, autoFilledMap])
+  }, [wizardSteps, responses, freeTextResponses, autoFilledMap, defaultedMap])
 
   const handleGenerate = useCallback(
     async (fileOption: FileOutputConfig) => {
@@ -237,8 +244,12 @@ export function StackSummaryPage({ stackId, mode }: StackSummaryPageProps) {
       const nextAutoFilledMap = { ...autoFilledMap }
       delete nextAutoFilledMap[question.id]
 
+      const nextDefaultedMap = { ...defaultedMap }
+      delete nextDefaultedMap[question.id]
+
       setFreeTextResponses(nextFreeText)
       setAutoFilledMap(nextAutoFilledMap)
+      setDefaultedMap(nextDefaultedMap)
       setAutoFillNotice(null)
 
       if (stackId) {
@@ -248,19 +259,21 @@ export function StackSummaryPage({ stackId, mode }: StackSummaryPageProps) {
           responses,
           freeTextResponses: nextFreeText,
           autoFilledMap: nextAutoFilledMap,
+          defaultedMap: nextDefaultedMap,
           updatedAt: Date.now(),
         })
       }
 
       handleCloseEdit()
     },
-    [responses, freeTextResponses, autoFilledMap, stackId, stackLabel, summaryHeader, handleCloseEdit]
+    [responses, freeTextResponses, autoFilledMap, defaultedMap, stackId, stackLabel, summaryHeader, handleCloseEdit]
   )
 
   const applyAnswerUpdate = useCallback(
     (question: WizardQuestion, answer: WizardAnswer) => {
       const currentResponses: Responses = responses ? { ...responses } : {}
       const currentAutoMap = { ...autoFilledMap }
+      const currentDefaultedMap = { ...defaultedMap }
       const prevValue = currentResponses[question.id]
       let nextValue: Responses[keyof Responses] | undefined
 
@@ -283,8 +296,10 @@ export function StackSummaryPage({ stackId, mode }: StackSummaryPageProps) {
       }
 
       delete currentAutoMap[question.id]
+      delete currentDefaultedMap[question.id]
       setResponses(currentResponses)
       setAutoFilledMap(currentAutoMap)
+      setDefaultedMap(currentDefaultedMap)
       setAutoFillNotice(null)
 
       if (stackId) {
@@ -294,6 +309,7 @@ export function StackSummaryPage({ stackId, mode }: StackSummaryPageProps) {
           responses: currentResponses,
           freeTextResponses,
           autoFilledMap: currentAutoMap,
+          defaultedMap: currentDefaultedMap,
           updatedAt: Date.now(),
         })
       }
@@ -302,7 +318,7 @@ export function StackSummaryPage({ stackId, mode }: StackSummaryPageProps) {
         handleCloseEdit()
       }
     },
-    [responses, freeTextResponses, autoFilledMap, stackId, stackLabel, summaryHeader, handleCloseEdit]
+    [responses, freeTextResponses, autoFilledMap, defaultedMap, stackId, stackLabel, summaryHeader, handleCloseEdit]
   )
 
   if (isLoading) {

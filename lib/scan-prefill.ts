@@ -23,7 +23,7 @@ const normalizeValueForQuestion = (value: string | null, question: WizardQuestio
 }
 
 export const prefillWizardFromScan = async (scan: RepoScanSummary) => {
-  const { stack, responses: wizardResponses } = buildResponsesFromScan(scan)
+  const { stack, responses: wizardResponses, defaultedQuestionIds } = await buildResponsesFromScan(scan)
   const { steps, stackLabel } = await buildStepsForStack(stack)
 
   const responses: Responses = {
@@ -31,6 +31,7 @@ export const prefillWizardFromScan = async (scan: RepoScanSummary) => {
   }
   const freeTextResponses: FreeTextResponses = {}
   const autoFilledMap: Record<string, boolean> = {}
+  const defaultedMap: Record<string, boolean> = {}
 
   const setIfPresent = (question: WizardQuestion, allResponses: WizardResponses) => {
     const key = (question.responseKey ?? question.id) as keyof WizardResponses
@@ -44,6 +45,10 @@ export const prefillWizardFromScan = async (scan: RepoScanSummary) => {
 
     if (question.id !== STACK_QUESTION_ID) {
       autoFilledMap[question.id] = true
+    }
+
+    if (defaultedQuestionIds[question.id]) {
+      defaultedMap[question.id] = true
     }
   }
 
@@ -59,6 +64,7 @@ export const prefillWizardFromScan = async (scan: RepoScanSummary) => {
     responses,
     freeTextResponses,
     autoFilledMap,
+    defaultedMap,
     updatedAt: Date.now(),
   })
 

@@ -1,0 +1,26 @@
+{
+  "id": "nuxt",
+  "defaults": {
+    "tooling": "nuxi",
+    "dataFetching": "server-side",
+    "apiLayer": "use-fetch",
+    "styling": "tailwind",
+    "folders": "vercel",
+    "stateManagement": "pinia",
+    "reactPerf": "memoHooks"
+  },
+  "rules": [
+    {
+      "if": { "toolingIncludes": ["tailwind"] },
+      "set": { "styling": "tailwind" }
+    },
+    {
+      "if": { "toolingIncludes": ["uno"] },
+      "set": { "styling": "uno" }
+    },
+    {
+      "if": { "toolingIncludes": ["scoped-css"] },
+      "set": { "styling": "scoped-css" }
+    }
+  ]
+}

@@ -6,6 +6,8 @@ import type {
     RepoScanSummary,
     RepoStructureSummary,
 } from "@/types/repo-scan"
+import { inferStackFromScan } from "@/lib/scan-to-wizard"
+import { loadStackConventions } from "@/lib/conventions"
 
 const GITHUB_API_BASE_URL = "https://api.github.com"
 const GITHUB_HOSTNAMES = new Set(["github.com", "www.github.com"])
@@ -788,6 +790,14 @@ export async function GET(request: NextRequest): Promise<NextResponse<RepoScanRe
             topics: repoJson.topics ? dedupeAndSort(repoJson.topics) : [],
             warnings,
             ...enriched,
+        }
+
+        const detectedStack = inferStackFromScan(summary)
+        const { conventions, hasStackFile } = await loadStackConventions(detectedStack)
+        summary.conventions = {
+            stack: detectedStack,
+            hasCustomConventions: hasStackFile,
+            structureRelevant: conventions.structureRelevant,
         }
 
         return NextResponse.json<RepoScanSummary>(summary)

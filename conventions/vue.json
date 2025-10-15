@@ -1,0 +1,29 @@
+{
+  "id": "vue",
+  "defaults": {
+    "tooling": "vite",
+    "language": "typescript",
+    "fileStructure": "feature-folders",
+    "stateManagement": "pinia",
+    "dataFetching": "swr",
+    "reactPerf": "memoHooks"
+  },
+  "rules": [
+    {
+      "if": { "toolingIncludes": ["create-vue"] },
+      "set": { "tooling": "create-vue" }
+    },
+    {
+      "if": { "toolingIncludes": ["quasar"] },
+      "set": { "tooling": "quasar" }
+    },
+    {
+      "if": { "testingIncludes": ["vitest"] },
+      "set": { "testingUT": "vitest" }
+    },
+    {
+      "if": { "testingIncludes": ["jest"] },
+      "set": { "testingUT": "jest" }
+    }
+  ]
+}
