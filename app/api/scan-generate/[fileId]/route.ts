@@ -18,13 +18,14 @@ export async function POST(request: NextRequest, context: RouteContext) {
       return NextResponse.json({ error: "Missing scan payload" }, { status: 400 })
     }
 
-    const { stack, responses } = await buildResponsesFromScan(payload.scan)
+    const { stack, responses, defaultedResponseMeta } = await buildResponsesFromScan(payload.scan)
     responses.outputFile = fileId
 
     const rendered = await renderTemplate({
       responses,
       frameworkFromPath: stack,
       fileNameFromPath: fileId,
+      defaultedResponses: defaultedResponseMeta,
     })
 
     return NextResponse.json({
@@ -37,4 +38,3 @@ export async function POST(request: NextRequest, context: RouteContext) {
     return NextResponse.json({ error: "Failed to generate instructions from scan" }, { status: 500 })
   }
 }
-

@@ -28,6 +28,7 @@ This document outlines how repository scans are transformed into AI instruction 
    - From the repo-scan UI, clicking “Generate” calls `lib/scan-generate.ts`, which posts to `/api/scan-generate/[fileId]`.
    - The API reuses `buildResponsesFromScan` server-side to ensure consistency, then renders the target template with `renderTemplate`.
    - Template rendering pulls `applyToGlob` from conventions so Copilot instructions target stack-appropriate file globs (e.g. `**/*.{py,pyi,md}` for Python).
+   - When a field falls back to a stack default because the scan lacked a signal, `renderTemplate` annotates the generated instruction with a note that it came from the default rather than the scan.
 
 ## Key Data Sources
 

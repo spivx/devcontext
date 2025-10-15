@@ -38,7 +38,7 @@ test('repo scan success path generates instructions preview', async ({ page }) =
   await expect(page.getByText('TypeScript').first()).toBeVisible()
   await expect(page.getByText('Playwright').first()).toBeVisible()
 
-  await page.route('**/api/generate/**', async (route) => {
+  await page.route('**/api/scan-generate/**', async (route) => {
     await route.fulfill({
       status: 200,
       contentType: 'application/json',

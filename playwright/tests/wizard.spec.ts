@@ -19,8 +19,29 @@ test('wizard supports filtering, defaults, and reset', async ({ page }) => {
 
   const questionHeading = page.getByTestId('wizard-question-heading')
 
-  await page.getByRole('button', { name: 'Use default (Vite)' }).click()
-  await expect(page.getByTestId('answer-option-react-language-typescript')).toBeVisible()
+  const defaultButton = page.getByRole('button', { name: 'Use default (Vite)' })
+  await expect(defaultButton).toBeEnabled()
+  await defaultButton.click()
+  await expect(defaultButton).toBeDisabled()
+
+  await expect.poll(
+    () =>
+      page.evaluate(() => {
+        const raw = window.localStorage.getItem('devcontext:wizard:react')
+        if (!raw) {
+          return null
+        }
+
+        try {
+          const state = JSON.parse(raw)
+          return state.responses?.['react-tooling'] ?? null
+        } catch (error) {
+          console.warn('Unable to parse wizard state', error)
+          return 'PARSE_ERROR'
+        }
+      }),
+    { timeout: 15000 }
+  ).toBe('vite')
 
   await page.getByRole('button', { name: 'Start Over' }).click()
   await expect(page.getByTestId('wizard-confirmation-dialog')).toBeVisible()

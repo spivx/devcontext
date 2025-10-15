@@ -28,16 +28,16 @@ test("wizard accepts custom free text answers and shows them in the summary", as
   const customInput = page.getByPlaceholder("Type your custom preference")
 
   await expect(customInput).toBeVisible()
-  await customInput.fill(customAnswer)
+  await customInput.click()
+  await customInput.fill("")
+  await customInput.type(customAnswer)
+  await expect(customInput).toHaveValue(customAnswer)
 
-  await expect(questionHeading).toHaveText("What build tooling do you use?")
+  const saveButton = page.getByRole("button", { name: "Save custom answer" })
+  await expect(saveButton).toBeEnabled()
+  await saveButton.click()
 
-  const confirmationMessage = page.getByTestId("custom-answer-confirmation")
-  await expect(confirmationMessage).toBeVisible()
-  await expect(confirmationMessage).toContainText(customAnswer)
-  await expect(confirmationMessage).toContainText(
-    "for this question when we generate your context file."
-  )
+  await expect(questionHeading).toHaveText("What language do you use?")
 
   await expect.poll(
     () =>
