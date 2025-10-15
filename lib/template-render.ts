@@ -30,10 +30,17 @@ function mapOutputFileToTemplateType(outputFile: string): string {
   return mapping[outputFile] ?? outputFile
 }
 
+type DefaultedResponseMeta = {
+  label: string
+  value: string
+  questionId: string
+}
+
 export type RenderTemplateParams = {
   responses: WizardResponses
   frameworkFromPath?: string | undefined
   fileNameFromPath?: string | undefined
+  defaultedResponses?: Partial<Record<keyof WizardResponses, DefaultedResponseMeta>>
 }
 
 export type RenderTemplateResult = {
@@ -46,6 +53,7 @@ export async function renderTemplate({
   responses,
   frameworkFromPath,
   fileNameFromPath,
+  defaultedResponses,
 }: RenderTemplateParams): Promise<RenderTemplateResult> {
   const framework = frameworkFromPath && !['general', 'none', 'undefined'].includes(frameworkFromPath)
     ? frameworkFromPath
@@ -97,13 +105,19 @@ export async function renderTemplate({
 
     const value = responses[key]
 
+    const defaultMeta = defaultedResponses?.[key]
+
     if (value === null || value === undefined || value === '') {
       const replacement = isJsonTemplate ? escapeForJson(fallback) : fallback
       generatedContent = generatedContent.replace(placeholder, replacement)
     } else {
-      const replacementValue = String(value)
-      const replacement = isJsonTemplate ? escapeForJson(replacementValue) : replacementValue
-      generatedContent = generatedContent.replace(placeholder, replacement)
+      const rawValue = String(value)
+      const baseValue = defaultMeta?.label ?? rawValue
+      const displayValue = defaultMeta
+        ? `${baseValue} (stack default - not detected via repo scan)`
+        : baseValue
+      const replacementValue = isJsonTemplate ? escapeForJson(displayValue) : displayValue
+      generatedContent = generatedContent.replace(placeholder, replacementValue)
     }
   }
 

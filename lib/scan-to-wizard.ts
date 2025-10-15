@@ -154,6 +154,7 @@ type StackQuestionDefault = {
   questionId: string
   responseKey: keyof WizardResponses
   value: string
+  label: string
 }
 
 const defaultsCache = new Map<string, StackQuestionDefault[]>()
@@ -178,6 +179,7 @@ const extractDefaultsFromSteps = (steps: WizardStep[], template: WizardResponses
         questionId: question.id,
         responseKey: key,
         value: defaultAnswer.value,
+        label: defaultAnswer.label ?? defaultAnswer.value,
       })
     })
   })
@@ -205,6 +207,7 @@ type BuildResult = {
   conventions: LoadedConvention
   hasCustomConventions: boolean
   defaultedQuestionIds: Record<string, boolean>
+  defaultedResponseMeta: Partial<Record<keyof WizardResponses, { questionId: string; label: string; value: string }>>
 }
 
 export const buildResponsesFromScan = async (scan: RepoScanSummary): Promise<BuildResult> => {
@@ -227,12 +230,21 @@ export const buildResponsesFromScan = async (scan: RepoScanSummary): Promise<Bui
   afterRules.stackSelection = stack
 
   const defaultedQuestionIds: Record<string, boolean> = {}
+  const defaultedResponseMeta: Partial<Record<
+    keyof WizardResponses,
+    { questionId: string; label: string; value: string }
+  >> = {}
   const questionDefaults = await loadStackQuestionDefaults(stack, afterRules)
-  questionDefaults.forEach(({ responseKey, questionId, value }) => {
+  questionDefaults.forEach(({ responseKey, questionId, value, label }) => {
     const currentValue = afterRules[responseKey]
     if (currentValue === null || currentValue === undefined || currentValue === "") {
       afterRules[responseKey] = value
       defaultedQuestionIds[questionId] = true
+      defaultedResponseMeta[responseKey] = {
+        questionId,
+        label,
+        value,
+      }
     }
   })
 
@@ -261,6 +273,7 @@ export const buildResponsesFromScan = async (scan: RepoScanSummary): Promise<Bui
     conventions,
     hasCustomConventions: hasStackFile,
     defaultedQuestionIds,
+    defaultedResponseMeta,
   }
 }
 
