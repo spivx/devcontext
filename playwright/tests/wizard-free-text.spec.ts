@@ -35,7 +35,7 @@ test("wizard accepts custom free text answers and shows them in the summary", as
 
   const saveButton = page.getByRole("button", { name: "Save custom answer" })
   await expect(saveButton).toBeEnabled()
-  await saveButton.click()
+  await customInput.press("Enter")
 
   await expect(questionHeading).toHaveText("What language do you use?")
 
