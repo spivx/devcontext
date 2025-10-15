@@ -9,6 +9,70 @@ const STACK_FALLBACK = "react"
 const toLowerArray = (values: string[] | undefined | null) =>
   Array.isArray(values) ? values.map((value) => value.toLowerCase()) : []
 
+const normalizeString = (value: string) => value.trim().toLowerCase()
+
+const collectConventionValues = (
+  conventions: LoadedConvention,
+  key: keyof WizardResponses,
+): string[] => {
+  const values: string[] = []
+  const pushValue = (candidate: unknown) => {
+    if (typeof candidate !== "string") return
+    const normalizedCandidate = normalizeString(candidate)
+    if (normalizedCandidate.length === 0) return
+    if (values.some((existing) => normalizeString(existing) === normalizedCandidate)) {
+      return
+    }
+    values.push(candidate)
+  }
+
+  pushValue(conventions.defaults[key])
+
+  conventions.rules.forEach((rule) => {
+    pushValue(rule.set?.[key])
+  })
+
+  return values
+}
+
+const detectFromScanList = (
+  scanList: string[] | undefined | null,
+  conventions: LoadedConvention,
+  key: keyof WizardResponses,
+): string | null => {
+  if (!Array.isArray(scanList) || scanList.length === 0) {
+    return null
+  }
+  const candidates = collectConventionValues(conventions, key)
+  if (candidates.length === 0) {
+    return null
+  }
+
+  const normalizedScan = scanList.map((value) => normalizeString(value))
+
+  for (const candidate of candidates) {
+    if (normalizedScan.includes(normalizeString(candidate))) {
+      return candidate
+    }
+  }
+
+  return null
+}
+
+const applyDetectedValue = <Key extends keyof WizardResponses>(
+  target: WizardResponses,
+  key: Key,
+  value: WizardResponses[Key] | null | undefined,
+): void => {
+  if (value === null || value === undefined) {
+    return
+  }
+  if (typeof value === "string" && value.trim() === "") {
+    return
+  }
+  target[key] = value
+}
+
 const detectStack = (scan: RepoScanSummary): string => {
   const frameworks = toLowerArray(scan.frameworks)
   const languages = toLowerArray(scan.languages)
@@ -64,37 +128,21 @@ const detectLanguage = (scan: RepoScanSummary): string | null => {
   return scan.language ? String(scan.language) : null
 }
 
-const detectTestingUnit = (scan: RepoScanSummary): string | null => {
-  const testing = toLowerArray(scan.testing)
-  if (testing.includes("pytest")) return "pytest"
-  if (testing.includes("unittest")) return "unittest"
-  if (testing.includes("vitest")) return "vitest"
-  if (testing.includes("jest")) return "jest"
-  if (testing.includes("jasmine")) return "jasmine-karma"
-  return null
-}
+const detectTestingUnit = (scan: RepoScanSummary, conventions: LoadedConvention): string | null =>
+  detectFromScanList(scan.testing, conventions, "testingUT")
 
-const detectTestingE2E = (scan: RepoScanSummary): string | null => {
-  const testing = toLowerArray(scan.testing)
-  if (testing.includes("playwright")) return "playwright"
-  if (testing.includes("cypress")) return "cypress"
-  return null
-}
+const detectTestingE2E = (scan: RepoScanSummary, conventions: LoadedConvention): string | null =>
+  detectFromScanList(scan.testing, conventions, "testingE2E")
 
-const detectToolingSummary = (scan: RepoScanSummary, stack: string): string | null => {
+const detectToolingSummary = (scan: RepoScanSummary, conventions: LoadedConvention): string | null => {
   if (scan.tooling && scan.tooling.length > 0) {
     return scan.tooling.join(" + ")
   }
 
-  if (stack === "python") return "pip"
-  if (stack === "nextjs") return "create-next-app"
-  if (stack === "react") return "vite"
-  if (stack === "angular") return "angular-cli"
-  if (stack === "vue") return "vite"
-  if (stack === "svelte") return "sveltekit"
-  if (stack === "nuxt") return "nuxi"
-  if (stack === "astro") return "astro"
-  if (stack === "remix") return "create-remix"
+  const defaultTooling = conventions.defaults.tooling
+  if (typeof defaultTooling === "string" && defaultTooling.trim().length > 0) {
+    return defaultTooling
+  }
 
   return null
 }
@@ -191,14 +239,14 @@ export const buildResponsesFromScan = async (scan: RepoScanSummary): Promise<Bui
   const base = createEmptyResponses(stack)
   const withDefaults: WizardResponses = { ...base, ...conventions.defaults }
 
-  withDefaults.tooling = withDefaults.tooling ?? detectToolingSummary(scan, stack)
-  withDefaults.language = withDefaults.language ?? detectLanguage(scan)
-  withDefaults.testingUT = withDefaults.testingUT ?? detectTestingUnit(scan)
-  withDefaults.testingE2E = withDefaults.testingE2E ?? detectTestingE2E(scan)
-  withDefaults.fileNaming = withDefaults.fileNaming ?? detectFileNaming(scan)
-  withDefaults.componentNaming = withDefaults.componentNaming ?? detectComponentNaming(scan)
-  withDefaults.commitStyle = withDefaults.commitStyle ?? detectCommitStyle(scan)
-  withDefaults.prRules = withDefaults.prRules ?? detectPRRules(scan)
+  applyDetectedValue(withDefaults, "tooling", detectToolingSummary(scan, conventions))
+  applyDetectedValue(withDefaults, "language", detectLanguage(scan))
+  applyDetectedValue(withDefaults, "testingUT", detectTestingUnit(scan, conventions))
+  applyDetectedValue(withDefaults, "testingE2E", detectTestingE2E(scan, conventions))
+  applyDetectedValue(withDefaults, "fileNaming", detectFileNaming(scan))
+  applyDetectedValue(withDefaults, "componentNaming", detectComponentNaming(scan))
+  applyDetectedValue(withDefaults, "commitStyle", detectCommitStyle(scan))
+  applyDetectedValue(withDefaults, "prRules", detectPRRules(scan))
 
   const afterRules = applyConventionRules(withDefaults, conventions.rules, scan)
   afterRules.stackSelection = stack
@@ -214,22 +262,22 @@ export const buildResponsesFromScan = async (scan: RepoScanSummary): Promise<Bui
   })
 
   if (!afterRules.tooling) {
-    afterRules.tooling = detectToolingSummary(scan, stack)
+    applyDetectedValue(afterRules, "tooling", detectToolingSummary(scan, conventions))
   }
   if (!afterRules.language) {
-    afterRules.language = detectLanguage(scan)
+    applyDetectedValue(afterRules, "language", detectLanguage(scan))
   }
   if (!afterRules.testingUT) {
-    afterRules.testingUT = detectTestingUnit(scan)
+    applyDetectedValue(afterRules, "testingUT", detectTestingUnit(scan, conventions))
   }
   if (!afterRules.testingE2E) {
-    afterRules.testingE2E = detectTestingE2E(scan)
+    applyDetectedValue(afterRules, "testingE2E", detectTestingE2E(scan, conventions))
   }
   if (!afterRules.fileNaming) {
-    afterRules.fileNaming = detectFileNaming(scan)
+    applyDetectedValue(afterRules, "fileNaming", detectFileNaming(scan))
   }
   if (!afterRules.componentNaming) {
-    afterRules.componentNaming = detectComponentNaming(scan)
+    applyDetectedValue(afterRules, "componentNaming", detectComponentNaming(scan))
   }
 
   return {
