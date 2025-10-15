@@ -10,7 +10,7 @@ import { absoluteUrl } from "@/lib/site-metadata"
 
 const title = "DevContext | Repo-aware AI Coding Guidelines Assistant"
 const description =
-  "Generate AI-ready Copilot instructions, Cursor rules, and developer onboarding docs with a GitHub-aware coding guidelines workflow."
+  "Build from scratch with a guided wizard or scan a public GitHub repo to generate AI-ready Copilot instructions, Cursor rules, and developer onboarding docs."
 
 export const metadata: Metadata = {
   title,
