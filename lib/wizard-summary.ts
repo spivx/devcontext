@@ -13,6 +13,7 @@ export type CompletionSummaryEntry = {
   answers: string[]
   isAutoFilled?: boolean
   isReadOnlyOnSummary?: boolean
+  isDefaultApplied?: boolean
 }
 
 const buildFileSummaryEntry = (
@@ -57,6 +58,7 @@ export const buildCompletionSummary = (
   responses: Responses,
   freeTextResponses: FreeTextResponses,
   autoFilledMap: Record<string, boolean> = {},
+  defaultedMap: Record<string, boolean> = {},
   includeFileEntry = true
 ): CompletionSummaryEntry[] => {
   const summary: CompletionSummaryEntry[] = includeFileEntry
@@ -94,6 +96,7 @@ export const buildCompletionSummary = (
         answers: answerSummaries,
         isAutoFilled: Boolean(autoFilledMap[question.id]),
         isReadOnlyOnSummary: Boolean(question.isReadOnlyOnSummary),
+        isDefaultApplied: Boolean(defaultedMap[question.id] && answerSummaries.length > 0),
       })
     })
   })

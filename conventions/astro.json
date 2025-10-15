@@ -1,0 +1,28 @@
+{
+  "id": "astro",
+  "defaults": {
+    "tooling": "react",
+    "dataFetching": "ssg",
+    "folders": "content-collections",
+    "collaboration": "vercel",
+    "reactPerf": "memoHooks"
+  },
+  "rules": [
+    {
+      "if": { "toolingIncludes": ["vue"] },
+      "set": { "tooling": "vue" }
+    },
+    {
+      "if": { "toolingIncludes": ["svelte"] },
+      "set": { "tooling": "svelte" }
+    },
+    {
+      "if": { "toolingIncludes": ["ssr"] },
+      "set": { "dataFetching": "ssr" }
+    },
+    {
+      "if": { "toolingIncludes": ["hybrid"] },
+      "set": { "dataFetching": "hybrid" }
+    }
+  ]
+}

@@ -1,10 +1,9 @@
 "use client"
 
-import { generateInstructions } from "@/lib/instructions-api"
 import { getFileOptions } from "@/lib/wizard-config"
+import { getMimeTypeForFormat } from "@/lib/wizard-utils"
 import type { RepoScanSummary } from "@/types/repo-scan"
 import type { GeneratedFileResult } from "@/types/output"
-import { buildResponsesFromScan } from "@/lib/scan-to-wizard"
 
 const fileOptions = getFileOptions()
 
@@ -14,17 +13,26 @@ export async function generateFromRepoScan(
   scan: RepoScanSummary,
   outputFileId: OutputFileId
 ): Promise<GeneratedFileResult | null> {
-  const { stack, responses } = buildResponsesFromScan(scan)
-  responses.outputFile = outputFileId
-
   const selected = fileOptions.find((f) => f.id === outputFileId) || null
 
-  const result = await generateInstructions({
-    stackSegment: stack,
-    outputFileId,
-    responses,
-    fileFormat: selected?.format,
+  const res = await fetch(`/api/scan-generate/${encodeURIComponent(outputFileId)}`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ scan, format: selected?.format ?? null }),
   })
 
-  return result
+  if (!res.ok) {
+    console.error("Failed to generate instructions from scan", await res.text())
+    return null
+  }
+
+  const payload = (await res.json()) as { fileName: string; content: string; mimeType?: string | null }
+
+  return {
+    fileName: payload.fileName,
+    fileContent: payload.content,
+    mimeType: getMimeTypeForFormat(selected?.format) ?? null,
+  }
 }

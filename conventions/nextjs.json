@@ -1,0 +1,40 @@
+{
+  "id": "nextjs",
+  "structureRelevant": ["src", "tests", "apps"],
+  "defaults": {
+    "tooling": "create-next-app",
+    "fileStructure": "app-directory",
+    "styling": "tailwind",
+    "stateManagement": "zustand",
+    "apiLayer": "server-actions",
+    "dataFetching": "server-components",
+    "reactPerf": "memoHooks",
+    "auth": "next-auth"
+  },
+  "rules": [
+    {
+      "if": { "routingIs": ["pages"] },
+      "set": { "fileStructure": "pages-directory" }
+    },
+    {
+      "if": { "routingIs": ["hybrid"] },
+      "set": { "fileStructure": "hybrid-router" }
+    },
+    {
+      "if": { "toolingIncludes": ["tailwind css", "tailwind"] },
+      "set": { "styling": "tailwind" }
+    },
+    {
+      "if": { "testingIncludes": ["vitest"] },
+      "set": { "testingUT": "vitest" }
+    },
+    {
+      "if": { "testingIncludes": ["jest"] },
+      "set": { "testingUT": "jest" }
+    },
+    {
+      "if": { "testingIncludes": ["playwright"] },
+      "set": { "testingE2E": "playwright" }
+    }
+  ]
+}

@@ -1,0 +1,40 @@
+{
+  "id": "angular",
+  "structureRelevant": ["src", "components", "tests", "apps"],
+  "defaults": {
+    "tooling": "angular-cli",
+    "language": "typescript-strict",
+    "fileStructure": "standalone-first",
+    "styling": "scss",
+    "stateManagement": "ngrx-store",
+    "apiLayer": "httpclient",
+    "dataFetching": "httpclient",
+    "reactPerf": "memoHooks"
+  },
+  "rules": [
+    {
+      "if": { "toolingIncludes": ["nx"] },
+      "set": { "tooling": "nx" }
+    },
+    {
+      "if": { "toolingIncludes": ["tailwind"] },
+      "set": { "styling": "tailwind" }
+    },
+    {
+      "if": { "testingIncludes": ["jest"] },
+      "set": { "testingUT": "jest" }
+    },
+    {
+      "if": { "testingIncludes": ["vitest"] },
+      "set": { "testingUT": "vitest" }
+    },
+    {
+      "if": { "testingIncludes": ["playwright"] },
+      "set": { "testingE2E": "playwright" }
+    },
+    {
+      "if": { "testingIncludes": ["cypress"] },
+      "set": { "testingE2E": "cypress" }
+    }
+  ]
+}

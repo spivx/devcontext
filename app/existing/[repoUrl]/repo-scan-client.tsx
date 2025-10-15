@@ -14,9 +14,10 @@ import { generateFromRepoScan } from "@/lib/scan-generate"
 import FinalOutputView from "@/components/final-output-view"
 import RepoScanLoader from "@/components/repo-scan-loader"
 import type { GeneratedFileResult } from "@/types/output"
-import { inferStackFromScan } from "@/lib/scan-to-wizard"
 
 const buildQuery = (url: string) => `/api/scan-repo?url=${encodeURIComponent(url)}`
+const CONVENTIONS_DOC_URL =
+    process.env.NEXT_PUBLIC_CONVENTIONS_URL ?? "https://github.com/devcontext-ai/devcontext/tree/main/conventions"
 
 const formatList = (values: string[]) => (values.length > 0 ? values.join(", ") : "Not detected")
 
@@ -100,38 +101,12 @@ export default function RepoScanClient({ initialRepoUrl }: RepoScanClientProps) 
             return []
         }
 
-        const stack = inferStackFromScan(scanResult)
-        const stackCategory = (() => {
-            if (stack === "python") return "python"
-            if (["nextjs", "react", "angular", "vue", "svelte", "nuxt", "astro", "remix"].includes(stack)) {
-                return "frontend"
-            }
-            return "general"
-        })()
+        const relevantKeys = scanResult.conventions?.structureRelevant ?? ["src", "components", "tests", "apps", "packages"]
 
-        const metadata: Record<
-            keyof RepoScanSummary["structure"],
-            { label: string; categories: Array<"any" | "frontend" | "python" | "general"> }
-        > = {
-            src: { label: "src", categories: ["any"] },
-            components: { label: "components", categories: ["frontend"] },
-            tests: { label: "tests", categories: ["any"] },
-            apps: { label: "apps", categories: ["frontend", "general"] },
-            packages: { label: "packages", categories: ["frontend", "general"] },
-        }
-
-        return (Object.entries(scanResult.structure) as Array<[keyof RepoScanSummary["structure"], boolean]>)
-            .map(([key, value]) => {
-                const details = metadata[key] ?? { label: key, categories: ["general"] }
-                const showEntry = value || details.categories.includes("any") || details.categories.includes(stackCategory)
-                return showEntry
-                    ? {
-                        key: details.label,
-                        value,
-                    }
-                    : null
-            })
-            .filter((entry): entry is { key: string; value: boolean } => Boolean(entry))
+        return relevantKeys.map((key) => ({
+            key,
+            value: scanResult.structure[key as keyof RepoScanSummary["structure"]] ?? false,
+        }))
     }, [scanResult])
 
     const handleStartScan = () => {
@@ -253,6 +228,28 @@ export default function RepoScanClient({ initialRepoUrl }: RepoScanClientProps) 
                                     </p>
                                 </section>
                                 <section className="grid gap-6 md:grid-cols-2">
+                                    {scanResult.conventions && !scanResult.conventions.hasCustomConventions ? (
+                                        <div className="md:col-span-2 rounded-2xl border border-dashed border-border/60 bg-background/70 p-5">
+                                            <div className="flex flex-col gap-2 text-sm text-muted-foreground">
+                                                <span>
+                                                    We don’t have conventions for <span className="font-semibold text-foreground">{scanResult.conventions.stack}</span> yet.
+                                                </span>
+                                                <span>
+                                                    Add a new <code className="rounded bg-muted px-1 py-0.5 text-xs">conventions/{scanResult.conventions.stack}.json</code> file to customize detection and defaults.
+                                                </span>
+                                                <div>
+                                                    <Link
+                                                        href={CONVENTIONS_DOC_URL}
+                                                        target="_blank"
+                                                        rel="noreferrer"
+                                                        className="inline-flex items-center rounded-full border border-border/60 px-3 py-1 text-xs font-semibold text-primary hover:border-primary/60"
+                                                    >
+                                                        View conventions directory
+                                                    </Link>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    ) : null}
                                     <div className="rounded-2xl border border-border/60 bg-background/70 p-5">
                                         <div className="flex items-center gap-2 text-sm font-semibold">
                                             <CheckCircle2 className="size-4 text-primary" aria-hidden="true" />

@@ -1,0 +1,24 @@
+{
+  "id": "react",
+  "defaults": {
+    "tooling": "vite",
+    "styling": "cssmodules",
+    "stateManagement": "context-hooks",
+    "dataFetching": "swr",
+    "reactPerf": "memoHooks"
+  },
+  "rules": [
+    {
+      "if": { "toolingIncludes": ["tailwind css", "tailwind"] },
+      "set": { "styling": "tailwind" }
+    },
+    {
+      "if": { "testingIncludes": ["vitest"] },
+      "set": { "testingUT": "vitest" }
+    },
+    {
+      "if": { "testingIncludes": ["jest"] },
+      "set": { "testingUT": "jest" }
+    }
+  ]
+}

@@ -1,0 +1,62 @@
+{
+  "id": "python",
+  "applyToGlob": "**/*.{py,pyi,md}",
+  "structureRelevant": ["src", "tests", "packages"],
+  "defaults": {
+    "tooling": "pip",
+    "language": "Python",
+    "variableNaming": "snake_case",
+    "fileNaming": "snake_case",
+    "componentNaming": "Not applicable",
+    "exports": "module exports",
+    "comments": "docstrings",
+    "fileStructure": "top-level modules",
+    "styling": "Not applicable",
+    "stateManagement": "Not applicable",
+    "apiLayer": "TODO: document primary framework (FastAPI, Django, Flask, etc.)",
+    "folders": "by-module",
+    "dataFetching": "Not applicable",
+    "reactPerf": "Not applicable",
+    "testingUT": "pytest",
+    "testingE2E": "TODO: outline integration / end-to-end coverage",
+    "auth": "TODO: document auth/session strategy",
+    "validation": "TODO: specify validation library (Pydantic, Marshmallow, etc.)",
+    "logging": "TODO: describe logging approach (structlog, stdlib logging)",
+    "codeStyle": "pep8"
+  },
+  "rules": [
+    {
+      "if": { "toolingIncludes": ["poetry"] },
+      "set": { "tooling": "Poetry" }
+    },
+    {
+      "if": { "toolingIncludes": ["pipenv"] },
+      "set": { "tooling": "Pipenv" }
+    },
+    {
+      "if": { "toolingIncludes": ["pyproject"] },
+      "set": { "tooling": "pyproject.toml" }
+    },
+    {
+      "if": { "toolingIncludes": ["ruff"] },
+      "set": { "codeStyle": "ruff" }
+    },
+    {
+      "if": { "toolingIncludes": ["black"] },
+      "set": { "codeStyle": "black" }
+    },
+    {
+      "if": { "toolingIncludes": ["flake8"] },
+      "set": { "codeStyle": "flake8" }
+    },
+    {
+      "if": { "testingIncludes": ["unittest"] },
+      "set": { "testingUT": "unittest" }
+    },
+    {
+      "if": { "testingIncludes": ["behave"] },
+      "set": { "testingUT": "behave" }
+    }
+  ],
+  "summaryMessage": "We generated Python-first defaults. Spot something missing? Add more signals under conventions/python.json."
+}

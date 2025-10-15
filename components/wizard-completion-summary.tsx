@@ -114,6 +114,11 @@ export function WizardCompletionSummary({
                   <li key={answer}>
                     <div className="flex items-center gap-2">
                       <span>{answer}</span>
+                      {index === 0 && entry.isDefaultApplied ? (
+                        <span className="rounded-full bg-muted px-2 py-0.5 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                          Default applied
+                        </span>
+                      ) : null}
                       {index === 0 && !entry.isReadOnlyOnSummary ? (
                         <Button
                           variant="ghost"

@@ -6,6 +6,7 @@ export type StoredWizardState = {
   responses: Responses
   freeTextResponses?: FreeTextResponses
   autoFilledMap: Record<string, boolean>
+  defaultedMap?: Record<string, boolean>
   updatedAt: number
 }
 
