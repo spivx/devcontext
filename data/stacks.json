@@ -38,7 +38,95 @@
                     "backend",
                     "scripting",
                     "language"
-                ]
+                ],
+                "detection": {
+                    "dependencyFiles": [
+                        {
+                            "patterns": [
+                                "pyproject.toml",
+                                "poetry.lock",
+                                "Pipfile",
+                                "Pipfile.lock"
+                            ],
+                            "signals": [
+                                {
+                                    "match": "fastapi",
+                                    "addFrameworks": [
+                                        "FastAPI"
+                                    ],
+                                    "addLanguages": [
+                                        "Python"
+                                    ],
+                                    "setPrimaryLanguage": "Python",
+                                    "preferStack": "python"
+                                },
+                                {
+                                    "match": "django",
+                                    "addFrameworks": [
+                                        "Django"
+                                    ],
+                                    "addLanguages": [
+                                        "Python"
+                                    ],
+                                    "setPrimaryLanguage": "Python",
+                                    "preferStack": "python"
+                                },
+                                {
+                                    "match": "flask",
+                                    "addFrameworks": [
+                                        "Flask"
+                                    ],
+                                    "addLanguages": [
+                                        "Python"
+                                    ],
+                                    "setPrimaryLanguage": "Python",
+                                    "preferStack": "python"
+                                }
+                            ]
+                        },
+                        {
+                            "patterns": [
+                                "requirements.txt",
+                                "requirements/*.txt"
+                            ],
+                            "signals": [
+                                {
+                                    "match": "fastapi",
+                                    "addFrameworks": [
+                                        "FastAPI"
+                                    ],
+                                    "addLanguages": [
+                                        "Python"
+                                    ],
+                                    "setPrimaryLanguage": "Python",
+                                    "preferStack": "python"
+                                },
+                                {
+                                    "match": "django",
+                                    "addFrameworks": [
+                                        "Django"
+                                    ],
+                                    "addLanguages": [
+                                        "Python"
+                                    ],
+                                    "setPrimaryLanguage": "Python",
+                                    "preferStack": "python"
+                                },
+                                {
+                                    "match": "flask",
+                                    "addFrameworks": [
+                                        "Flask"
+                                    ],
+                                    "addLanguages": [
+                                        "Python"
+                                    ],
+                                    "setPrimaryLanguage": "Python",
+                                    "preferStack": "python"
+                                }
+                            ]
+                        }
+                    ]
+                }
             },
             {
                 "value": "angular",
@@ -105,6 +193,59 @@
                     "routing",
                     "full-stack"
                 ]
+            },
+            {
+                "value": "java",
+                "label": "Java / Spring Boot",
+                "icon": "spring",
+                "docs": "https://spring.io/projects/spring-boot",
+                "tags": [
+                    "backend",
+                    "java"
+                ],
+                "disabled": true,
+                "disabledLabel": "Soon",
+                "detection": {
+                    "dependencyFiles": [
+                        {
+                            "patterns": [
+                                "pom.xml"
+                            ],
+                            "signals": [
+                                {
+                                    "match": "org.springframework.boot",
+                                    "addFrameworks": [
+                                        "Spring Boot"
+                                    ],
+                                    "addLanguages": [
+                                        "Java"
+                                    ],
+                                    "setPrimaryLanguage": "Java",
+                                    "preferStack": "java"
+                                }
+                            ]
+                        },
+                        {
+                            "patterns": [
+                                "build.gradle",
+                                "build.gradle.kts"
+                            ],
+                            "signals": [
+                                {
+                                    "match": "org.springframework.boot",
+                                    "addFrameworks": [
+                                        "Spring Boot"
+                                    ],
+                                    "addLanguages": [
+                                        "Java"
+                                    ],
+                                    "setPrimaryLanguage": "Java",
+                                    "preferStack": "java"
+                                }
+                            ]
+                        }
+                    ]
+                }
             }
         ]
     }

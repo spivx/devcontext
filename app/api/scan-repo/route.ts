@@ -6,6 +6,8 @@ import type {
     RepoScanSummary,
     RepoStructureSummary,
 } from "@/types/repo-scan"
+import { buildDependencyAnalysisTasks, hasDependencyDetectionRules } from "@/lib/stack-detection"
+import type { DependencyAnalysisTask } from "@/lib/stack-detection"
 import { loadStackQuestionMetadata, normalizeConventionValue } from "@/lib/question-metadata"
 import { loadStackConventions } from "@/lib/conventions"
 import { inferStackFromScan } from "@/lib/scan-to-wizard"
@@ -423,6 +425,107 @@ const readTextFile = async (
     }
 }
 
+type DependencyDetectionOutcome = {
+    frameworks: Set<string>
+    languages: Set<string>
+    preferredStacks: Set<string>
+    primaryLanguage: string | null
+}
+
+const manifestHasDependency = (pkg: PackageJson, name: string): boolean => {
+    const needle = name.trim().toLowerCase()
+    if (!needle) {
+        return false
+    }
+
+    const sources = [
+        pkg.dependencies,
+        pkg.devDependencies,
+        pkg.peerDependencies,
+        pkg.optionalDependencies,
+    ]
+
+    return sources.some((source) => {
+        if (!source) {
+            return false
+        }
+
+        return Object.keys(source).some((key) => key.toLowerCase() === needle)
+    })
+}
+
+const evaluateDependencyAnalysisTasks = async (
+    owner: string,
+    repo: string,
+    ref: string,
+    headers: Record<string, string>,
+    tasks: DependencyAnalysisTask[],
+    packageJson: PackageJson | null,
+): Promise<DependencyDetectionOutcome> => {
+    const outcome: DependencyDetectionOutcome = {
+        frameworks: new Set<string>(),
+        languages: new Set<string>(),
+        preferredStacks: new Set<string>(),
+        primaryLanguage: null,
+    }
+
+    for (const task of tasks) {
+        const needsJson = task.signals.some((signal) => signal.type === "json-dependency")
+        const needsText = task.signals.some((signal) => signal.type !== "json-dependency")
+        let manifest: PackageJson | null = null
+        let content: string | null = null
+
+        if (needsJson && packageJson && task.path.toLowerCase() === "package.json") {
+            manifest = packageJson
+        }
+
+        if (needsText || !manifest) {
+            content = await readTextFile(owner, repo, ref, task.path, headers)
+            if (content === null) {
+                continue
+            }
+        }
+
+        if (needsJson && !manifest && content) {
+            try {
+                manifest = JSON.parse(content) as PackageJson
+            } catch {
+                manifest = null
+            }
+        }
+
+        const contentLower = content ? content.toLowerCase() : ""
+
+        task.signals.forEach((signal) => {
+            let matched = false
+
+            if (signal.type === "json-dependency") {
+                matched = Boolean(manifest && manifestHasDependency(manifest, signal.match))
+            } else {
+                matched = Boolean(contentLower && contentLower.includes(signal.matchLower))
+            }
+
+            if (!matched) {
+                return
+            }
+
+            signal.addFrameworks.forEach((framework) => outcome.frameworks.add(framework))
+            signal.addLanguages.forEach((language) => outcome.languages.add(language))
+
+            const preferredStack = signal.preferStack ?? signal.stack
+            if (preferredStack) {
+                outcome.preferredStacks.add(preferredStack)
+            }
+
+            if (!outcome.primaryLanguage && signal.setPrimaryLanguage) {
+                outcome.primaryLanguage = signal.setPrimaryLanguage
+            }
+        })
+    }
+
+    return outcome
+}
+
 type FileStyleKey = "pascal" | "camel" | "kebab" | "snake"
 
 const stripExtension = (name: string) => name.replace(/\.[^.]+$/u, "")
@@ -459,11 +562,11 @@ const classifyNameStyle = (rawName: string): FileStyleKey | null => {
     return null
 }
 
-const pickDominantStyle = (counts: Record<FileStyleKey, number>): FileStyleKey | null => {
-    let winner: FileStyleKey | null = null
+const pickDominantStyle = <Key extends string>(counts: Record<Key, number>): Key | null => {
+    let winner: Key | null = null
     let winnerCount = 0
 
-    for (const key of Object.keys(counts) as FileStyleKey[]) {
+    for (const key of Object.keys(counts) as Key[]) {
         const value = counts[key]
         if (value > winnerCount) {
             winner = key
@@ -540,6 +643,130 @@ const analyzeNamingStyles = (paths: string[]) => {
                 ? defaultComponentMapping[dominantFileStyle]
                 : null,
     }
+}
+
+type IdentifierStyleKey = "camel" | "snake" | "pascal"
+
+const classifyIdentifierStyle = (rawName: string): IdentifierStyleKey | null => {
+    const trimmed = rawName.trim().replace(/^_+/, "").replace(/_+$/u, "")
+    if (!trimmed) {
+        return null
+    }
+
+    if (/^[A-Z0-9_]+$/u.test(trimmed)) {
+        return null
+    }
+
+    if (/^[a-z]+(?:_[a-z0-9]+)+$/u.test(trimmed)) {
+        return "snake"
+    }
+
+    if (/^[A-Z][A-Za-z0-9]*$/u.test(trimmed)) {
+        return "pascal"
+    }
+
+    if (/^[a-z][A-Za-z0-9]*$/u.test(trimmed)) {
+        return "camel"
+    }
+
+    if (/^[a-z]+(?:[A-Z][a-z0-9]*)+$/u.test(trimmed)) {
+        return "camel"
+    }
+
+    return null
+}
+
+const VARIABLE_ANALYSIS_MAX_FILES = 20
+const VARIABLE_ANALYSIS_MAX_CONTENT_LENGTH = 20000
+
+const extractIdentifiersFromJs = (contents: string): string[] => {
+    const identifiers: string[] = []
+    const simpleDeclaration = /\b(?:const|let|var)\s+([A-Za-z_$][\w$]*)/gu
+    for (const match of contents.matchAll(simpleDeclaration)) {
+        const name = match[1]
+        if (name) {
+            identifiers.push(name.replace(/\$/g, ""))
+        }
+    }
+    const functionDeclaration = /\bfunction\s+([A-Za-z_$][\w$]*)/gu
+    for (const match of contents.matchAll(functionDeclaration)) {
+        const name = match[1]
+        if (name) {
+            identifiers.push(name.replace(/\$/g, ""))
+        }
+    }
+    return identifiers
+}
+
+const extractIdentifiersFromPython = (contents: string): string[] => {
+    const identifiers: string[] = []
+    const assignment = /^\s*([a-zA-Z_][a-zA-Z0-9_]*)\s*=/gmu
+    for (const match of contents.matchAll(assignment)) {
+        const name = match[1]
+        if (name && !/^self$|^cls$/u.test(name)) {
+            identifiers.push(name)
+        }
+    }
+    const functionDef = /^\s*def\s+([a-zA-Z_][a-zA-Z0-9_]*)\s*\(/gmu
+    for (const match of contents.matchAll(functionDef)) {
+        const name = match[1]
+        if (name) {
+            identifiers.push(name)
+        }
+    }
+    return identifiers
+}
+
+const analyzeVariableNamingStyle = async (
+    owner: string,
+    repo: string,
+    ref: string,
+    paths: string[],
+    headers: Record<string, string>,
+): Promise<string | null> => {
+    const counts: Record<IdentifierStyleKey, number> = { camel: 0, snake: 0, pascal: 0 }
+    const candidates: string[] = []
+
+    for (const filePath of paths) {
+        if (candidates.length >= VARIABLE_ANALYSIS_MAX_FILES) {
+            break
+        }
+        if (/\.(ts|tsx|js|jsx|mjs|cjs)$/iu.test(filePath) || /\.py$/iu.test(filePath)) {
+            candidates.push(filePath)
+        }
+    }
+
+    for (const candidate of candidates) {
+        const contents = await readTextFile(owner, repo, ref, candidate, headers)
+        if (!contents) {
+            continue
+        }
+        const truncated = contents.slice(0, VARIABLE_ANALYSIS_MAX_CONTENT_LENGTH)
+        const identifiers =
+            /\.py$/iu.test(candidate) ? extractIdentifiersFromPython(truncated) : extractIdentifiersFromJs(truncated)
+        if (identifiers.length === 0) {
+            continue
+        }
+        identifiers.forEach((identifier) => {
+            const style = classifyIdentifierStyle(identifier)
+            if (style) {
+                counts[style] += 1
+            }
+        })
+    }
+
+    const dominant = pickDominantStyle(counts)
+    if (!dominant) {
+        return null
+    }
+
+    const mapping: Record<IdentifierStyleKey, string> = {
+        camel: "camelCase",
+        snake: "snake_case",
+        pascal: "PascalCase",
+    }
+
+    return mapping[dominant] ?? null
 }
 
 const detectEnrichedSignals = async (
@@ -654,6 +881,7 @@ const detectEnrichedSignals = async (
     if (hasMatch(/(^|\/)prettier\.config\.(js|cjs|mjs|ts)?$/) || hasMatch(/(^|\/)\.prettierrc(\.[a-z]+)?$/)) editor.push("prettier")
 
     const { fileNamingStyle, componentNamingStyle } = analyzeNamingStyles(paths)
+    const variableNamingStyle = await analyzeVariableNamingStyle(owner, repo, ref, paths, headers)
 
     // Code style detection (ESLint presets)
     let codeStylePreference: string | null = null
@@ -704,6 +932,7 @@ const detectEnrichedSignals = async (
       codeQuality,
       editor,
       fileNamingStyle,
+      variableNamingStyle,
       componentNamingStyle,
       codeStylePreference,
       commitMessageStyle,
@@ -796,7 +1025,7 @@ export async function GET(request: NextRequest): Promise<NextResponse<RepoScanRe
         }
 
         const languagesJson = (await languagesResponse.json()) as Record<string, number>
-        const languages = Object.entries(languagesJson)
+        let languages = Object.entries(languagesJson)
             .sort(([, bytesA], [, bytesB]) => bytesB - bytesA)
             .map(([name]) => name)
 
@@ -852,18 +1081,52 @@ export async function GET(request: NextRequest): Promise<NextResponse<RepoScanRe
 
         const { tooling, testing, frameworks } = await detectTooling(paths, packageJson)
 
+        const frameworkSet = new Set(frameworks)
+        const languageSet = new Set(languages)
+        let preferredPrimaryLanguage: string | null = null
+
+        if (hasDependencyDetectionRules) {
+            const dependencyTasks = buildDependencyAnalysisTasks(paths)
+
+            if (dependencyTasks.length > 0) {
+                const dependencyOutcome = await evaluateDependencyAnalysisTasks(
+                    owner,
+                    repo,
+                    defaultBranch,
+                    headers,
+                    dependencyTasks,
+                    packageJson,
+                )
+
+                dependencyOutcome.frameworks.forEach((framework) => frameworkSet.add(framework))
+                dependencyOutcome.languages.forEach((language) => languageSet.add(language))
+
+                if (dependencyOutcome.primaryLanguage) {
+                    preferredPrimaryLanguage = dependencyOutcome.primaryLanguage
+                }
+            }
+        }
+
+        const mergedFrameworks = dedupeAndSort(frameworkSet)
+        languages = Array.from(languageSet)
+
         if (lowestRateLimit !== null && lowestRateLimit < 5) {
             warnings.push(`GitHub API rate limit is low (remaining: ${lowestRateLimit}).`)
         }
 
         const enriched = await detectEnrichedSignals(owner, repo, defaultBranch, paths, packageJson, headers)
 
+        const sortedLanguages = dedupeAndSort(languages)
+        const primaryLanguage = preferredPrimaryLanguage
+            ?? repoJson.language
+            ?? (sortedLanguages.length > 0 ? sortedLanguages[0] : null)
+
         const summary: RepoScanSummary = {
             repo: `${owner}/${repo}`,
             defaultBranch,
-            language: repoJson.language ?? (languages.length > 0 ? languages[0] : null),
-            languages: dedupeAndSort(languages),
-            frameworks,
+            language: primaryLanguage,
+            languages: sortedLanguages,
+            frameworks: mergedFrameworks,
             tooling,
             testing,
             structure,
