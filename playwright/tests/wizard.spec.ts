@@ -21,8 +21,8 @@ test('wizard supports filtering, defaults, and reset', async ({ page }) => {
 
   const defaultButton = page.getByRole('button', { name: 'Use default (Vite)' })
   await expect(defaultButton).toBeEnabled()
-  await defaultButton.click()
-  await expect(defaultButton).toBeDisabled()
+  await defaultButton.click({ noWaitAfter: true })
+  await expect(questionHeading).toHaveText('What language do you use?')
 
   await expect.poll(
     () =>
