@@ -40,6 +40,10 @@ export type StackDependencyFileDetection = {
      */
     paths?: string[]
     /**
+     * Legacy support for single path detection.
+     */
+    path?: string
+    /**
      * Signals that should be evaluated against the file contents.
      */
     signals: StackDependencySignal[]

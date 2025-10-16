@@ -57,3 +57,17 @@ export type RepoScanResponse = RepoScanSummary | RepoScanErrorResponse
 export type RepoScanRouteParams = {
     repoUrl: string
 }
+
+export type GitHubTreeItem = {
+    path: string
+    type: "blob" | "tree" | string
+}
+
+export type PackageJson = {
+    dependencies?: Record<string, string>
+    devDependencies?: Record<string, string>
+    peerDependencies?: Record<string, string>
+    optionalDependencies?: Record<string, string>
+    engines?: { node?: string }
+    workspaces?: string[] | { packages?: string[] }
+}

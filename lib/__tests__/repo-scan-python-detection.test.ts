@@ -1,13 +1,7 @@
 import { describe, expect, it } from "vitest"
 
-import { detectPythonTestingSignals } from "@/app/api/scan-repo/route"
-
-type PackageJson = {
-  dependencies?: Record<string, string>
-  devDependencies?: Record<string, string>
-  peerDependencies?: Record<string, string>
-  optionalDependencies?: Record<string, string>
-}
+import { detectPythonTestingSignals } from "@/lib/repo-scan/python-testing-signals"
+import type { PackageJson } from "@/types/repo-scan"
 
 const createPkg = (deps: Partial<PackageJson>): PackageJson => ({ ...deps })
 
