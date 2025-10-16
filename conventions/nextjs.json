@@ -1,16 +1,6 @@
 {
   "id": "nextjs",
   "structureRelevant": ["src", "tests", "apps"],
-  "defaults": {
-    "tooling": "create-next-app",
-    "fileStructure": "app-directory",
-    "styling": "tailwind",
-    "stateManagement": "zustand",
-    "apiLayer": "server-actions",
-    "dataFetching": "server-components",
-    "reactPerf": "memoHooks",
-    "auth": "next-auth"
-  },
   "rules": [
     {
       "if": { "routingIs": ["pages"] },
