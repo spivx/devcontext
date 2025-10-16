@@ -1,12 +1,5 @@
 {
   "id": "remix",
-  "defaults": {
-    "folders": "vercel",
-    "dataFetching": "route-loaders",
-    "styling": "tailwind",
-    "testingUT": "vitest",
-    "reactPerf": "memoHooks"
-  },
   "rules": [
     {
       "if": { "toolingIncludes": ["jest"] },

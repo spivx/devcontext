@@ -1,14 +1,5 @@
 {
   "id": "nuxt",
-  "defaults": {
-    "tooling": "nuxi",
-    "dataFetching": "server-side",
-    "apiLayer": "use-fetch",
-    "styling": "tailwind",
-    "folders": "vercel",
-    "stateManagement": "pinia",
-    "reactPerf": "memoHooks"
-  },
   "rules": [
     {
       "if": { "toolingIncludes": ["tailwind"] },

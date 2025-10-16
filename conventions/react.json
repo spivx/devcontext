@@ -1,12 +1,5 @@
 {
   "id": "react",
-  "defaults": {
-    "tooling": "vite",
-    "styling": "cssmodules",
-    "stateManagement": "context-hooks",
-    "dataFetching": "swr",
-    "reactPerf": "memoHooks"
-  },
   "rules": [
     {
       "if": { "toolingIncludes": ["tailwind css", "tailwind"] },

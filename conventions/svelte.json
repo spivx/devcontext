@@ -1,13 +1,5 @@
 {
   "id": "svelte",
-  "defaults": {
-    "tooling": "sveltekit",
-    "language": "typescript",
-    "stateManagement": "svelte-stores",
-    "styling": "scoped-css",
-    "testingUT": "vitest",
-    "reactPerf": "memoHooks"
-  },
   "rules": [
     {
       "if": { "toolingIncludes": ["vite"] },

@@ -1,16 +1,6 @@
 {
   "id": "angular",
   "structureRelevant": ["src", "components", "tests", "apps"],
-  "defaults": {
-    "tooling": "angular-cli",
-    "language": "typescript-strict",
-    "fileStructure": "standalone-first",
-    "styling": "scss",
-    "stateManagement": "ngrx-store",
-    "apiLayer": "httpclient",
-    "dataFetching": "httpclient",
-    "reactPerf": "memoHooks"
-  },
   "rules": [
     {
       "if": { "toolingIncludes": ["nx"] },

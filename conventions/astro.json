@@ -1,12 +1,5 @@
 {
   "id": "astro",
-  "defaults": {
-    "tooling": "react",
-    "dataFetching": "ssg",
-    "folders": "content-collections",
-    "collaboration": "vercel",
-    "reactPerf": "memoHooks"
-  },
   "rules": [
     {
       "if": { "toolingIncludes": ["vue"] },
