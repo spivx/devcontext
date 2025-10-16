@@ -6,9 +6,10 @@ import type {
     RepoScanSummary,
     RepoStructureSummary,
 } from "@/types/repo-scan"
-import { collectConventionValues, normalizeConventionValue } from "@/lib/convention-values"
+import { loadStackQuestionMetadata, normalizeConventionValue } from "@/lib/question-metadata"
 import { loadStackConventions } from "@/lib/conventions"
 import { inferStackFromScan } from "@/lib/scan-to-wizard"
+import { stackQuestion } from "@/lib/wizard-config"
 
 const GITHUB_API_BASE_URL = "https://api.github.com"
 const GITHUB_HOSTNAMES = new Set(["github.com", "www.github.com"])
@@ -302,10 +303,10 @@ const getTestingConventionValues = async (stackId: string): Promise<TestingConve
         return testingConventionCache.get(normalized)!
     }
 
-    const { conventions } = await loadStackConventions(normalized)
+    const metadata = await loadStackQuestionMetadata(normalized)
     const values: TestingConventionValues = {
-        unit: collectConventionValues(conventions, "testingUT"),
-        e2e: collectConventionValues(conventions, "testingE2E"),
+        unit: metadata.answersByResponseKey.testingUT ?? [],
+        e2e: metadata.answersByResponseKey.testingE2E ?? [],
     }
     testingConventionCache.set(normalized, values)
     return values
@@ -873,8 +874,16 @@ export async function GET(request: NextRequest): Promise<NextResponse<RepoScanRe
 
         const detectedStack = inferStackFromScan(summary)
         const { conventions, hasStackFile } = await loadStackConventions(detectedStack)
+        const stackAnswers = stackQuestion?.answers ?? []
+        const matchedStackAnswer = stackAnswers.find((answer) => answer.value === detectedStack) ?? null
+        const stackSupported = matchedStackAnswer
+            ? matchedStackAnswer.disabled !== true && matchedStackAnswer.enabled !== false
+            : false
+        const stackLabel = matchedStackAnswer?.label ?? null
         summary.conventions = {
             stack: detectedStack,
+            stackLabel,
+            isSupported: stackSupported,
             hasCustomConventions: hasStackFile,
             structureRelevant: conventions.structureRelevant,
         }

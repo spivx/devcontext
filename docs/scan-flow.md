@@ -6,18 +6,17 @@ This document outlines how repository scans are transformed into AI instruction 
 
 1. **Scan the repository** (`app/api/scan-repo/route.ts`)
    - Detect languages, frameworks, tooling, structure hints, and enriched metadata.
-   - Use stack conventions (`collectConventionValues`) to cross-check detection lists (e.g., testing tools) so any signal we add in `conventions/<stack>.json` becomes discoverable with minimal code changes.
-   - Reuse convention values to expand stack-specific heuristics (e.g., Python’s Behave directories, Next.js routing shapes), so each conventions file remains the source of truth for new detections.
+   - Load stack question metadata (`loadStackQuestionMetadata`) so detection lists (e.g., testing tools) map onto the same canonical values the wizard exposes.
+   - Reuse those canonical values to expand stack-specific heuristics (e.g., Python’s Behave directories, Next.js routing shapes) without hard-coding strings inside the scanner.
    - Infer the primary stack using `inferStackFromScan`.
    - Load stack conventions (`loadStackConventions`) to determine which structure hints matter and whether stack-specific rules exist.
    - Attach `summary.conventions` so the UI knows which directories to highlight and whether a conventions file was found.
 
 2. **Build wizard defaults** (`lib/scan-to-wizard.ts`)
    - Start with an empty `WizardResponses` object.
-   - Apply convention defaults from `conventions/<stack>.json` + `default.json`.
-   - Layer in detections from the scan (tooling, testing, naming signals, etc.), matching scan values against convention-provided options so stack JSON remains the single source of truth.
+   - Layer in detections from the scan (tooling, testing, naming signals, etc.), matching scan values against the question catalog so defaults stay in sync with the wizard.
    - Run convention rules to tweak values based on detected tooling/testing.
-   - Pull default answers directly from the stack’s question set (`buildStepsForStack`) and fill any remaining empty responses. We track which questions were auto-defaulted (`defaultedQuestionIds`) so the summary can explain why.
+   - Pull default answers directly from the stack’s question set (`loadStackQuestionMetadata`) and fill any remaining empty responses. We track which questions were auto-defaulted (`defaultedQuestionIds`) so the summary can explain why.
 
 3. **Persist and surface responses**
    - `lib/scan-prefill.ts` merges the generated responses into local wizard state and stores both `autoFilledMap` and `defaultedMap` in localStorage.
@@ -34,8 +33,9 @@ This document outlines how repository scans are transformed into AI instruction 
 
 | Location | Purpose |
 | --- | --- |
-| `conventions/default.json` & `/conventions/<stack>.json` | Declarative defaults + rules for each stack (tooling choices, structure hints, apply-to glob, etc.). |
-| `lib/convention-values.ts` | Helpers that normalize and aggregate convention values (e.g., testingUT/testingE2E) for both the scanner and the wizard. |
+| `conventions/default.json` & `/conventions/<stack>.json` | Declarative rules, `applyToGlob`, and structure hints for each stack. |
+| `lib/question-metadata.ts` | Caches question answers/defaults per stack so both the scanner and wizard share a single source of truth. |
+| `lib/wizard-responses.ts` | Produces empty `WizardResponses` objects and guards response keys. |
 | `data/stacks.json` | List of stacks exposed to the wizard; each should have a matching conventions file. |
 | `data/questions/<stack>.json` | Stack-specific questions with default answers and metadata. These defaults are now honored automatically when scan data is missing. |
 
