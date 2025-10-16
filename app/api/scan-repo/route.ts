@@ -5,11 +5,14 @@ import type {
     RepoScanResponse,
     RepoScanSummary,
     RepoStructureSummary,
+    GitHubTreeItem,
+    PackageJson,
 } from "@/types/repo-scan"
 import { buildDependencyAnalysisTasks, hasDependencyDetectionRules } from "@/lib/stack-detection"
 import type { DependencyAnalysisTask } from "@/lib/stack-detection"
-import { loadStackQuestionMetadata, normalizeConventionValue } from "@/lib/question-metadata"
 import { loadStackConventions } from "@/lib/conventions"
+import { dependencyHas } from "@/lib/repo-scan/dependency-utils"
+import { detectPythonTestingSignals } from "@/lib/repo-scan/python-testing-signals"
 import { inferStackFromScan } from "@/lib/scan-to-wizard"
 import { stackQuestion } from "@/lib/wizard-config"
 
@@ -18,33 +21,6 @@ const GITHUB_HOSTNAMES = new Set(["github.com", "www.github.com"])
 
 const JSON_HEADERS = {
     Accept: "application/vnd.github+json",
-}
-
-interface GitHubTreeItem {
-    path: string
-    type: "blob" | "tree" | string
-}
-
-interface PackageJson {
-    dependencies?: Record<string, string>
-    devDependencies?: Record<string, string>
-    peerDependencies?: Record<string, string>
-    optionalDependencies?: Record<string, string>
-    engines?: { node?: string }
-    workspaces?: string[] | { packages?: string[] }
-}
-
-const dependencyHas = (pkg: PackageJson, names: string[]): boolean => {
-    const sources = [
-        pkg.dependencies,
-        pkg.devDependencies,
-        pkg.peerDependencies,
-        pkg.optionalDependencies,
-    ]
-
-    return sources.some((source) =>
-        source ? names.some((name) => Object.prototype.hasOwnProperty.call(source, name)) : false,
-    )
 }
 
 const isNullishOrEmpty = (value: unknown): value is null | undefined | "" => value === null || value === undefined || value === ""
@@ -289,79 +265,6 @@ const detectTooling = async (
         tooling: dedupeAndSort(tooling),
         testing: dedupeAndSort(testing),
         frameworks: dedupeAndSort(frameworks),
-    }
-}
-
-type TestingConventionValues = {
-    unit: string[]
-    e2e: string[]
-}
-
-const testingConventionCache = new Map<string, TestingConventionValues>()
-
-const getTestingConventionValues = async (stackId: string): Promise<TestingConventionValues> => {
-    const normalized = stackId.trim().toLowerCase()
-    if (testingConventionCache.has(normalized)) {
-        return testingConventionCache.get(normalized)!
-    }
-
-    const metadata = await loadStackQuestionMetadata(normalized)
-    const values: TestingConventionValues = {
-        unit: metadata.answersByResponseKey.testingUT ?? [],
-        e2e: metadata.answersByResponseKey.testingE2E ?? [],
-    }
-    testingConventionCache.set(normalized, values)
-    return values
-}
-
-const findConventionValue = (values: string[], target: string): string | null => {
-    const normalizedTarget = normalizeConventionValue(target)
-    return values.find((value) => normalizeConventionValue(value) === normalizedTarget) ?? null
-}
-
-const BEHAVE_DEPENDENCIES = ["behave", "behave-django", "behave-webdriver"]
-
-export const detectPythonTestingSignals = async (
-    paths: string[],
-    pkg: PackageJson | null,
-    testing: Set<string>,
-): Promise<void> => {
-    const { unit } = await getTestingConventionValues("python")
-    if (unit.length === 0) {
-        return
-    }
-
-    const behaveValue = findConventionValue(unit, "behave")
-    const unittestValue = findConventionValue(unit, "unittest")
-
-    if (!behaveValue && !unittestValue) {
-        return
-    }
-
-    const lowerCasePaths = paths.map((path) => path.toLowerCase())
-
-    if (behaveValue) {
-        const hasFeaturesDir = lowerCasePaths.some((path) => path.startsWith("features/") || path.includes("/features/"))
-        const hasStepsDir = lowerCasePaths.some((path) => path.includes("/steps/"))
-        const hasEnvironment = lowerCasePaths.some((path) => path.endsWith("/environment.py") || path.endsWith("environment.py"))
-        const hasDependency = pkg ? dependencyHas(pkg, BEHAVE_DEPENDENCIES) : false
-
-        if (hasDependency || (hasFeaturesDir && (hasStepsDir || hasEnvironment))) {
-            testing.add(behaveValue)
-        }
-    }
-
-    if (unittestValue) {
-        const hasUnitFiles = lowerCasePaths.some((path) => {
-            if (!/(^|\/)(tests?|testcases|specs)\//.test(path)) {
-                return false
-            }
-            return /(^|\/)(test_[^/]+|[^/]+_test)\.py$/.test(path)
-        })
-
-        if (hasUnitFiles) {
-            testing.add(unittestValue)
-        }
     }
 }
 
