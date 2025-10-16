@@ -5,7 +5,7 @@ import type { RepoScanSummary } from "@/types/repo-scan"
 import type { LoadedConvention } from "@/types/conventions"
 import type { WizardResponses } from "@/types/wizard"
 
-const STACK_FALLBACK = "react"
+const STACK_FALLBACK = "unsupported"
 
 const toLowerArray = (values: string[] | undefined | null) =>
   Array.isArray(values) ? values.map((value) => value.toLowerCase()) : []
@@ -49,6 +49,7 @@ const applyDetectedValue = <Key extends keyof WizardResponses>(
 const detectStack = (scan: RepoScanSummary): string => {
   const frameworks = toLowerArray(scan.frameworks)
   const languages = toLowerArray(scan.languages)
+  const primaryLanguage = scan.language ? scan.language.trim().toLowerCase() : null
 
   if (frameworks.some((name) => /next\.?js/.test(name))) return "nextjs"
   if (frameworks.includes("nuxt")) return "nuxt"
@@ -59,6 +60,8 @@ const detectStack = (scan: RepoScanSummary): string => {
   if (frameworks.includes("svelte")) return "svelte"
   if (frameworks.includes("react")) return "react"
   if (languages.includes("python")) return "python"
+
+  // No known framework detected; mark as unsupported instead of falling back
   return STACK_FALLBACK
 }
 
