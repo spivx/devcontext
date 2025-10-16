@@ -1,5 +1,7 @@
 import type { PropsWithChildren } from "react"
 
+import type { StackDetectionConfig } from "@/types/stack-detection"
+
 export type DataAnswerSource = {
     value: string
     label: string
@@ -15,6 +17,7 @@ export type DataAnswerSource = {
     enabled?: boolean
     filename?: string
     format?: string
+    detection?: StackDetectionConfig
 }
 
 export type QuestionFreeTextConfig = {

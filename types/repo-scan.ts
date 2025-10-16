@@ -41,6 +41,7 @@ export type RepoScanSummary = {
     codeQuality?: string[]
     editor?: string[]
     fileNamingStyle?: string | null
+    variableNamingStyle?: string | null
     componentNamingStyle?: string | null
     codeStylePreference?: string | null
     commitMessageStyle?: string | null

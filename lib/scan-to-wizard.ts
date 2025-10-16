@@ -71,8 +71,17 @@ const detectLanguage = (scan: RepoScanSummary): string | null => {
   const languages = toLowerArray(scan.languages)
   if (languages.includes("typescript")) return "typescript"
   if (languages.includes("javascript")) return "javascript"
+  if (languages.includes("java")) return "Java"
   if (languages.includes("python")) return "Python"
   return scan.language ? String(scan.language) : null
+}
+
+const detectApiLayer = (scan: RepoScanSummary): string | null => {
+  const frameworks = toLowerArray(scan.frameworks)
+  if (frameworks.includes("fastapi")) return "fastapi"
+  if (frameworks.includes("django")) return "django"
+  if (frameworks.includes("flask")) return "flask"
+  return null
 }
 
 const detectTestingUnit = (scan: RepoScanSummary, candidates: string[] | undefined | null): string | null =>
@@ -91,6 +100,11 @@ const detectToolingSummary = (scan: RepoScanSummary): string | null => {
 
 const detectFileNaming = (scan: RepoScanSummary): string | null => {
   const detected = (scan as Record<string, unknown>).fileNamingStyle
+  return typeof detected === "string" ? detected : null
+}
+
+const detectVariableNaming = (scan: RepoScanSummary): string | null => {
+  const detected = (scan as Record<string, unknown>).variableNamingStyle
   return typeof detected === "string" ? detected : null
 }
 
@@ -138,10 +152,12 @@ export const buildResponsesFromScan = async (scan: RepoScanSummary): Promise<Bui
   applyDetectedValue(withDetected, "language", detectLanguage(scan))
   applyDetectedValue(withDetected, "testingUT", detectTestingUnit(scan, answersByResponseKey.testingUT))
   applyDetectedValue(withDetected, "testingE2E", detectTestingE2E(scan, answersByResponseKey.testingE2E))
+  applyDetectedValue(withDetected, "variableNaming", detectVariableNaming(scan))
   applyDetectedValue(withDetected, "fileNaming", detectFileNaming(scan))
   applyDetectedValue(withDetected, "componentNaming", detectComponentNaming(scan))
   applyDetectedValue(withDetected, "commitStyle", detectCommitStyle(scan))
   applyDetectedValue(withDetected, "prRules", detectPRRules(scan))
+  applyDetectedValue(withDetected, "apiLayer", detectApiLayer(scan))
 
   const afterRules = applyConventionRules(withDetected, conventions.rules, scan)
   afterRules.stackSelection = stack
@@ -173,8 +189,14 @@ export const buildResponsesFromScan = async (scan: RepoScanSummary): Promise<Bui
   if (!afterRules.testingE2E) {
     applyDetectedValue(afterRules, "testingE2E", detectTestingE2E(scan, answersByResponseKey.testingE2E))
   }
+  if (!afterRules.variableNaming) {
+    applyDetectedValue(afterRules, "variableNaming", detectVariableNaming(scan))
+  }
   if (!afterRules.fileNaming) {
     applyDetectedValue(afterRules, "fileNaming", detectFileNaming(scan))
+  }
+  if (!afterRules.apiLayer) {
+    applyDetectedValue(afterRules, "apiLayer", detectApiLayer(scan))
   }
   if (!afterRules.componentNaming) {
     applyDetectedValue(afterRules, "componentNaming", detectComponentNaming(scan))
