@@ -8,6 +8,8 @@ export type RepoStructureSummary = {
 
 export type RepoScanConventionsMeta = {
     stack: string
+    stackLabel: string | null
+    isSupported: boolean
     hasCustomConventions: boolean
     structureRelevant: Array<keyof RepoStructureSummary>
 }

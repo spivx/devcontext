@@ -18,6 +18,7 @@ import type { GeneratedFileResult } from "@/types/output"
 const buildQuery = (url: string) => `/api/scan-repo?url=${encodeURIComponent(url)}`
 const CONVENTIONS_DOC_URL =
     process.env.NEXT_PUBLIC_CONVENTIONS_URL ?? "https://github.com/devcontext-ai/devcontext/tree/main/conventions"
+const STACKS_DATA_DOC_URL = "https://github.com/spivx/devcontext/blob/main/data/stacks.json"
 
 const formatList = (values: string[]) => (values.length > 0 ? values.join(", ") : "Not detected")
 
@@ -127,6 +128,11 @@ export default function RepoScanClient({ initialRepoUrl }: RepoScanClientProps) 
     }
 
     const warnings = scanResult?.warnings ?? []
+    const stackMeta = scanResult?.conventions ?? null
+    const detectedStackId = stackMeta?.stack ?? null
+    const detectedStackLabel = stackMeta?.stackLabel ?? detectedStackId ?? "Not detected"
+    const stackIsSupported = stackMeta?.isSupported ?? false
+    const showUnsupportedStackNotice = Boolean(detectedStackId) && !stackIsSupported
     const repoSlug = repoUrlForScan ? toSlug(repoUrlForScan) : null
     const promptVisible = Boolean(repoUrlForScan && !hasConfirmed && !isLoading && !scanResult && !error)
     const canRetry = hasConfirmed && !isLoading
@@ -138,7 +144,7 @@ export default function RepoScanClient({ initialRepoUrl }: RepoScanClientProps) 
     const [generatedFile, setGeneratedFile] = useState<GeneratedFileResult | null>(null)
 
     const handleGenerate = useCallback(async (fileId: string) => {
-        if (!scanResult) return
+        if (!scanResult || scanResult.conventions?.isSupported === false) return
         setIsGeneratingMap((prev) => ({ ...prev, [fileId]: true }))
         setGeneratedFile(null)
         try {
@@ -228,7 +234,22 @@ export default function RepoScanClient({ initialRepoUrl }: RepoScanClientProps) 
                                     </p>
                                 </section>
                                 <section className="grid gap-6 md:grid-cols-2">
-                                    {scanResult.conventions && !scanResult.conventions.hasCustomConventions ? (
+                                    <div className="rounded-2xl border border-border/60 bg-background/70 p-5">
+                                        <div className="flex items-center gap-2 text-sm font-semibold">
+                                            <CheckCircle2 className="size-4 text-primary" aria-hidden="true" />
+                                            Detected stack
+                                        </div>
+                                        <p className="mt-3 text-base text-foreground">{detectedStackLabel}</p>
+                                        {detectedStackId && detectedStackLabel !== detectedStackId ? (
+                                            <p className="mt-1 text-xs text-muted-foreground">
+                                                Stack ID: <code className="rounded bg-muted px-1 py-0.5">{detectedStackId}</code>
+                                            </p>
+                                        ) : null}
+                                        {showUnsupportedStackNotice ? (
+                                            <p className="mt-2 text-xs font-medium text-destructive">Not yet supported</p>
+                                        ) : null}
+                                    </div>
+                                    {!showUnsupportedStackNotice && scanResult.conventions && !scanResult.conventions.hasCustomConventions ? (
                                         <div className="md:col-span-2 rounded-2xl border border-dashed border-border/60 bg-background/70 p-5">
                                             <div className="flex flex-col gap-2 text-sm text-muted-foreground">
                                                 <span>
@@ -250,107 +271,138 @@ export default function RepoScanClient({ initialRepoUrl }: RepoScanClientProps) 
                                             </div>
                                         </div>
                                     ) : null}
-                                    <div className="rounded-2xl border border-border/60 bg-background/70 p-5">
-                                        <div className="flex items-center gap-2 text-sm font-semibold">
-                                            <CheckCircle2 className="size-4 text-primary" aria-hidden="true" />
-                                            Primary language
-                                        </div>
-                                        <p className="mt-3 text-base text-foreground">
-                                            {scanResult.language ?? "Not detected"}
-                                        </p>
-                                        {scanResult.languages.length > 1 ? (
-                                            <p className="mt-2 text-xs text-muted-foreground">
-                                                Also spotted: {scanResult.languages.slice(1).join(", ")}
-                                            </p>
-                                        ) : null}
-                                    </div>
-                                    <div className="rounded-2xl border border-border/60 bg-background/70 p-5">
-                                        <div className="flex items-center gap-2 text-sm font-semibold">
-                                            <CheckCircle2 className="size-4 text-primary" aria-hidden="true" />
-                                            Default branch
-                                        </div>
-                                        <p className="mt-3 text-base text-foreground">{scanResult.defaultBranch}</p>
-                                    </div>
+                                    {!showUnsupportedStackNotice ? (
+                                        <>
+                                            <div className="rounded-2xl border border-border/60 bg-background/70 p-5">
+                                                <div className="flex items-center gap-2 text-sm font-semibold">
+                                                    <CheckCircle2 className="size-4 text-primary" aria-hidden="true" />
+                                                    Primary language
+                                                </div>
+                                                <p className="mt-3 text-base text-foreground">
+                                                    {scanResult.language ?? "Not detected"}
+                                                </p>
+                                                {scanResult.languages.length > 1 ? (
+                                                    <p className="mt-2 text-xs text-muted-foreground">
+                                                        Also spotted: {scanResult.languages.slice(1).join(", ")}
+                                                    </p>
+                                                ) : null}
+                                            </div>
+                                            <div className="rounded-2xl border border-border/60 bg-background/70 p-5">
+                                                <div className="flex items-center gap-2 text-sm font-semibold">
+                                                    <CheckCircle2 className="size-4 text-primary" aria-hidden="true" />
+                                                    Default branch
+                                                </div>
+                                                <p className="mt-3 text-base text-foreground">{scanResult.defaultBranch}</p>
+                                            </div>
+                                        </>
+                                    ) : null}
                                 </section>
-                                <section className="grid gap-6 md:grid-cols-2">
-                                    <div className="rounded-2xl border border-border/60 bg-background/70 p-5">
-                                        <h3 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">Frameworks</h3>
-                                        <p className="mt-3 text-sm text-foreground">{formatList(scanResult.frameworks)}</p>
-                                    </div>
-                                    <div className="rounded-2xl border border-border/60 bg-background/70 p-5">
-                                        <h3 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">Tooling</h3>
-                                        <p className="mt-3 text-sm text-foreground">{formatList(scanResult.tooling)}</p>
-                                    </div>
-                                    <div className="rounded-2xl border border-border/60 bg-background/70 p-5">
-                                        <h3 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">Testing</h3>
-                                        <p className="mt-3 text-sm text-foreground">{formatList(scanResult.testing)}</p>
-                                    </div>
-                                    <div className="rounded-2xl border border-border/60 bg-background/70 p-5">
-                                        <h3 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">Structure hints</h3>
-                                        <ul className="mt-3 space-y-2 text-sm text-foreground">
-                                            {structureEntries.map(({ key, value }) => (
-                                                <li key={key} className="flex items-center justify-between gap-4">
-                                                    <span className="font-medium capitalize">{key}</span>
-                                                    <span className={value ? "text-emerald-400" : "text-muted-foreground"}>
-                                                        {value ? "Present" : "Missing"}
-                                                    </span>
-                                                </li>
-                                            ))}
-                                        </ul>
-                                    </div>
-                                </section>
-                                <section className="space-y-4 rounded-2xl border border-border/60 bg-background/70 p-5">
-                                    <div className="space-y-1">
-                                        <h3 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">Generate instructions</h3>
-                                        <p className="text-xs text-muted-foreground">
-                                            Choose the file you need—each one opens an Instructions ready preview powered by this scan.
-                                        </p>
-                                    </div>
-                                    <div className="flex flex-wrap gap-3">
-                                        {fileOptions.map((file) => {
-                                            const busy = Boolean(isGeneratingMap[file.id])
-                                            return (
-                                                <Button
-                                                    key={file.id}
-                                                    onClick={() => void handleGenerate(file.id)}
-                                                    disabled={busy}
-                                                    className="flex h-[36px] items-center rounded-full px-4 py-0 text-sm"
-                                                >
-                                                    {busy ? `Generating ${file.filename}…` : `Generate ${file.filename}`}
-                                                </Button>
-                                            )
-                                        })}
-                                    </div>
-                                </section>
-                                {warnings.length > 0 ? (
-                                    <div className="rounded-2xl border border-amber-400/60 bg-amber-950/40 p-4 text-amber-200">
-                                        <div className="flex items-start gap-2">
-                                            <AlertTriangle className="mt-0.5 size-4" aria-hidden="true" />
-                                            <div className="space-y-1 text-sm">
-                                                {warnings.map((warning) => (
-                                                    <p key={warning}>{warning}</p>
-                                                ))}
+                                {showUnsupportedStackNotice ? (
+                                    <div className="rounded-2xl border border-dashed border-destructive/40 bg-destructive/10 p-5">
+                                        <div className="flex items-start gap-3 text-sm text-muted-foreground">
+                                            <AlertTriangle className="mt-0.5 size-5 text-destructive" aria-hidden="true" />
+                                            <div className="space-y-2">
+                                                <p>
+                                                    We detected <span className="font-semibold text-foreground">{detectedStackLabel}</span>, but this stack isn’t supported yet.
+                                                </p>
+                                                <p>
+                                                    Contribute a new entry in{" "}
+                                                    <Link
+                                                        href={STACKS_DATA_DOC_URL}
+                                                        target="_blank"
+                                                        rel="noreferrer"
+                                                        className="inline-flex items-center font-semibold text-primary hover:underline"
+                                                    >
+                                                        data/stacks.json
+                                                    </Link>{" "}
+                                                    to enable full summaries for this stack.
+                                                </p>
                                             </div>
                                         </div>
                                     </div>
-                                ) : null}
-                                <div
-                                    className="rounded-2xl border border-border/60 bg-background/70 p-5"
-                                    data-testid="repo-scan-raw-json"
-                                >
-                                    <h3 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">Raw response</h3>
-                                    <pre className="mt-3 max-h-72 overflow-auto rounded-md bg-muted p-3 text-xs text-muted-foreground">
-                                        {JSON.stringify(scanResult, null, 2)}
-                                    </pre>
-                                </div>
-                                {generatedFile ? (
-                                    <FinalOutputView
-                                        fileName={generatedFile.fileName}
-                                        fileContent={generatedFile.fileContent}
-                                        mimeType={generatedFile.mimeType}
-                                        onClose={() => setGeneratedFile(null)}
-                                    />
-                                ) : null}
+                                ) : (
+                                    <>
+                                        <section className="grid gap-6 md:grid-cols-2">
+                                            <div className="rounded-2xl border border-border/60 bg-background/70 p-5">
+                                                <h3 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">Frameworks</h3>
+                                                <p className="mt-3 text-sm text-foreground">{formatList(scanResult.frameworks)}</p>
+                                            </div>
+                                            <div className="rounded-2xl border border-border/60 bg-background/70 p-5">
+                                                <h3 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">Tooling</h3>
+                                                <p className="mt-3 text-sm text-foreground">{formatList(scanResult.tooling)}</p>
+                                            </div>
+                                            <div className="rounded-2xl border border-border/60 bg-background/70 p-5">
+                                                <h3 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">Testing</h3>
+                                                <p className="mt-3 text-sm text-foreground">{formatList(scanResult.testing)}</p>
+                                            </div>
+                                            <div className="rounded-2xl border border-border/60 bg-background/70 p-5">
+                                                <h3 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">Structure hints</h3>
+                                                <ul className="mt-3 space-y-2 text-sm text-foreground">
+                                                    {structureEntries.map(({ key, value }) => (
+                                                        <li key={key} className="flex items-center justify-between gap-4">
+                                                            <span className="font-medium capitalize">{key}</span>
+                                                            <span className={value ? "text-emerald-400" : "text-muted-foreground"}>
+                                                                {value ? "Present" : "Missing"}
+                                                            </span>
+                                                        </li>
+                                                    ))}
+                                                </ul>
+                                            </div>
+                                        </section>
+                                        <section className="space-y-4 rounded-2xl border border-border/60 bg-background/70 p-5">
+                                            <div className="space-y-1">
+                                                <h3 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">Generate instructions</h3>
+                                                <p className="text-xs text-muted-foreground">
+                                                    Choose the file you need—each one opens an Instructions ready preview powered by this scan.
+                                                </p>
+                                            </div>
+                                            <div className="flex flex-wrap gap-3">
+                                                {fileOptions.map((file) => {
+                                                    const busy = Boolean(isGeneratingMap[file.id])
+                                                    return (
+                                                        <Button
+                                                            key={file.id}
+                                                            onClick={() => void handleGenerate(file.id)}
+                                                            disabled={busy}
+                                                            className="flex h-[36px] items-center rounded-full px-4 py-0 text-sm"
+                                                        >
+                                                            {busy ? `Generating ${file.filename}…` : `Generate ${file.filename}`}
+                                                        </Button>
+                                                    )
+                                                })}
+                                            </div>
+                                        </section>
+                                        {warnings.length > 0 ? (
+                                            <div className="rounded-2xl border border-amber-400/60 bg-amber-950/40 p-4 text-amber-200">
+                                                <div className="flex items-start gap-2">
+                                                    <AlertTriangle className="mt-0.5 size-4" aria-hidden="true" />
+                                                    <div className="space-y-1 text-sm">
+                                                        {warnings.map((warning) => (
+                                                            <p key={warning}>{warning}</p>
+                                                        ))}
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        ) : null}
+                                        <div
+                                            className="rounded-2xl border border-border/60 bg-background/70 p-5"
+                                            data-testid="repo-scan-raw-json"
+                                        >
+                                            <h3 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">Raw response</h3>
+                                            <pre className="mt-3 max-h-72 overflow-auto rounded-md bg-muted p-3 text-xs text-muted-foreground">
+                                                {JSON.stringify(scanResult, null, 2)}
+                                            </pre>
+                                        </div>
+                                        {generatedFile ? (
+                                            <FinalOutputView
+                                                fileName={generatedFile.fileName}
+                                                fileContent={generatedFile.fileContent}
+                                                mimeType={generatedFile.mimeType}
+                                                onClose={() => setGeneratedFile(null)}
+                                            />
+                                        ) : null}
+                                    </>
+                                )}
                             </div>
                         ) : null}
                     </CardContent>
