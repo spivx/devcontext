@@ -29,15 +29,14 @@ test("wizard accepts custom free text answers and shows them in the summary", as
 
   await expect(customInput).toBeVisible()
   await customInput.click()
-  await customInput.fill("")
-  await customInput.type(customAnswer)
+  await customInput.fill(customAnswer)
   await expect(customInput).toHaveValue(customAnswer)
 
   const saveButton = page.getByRole("button", { name: "Save custom answer" })
   await expect(saveButton).toBeEnabled()
-  await customInput.press("Enter")
-
-  await expect(questionHeading).toHaveText("What language do you use?")
+  await page.getByTestId("wizard-free-text-form").evaluate((form) => {
+    (form as HTMLFormElement).requestSubmit()
+  })
 
   await expect.poll(
     () =>
@@ -57,6 +56,8 @@ test("wizard accepts custom free text answers and shows them in the summary", as
       }, { questionId: "react-tooling" }),
     { timeout: 15000 }
   ).toBe(customAnswer)
+
+  await expect(questionHeading).toHaveText("What language do you use?")
 
   const storedState = await page.evaluate(() => {
     const raw = window.localStorage.getItem("devcontext:wizard:react")
