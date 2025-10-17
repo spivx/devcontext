@@ -28,6 +28,8 @@ import {
 import { persistWizardState, clearWizardState } from "@/lib/wizard-storage"
 import { WizardAnswerGrid } from "./wizard-answer-grid"
 import { WizardConfirmationDialog } from "./wizard-confirmation-dialog"
+import { track } from "@/lib/mixpanel"
+import { ANALYTICS_EVENTS } from "@/lib/analytics-events"
 
 const suffixSteps = getSuffixSteps()
 const buildStepSignature = (step: WizardStep) => `${step.id}::${step.questions.map((question) => question.id).join("|")}`
@@ -559,6 +561,16 @@ export function InstructionsWizard({
       return
     }
 
+    // Track answer selection
+    track(ANALYTICS_EVENTS.WIZARD_ANSWER_SELECTED, {
+      questionId: currentQuestion.id,
+      answerValue: answer.value,
+      answerLabel: answer.label,
+      allowMultiple: currentQuestion.allowMultiple ?? false,
+      isDefault: Boolean(answer.isDefault),
+      stepId: currentStep?.id ?? null,
+    })
+
     void handleQuestionAnswerSelection(currentQuestion, answer)
   }
 
@@ -704,6 +716,11 @@ export function InstructionsWizard({
       return
     }
 
+    track(ANALYTICS_EVENTS.WIZARD_FREE_TEXT_SAVED, {
+      questionId: currentQuestion.id,
+      length: currentFreeTextValue.trim().length,
+    })
+
     commitFreeTextValue(currentQuestion, currentFreeTextValue)
   }
 
@@ -711,6 +728,10 @@ export function InstructionsWizard({
     if (!currentQuestion) {
       return
     }
+
+    track(ANALYTICS_EVENTS.WIZARD_FREE_TEXT_CLEARED, {
+      questionId: currentQuestion.id,
+    })
 
     commitFreeTextValue(currentQuestion, "", { allowAutoAdvance: false })
   }
@@ -732,6 +753,14 @@ export function InstructionsWizard({
     clearAutoFilledFlag(currentQuestion.id)
 
     const isStackQuestion = currentQuestion.id === STACK_QUESTION_ID
+
+    // Track default use
+    track(ANALYTICS_EVENTS.WIZARD_USE_DEFAULT, {
+      questionId: currentQuestion.id,
+      answerValue: defaultAnswer.value,
+      answerLabel: defaultAnswer.label,
+      isStackQuestion,
+    })
 
     if (isStackQuestion) {
       await loadStackQuestions(defaultAnswer.value, defaultAnswer.label, {
@@ -769,6 +798,7 @@ export function InstructionsWizard({
   }
 
   const requestResetWizard = () => {
+    track(ANALYTICS_EVENTS.WIZARD_RESET)
     setPendingConfirmation("reset")
   }
 
