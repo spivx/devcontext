@@ -14,6 +14,8 @@ import { generateFromRepoScan } from "@/lib/scan-generate"
 import FinalOutputView from "@/components/final-output-view"
 import RepoScanLoader from "@/components/repo-scan-loader"
 import type { GeneratedFileResult } from "@/types/output"
+import { track } from "@/lib/mixpanel"
+import { ANALYTICS_EVENTS } from "@/lib/analytics-events"
 
 const buildQuery = (url: string) => `/api/scan-repo?url=${encodeURIComponent(url)}`
 const CONVENTIONS_DOC_URL =
@@ -110,22 +112,26 @@ export default function RepoScanClient({ initialRepoUrl }: RepoScanClientProps) 
         }))
     }, [scanResult])
 
-    const handleStartScan = () => {
-        if (!repoUrlForScan) {
-            return
-        }
-
-        setHasConfirmed(true)
-        setScanToken((token) => token + 1)
+  const handleStartScan = () => {
+    if (!repoUrlForScan) {
+      return
     }
 
-    const handleRetryScan = () => {
-        if (!repoUrlForScan) {
-            return
-        }
+    setHasConfirmed(true)
+    setScanToken((token) => token + 1)
 
-        setScanToken((token) => token + 1)
+    track(ANALYTICS_EVENTS.REPO_SCAN_START, { repo: repoUrlForScan })
+  }
+
+  const handleRetryScan = () => {
+    if (!repoUrlForScan) {
+      return
     }
+
+    setScanToken((token) => token + 1)
+
+    track(ANALYTICS_EVENTS.REPO_SCAN_RETRY, { repo: repoUrlForScan })
+  }
 
     const warnings = scanResult?.warnings ?? []
     const stackMeta = scanResult?.conventions ?? null

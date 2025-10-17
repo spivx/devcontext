@@ -26,6 +26,8 @@ import type {
 } from "@/types/wizard"
 import type { GeneratedFileResult } from "@/types/output"
 import { WizardEditAnswerDialog } from "@/components/wizard-edit-answer-dialog"
+import { track } from "@/lib/mixpanel"
+import { ANALYTICS_EVENTS } from "@/lib/analytics-events"
 
 const fileOptions = getFileOptions()
 const fileSummaryQuestion = getFileSummaryQuestion()
@@ -210,6 +212,7 @@ export function StackSummaryPage({ stackId, mode }: StackSummaryPageProps) {
   }, [wizardSteps])
 
   const handleEditClick = (questionId: string) => {
+    track(ANALYTICS_EVENTS.SUMMARY_EDIT_OPEN, { questionId })
     setEditingQuestionId(questionId)
   }
 
@@ -226,6 +229,7 @@ export function StackSummaryPage({ stackId, mode }: StackSummaryPageProps) {
       const trimmed = submittedValue.trim()
       const nextFreeText: FreeTextResponses = (() => {
         if (trimmed.length === 0) {
+          track(ANALYTICS_EVENTS.SUMMARY_EDIT_FREE_TEXT_CLEARED, { questionId: question.id })
           if (!(question.id in freeTextResponses)) {
             return { ...freeTextResponses }
           }
@@ -235,6 +239,10 @@ export function StackSummaryPage({ stackId, mode }: StackSummaryPageProps) {
           return next
         }
 
+        track(ANALYTICS_EVENTS.SUMMARY_EDIT_FREE_TEXT_SAVED, {
+          questionId: question.id,
+          length: trimmed.length,
+        })
         return {
           ...freeTextResponses,
           [question.id]: trimmed,
@@ -313,6 +321,13 @@ export function StackSummaryPage({ stackId, mode }: StackSummaryPageProps) {
           updatedAt: Date.now(),
         })
       }
+
+      track(ANALYTICS_EVENTS.SUMMARY_EDIT_ANSWER_SELECTED, {
+        questionId: question.id,
+        answerValue: answer.value,
+        answerLabel: answer.label,
+        allowMultiple: question.allowMultiple ?? false,
+      })
 
       if (!question.allowMultiple) {
         handleCloseEdit()

@@ -8,6 +8,8 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { normalizeGitHubRepoInput } from "@/lib/github"
+import { track } from "@/lib/mixpanel"
+import { ANALYTICS_EVENTS } from "@/lib/analytics-events"
 
 export function ExistingRepoEntryClient() {
   const router = useRouter()
@@ -29,6 +31,11 @@ export function ExistingRepoEntryClient() {
     setIsSubmitting(true)
 
     const encoded = encodeURIComponent(normalized)
+
+    track(ANALYTICS_EVENTS.REPO_ANALYZE_SUBMIT, {
+      inputProvided: value.length > 0,
+      url: normalized,
+    })
 
     router.push(`/existing/${encoded}`)
   }
