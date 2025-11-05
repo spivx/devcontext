@@ -33,6 +33,7 @@
     "@testing-library/jest-dom": "^6.8.0",
     "@testing-library/react": "^16.3.0",
     "@playwright/test": "^1.50.1",
+    "@types/mixpanel-browser": "^2.60.0",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
