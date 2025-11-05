@@ -17,6 +17,10 @@ export const ANALYTICS_EVENTS = {
   REPO_SCAN_START: "Repo Scan Start",
   REPO_SCAN_RETRY: "Repo Scan Retry",
   REPO_SCAN_GENERATE_FILE: "Repo Scan Generate File",
+  // Global UI events
+  UI_CLICK: "UI Click",
+  UI_INPUT: "UI Input",
+  UI_SUBMIT: "UI Submit",
 } as const
 
 export type AnalyticsEvent =
