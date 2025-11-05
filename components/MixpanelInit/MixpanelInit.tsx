@@ -3,15 +3,11 @@
 import { useEffect } from "react"
 import { usePathname, useSearchParams } from "next/navigation"
 
-import { initMixpanel, trackPageView } from "@/lib/mixpanel"
+import { trackPageView } from "@/lib/mixpanel"
 
 export function MixpanelInit() {
   const pathname = usePathname()
   const searchParams = useSearchParams()
-
-  useEffect(() => {
-    initMixpanel()
-  }, [])
 
   useEffect(() => {
     if (!pathname) {

@@ -2,12 +2,16 @@ import mixpanel from "mixpanel-browser"
 
 import { ANALYTICS_EVENTS, type AnalyticsEvent } from "@/lib/analytics-events"
 
+declare global {
+  interface Window {
+    __mixpanel_initialized?: boolean
+  }
+}
+
 const MIXPANEL_TOKEN = process.env.NEXT_PUBLIC_MIXPANEL_TOKEN
 
-let isMixpanelInitialized = false
-
-export const initMixpanel = () => {
-  if (typeof window === "undefined" || isMixpanelInitialized) {
+const initializeMixpanel = () => {
+  if (typeof window === "undefined" || window.__mixpanel_initialized) {
     return
   }
 
@@ -19,15 +23,36 @@ export const initMixpanel = () => {
   }
 
   mixpanel.init(MIXPANEL_TOKEN, {
-    debug: process.env.NODE_ENV !== "production",
-    ignore_dnt: true,
+    debug: false,
+    track_pageview: false,
+    persistence: "localStorage",
   })
 
-  isMixpanelInitialized = true
+  window.__mixpanel_initialized = true
+  mixpanel.track("Page Load", { path: window.location.pathname })
 }
 
+if (typeof window !== "undefined") {
+  initializeMixpanel()
+}
+
+export const initMixpanel = initializeMixpanel
+
 export const track = (event: AnalyticsEvent, props?: Record<string, unknown>) => {
-  if (typeof window === "undefined" || !isMixpanelInitialized) {
+  if (typeof window === "undefined") {
+    return
+  }
+
+  if (process.env.NODE_ENV === "development") {
+    console.log("[mixpanel track]", event, props)
+    return
+  }
+
+  if (!window.__mixpanel_initialized) {
+    initializeMixpanel()
+  }
+
+  if (!window.__mixpanel_initialized) {
     return
   }
 
@@ -35,7 +60,20 @@ export const track = (event: AnalyticsEvent, props?: Record<string, unknown>) =>
 }
 
 export const identify = (userId: string) => {
-  if (typeof window === "undefined" || !isMixpanelInitialized) {
+  if (typeof window === "undefined") {
+    return
+  }
+
+  if (process.env.NODE_ENV === "development") {
+    console.log("[mixpanel identify]", userId)
+    return
+  }
+
+  if (!window.__mixpanel_initialized) {
+    initializeMixpanel()
+  }
+
+  if (!window.__mixpanel_initialized) {
     return
   }
 
