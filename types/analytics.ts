@@ -1,6 +1,6 @@
 export type GlobalInteractionEventKey = "UI_CLICK" | "UI_INPUT" | "UI_SUBMIT"
 
-export interface GlobalInteractionProps {
+export interface GlobalInteractionProps extends Record<string, unknown> {
   eventType: GlobalInteractionEventKey
   tag: string
   id?: string
