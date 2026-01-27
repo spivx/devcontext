@@ -60,6 +60,9 @@ export const metadata: Metadata = {
     default: siteTitle,
     template: `%s | DevContext`,
   },
+  alternates: {
+    canonical: "/",
+  },
   applicationName: "DevContext",
   description: siteDescription,
   keywords: [
