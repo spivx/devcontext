@@ -62,6 +62,9 @@ export default function LandingPage() {
               <Link href="/stacks">Browse stacks</Link>
             </Button>
             <Button asChild variant="ghost" size="sm" className="hidden sm:inline-flex">
+              <Link href="/skills">Skill builder</Link>
+            </Button>
+            <Button asChild variant="ghost" size="sm" className="hidden sm:inline-flex">
               <Link href="/new">Launch wizard</Link>
             </Button>
             <Button asChild variant="outline" size="sm">

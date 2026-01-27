@@ -14,10 +14,12 @@
     "test:e2e": "playwright test"
   },
   "dependencies": {
+    "@radix-ui/react-collapsible": "^1.1.12",
     "@radix-ui/react-slot": "^1.2.3",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "framer-motion": "^11.18.2",
+    "gray-matter": "^4.0.3",
     "jszip": "^3.10.1",
     "lucide-react": "^0.544.0",
     "mixpanel-browser": "^2.70.0",
