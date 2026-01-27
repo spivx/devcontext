@@ -1,4 +1,4 @@
-const DEFAULT_SITE_URL = "https://devcontext.xyz";
+const DEFAULT_SITE_URL = "https://www.devcontext.xyz";
 
 const normalizeSiteUrl = (input: string): string => {
   const trimmed = input.trim();
