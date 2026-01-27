@@ -23,6 +23,14 @@ describe('template-config', () => {
             it('should return correct config for cursor rules', () => {
                 const result = getTemplateConfig('cursor-rules')
                 expect(result).toEqual({
+                    template: 'cursor-rules-template-mdc.md',
+                    outputFileName: 'cursor-rules.zip'
+                })
+            })
+
+            it('should return correct config for legacy cursor rules', () => {
+                const result = getTemplateConfig('cursor-rules-legacy')
+                expect(result).toEqual({
                     template: 'cursor-rules-template.json',
                     outputFileName: '.cursor/rules'
                 })
@@ -109,8 +117,8 @@ describe('template-config', () => {
                 }
                 const result = getTemplateConfig(key)
                 expect(result).toEqual({
-                    template: 'cursor-rules-template.json',
-                    outputFileName: '.cursor/rules',
+                    template: 'cursor-rules-template-mdc.md',
+                    outputFileName: 'cursor-rules.zip',
                 })
             })
         })
@@ -138,6 +146,7 @@ describe('template-config', () => {
                     'agents-astro',
                     'agents-remix',
                     'cursor-rules',
+                    'cursor-rules-legacy',
                     'json-rules',
                     'instructions-md'
                 ]
