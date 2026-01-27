@@ -1,4 +1,4 @@
-const DEFAULT_SITE_URL = "https://www.devcontext.xyz";
+const DEFAULT_SITE_URL = "https://devcontext.xyz";
 
 const normalizeSiteUrl = (input: string): string => {
   const trimmed = input.trim();
@@ -23,9 +23,13 @@ export const SITE_URL = normalizeSiteUrl(
 export const CANONICAL_HOST = new URL(SITE_URL).hostname;
 
 export const absoluteUrl = (path = ""): string => {
-  if (!path || path === "/") {
-    return SITE_URL;
+  const base = SITE_URL.endsWith("/") ? SITE_URL.slice(0, -1) : SITE_URL;
+  const normalizedPath = path.startsWith("/") ? path : `/${path}`;
+
+  // Ensure the root path always has a trailing slash for SEO consistency
+  if (normalizedPath === "/") {
+    return `${base}/`;
   }
 
-  return `${SITE_URL}${path.startsWith("/") ? path : `/${path}`}`;
+  return `${base}${normalizedPath}`;
 };
