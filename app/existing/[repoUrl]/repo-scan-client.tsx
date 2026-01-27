@@ -112,26 +112,26 @@ export default function RepoScanClient({ initialRepoUrl }: RepoScanClientProps) 
         }))
     }, [scanResult])
 
-  const handleStartScan = () => {
-    if (!repoUrlForScan) {
-      return
+    const handleStartScan = () => {
+        if (!repoUrlForScan) {
+            return
+        }
+
+        setHasConfirmed(true)
+        setScanToken((token) => token + 1)
+
+        track(ANALYTICS_EVENTS.REPO_SCAN_START, { repo: repoUrlForScan })
     }
 
-    setHasConfirmed(true)
-    setScanToken((token) => token + 1)
+    const handleRetryScan = () => {
+        if (!repoUrlForScan) {
+            return
+        }
 
-    track(ANALYTICS_EVENTS.REPO_SCAN_START, { repo: repoUrlForScan })
-  }
+        setScanToken((token) => token + 1)
 
-  const handleRetryScan = () => {
-    if (!repoUrlForScan) {
-      return
+        track(ANALYTICS_EVENTS.REPO_SCAN_RETRY, { repo: repoUrlForScan })
     }
-
-    setScanToken((token) => token + 1)
-
-    track(ANALYTICS_EVENTS.REPO_SCAN_RETRY, { repo: repoUrlForScan })
-  }
 
     const warnings = scanResult?.warnings ?? []
     const stackMeta = scanResult?.conventions ?? null
@@ -372,7 +372,16 @@ export default function RepoScanClient({ initialRepoUrl }: RepoScanClientProps) 
                                                             disabled={busy}
                                                             className="flex h-[36px] items-center rounded-full px-4 py-0 text-sm"
                                                         >
-                                                            {busy ? `Generating ${file.filename}…` : `Generate ${file.filename}`}
+                                                            <div className="flex items-center gap-2">
+                                                                <span>
+                                                                    {busy ? `Generating ${file.filename}…` : `Generate ${file.filename}`}
+                                                                </span>
+                                                                {file.isLegacy && (
+                                                                    <span className="rounded-full bg-amber-950/30 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-white">
+                                                                        Legacy
+                                                                    </span>
+                                                                )}
+                                                            </div>
                                                         </Button>
                                                     )
                                                 })}

@@ -65,18 +65,18 @@ export const buildStepFromQuestionSet = (
     title: string,
     questions: DataQuestionSource[]
 ): WizardStep => ({
-        id,
-        title,
-        questions: questions.map((question) => ({
-            id: question.id,
-            question: question.question,
-            allowMultiple: question.allowMultiple,
-            responseKey: question.responseKey,
-            isReadOnlyOnSummary: question.isReadOnlyOnSummary,
-            enableFilter: question.enableFilter,
-            answers: question.answers.map(mapAnswerSourceToWizard),
-            freeText: question.freeText,
-        })),
+    id,
+    title,
+    questions: questions.map((question) => ({
+        id: question.id,
+        question: question.question,
+        allowMultiple: question.allowMultiple,
+        responseKey: question.responseKey,
+        isReadOnlyOnSummary: question.isReadOnlyOnSummary,
+        enableFilter: question.enableFilter,
+        answers: question.answers.map(mapAnswerSourceToWizard),
+        freeText: question.freeText,
+    })),
 })
 
 export const buildFileOptionsFromQuestion = (
@@ -98,6 +98,7 @@ export const buildFileOptionsFromQuestion = (
             icon: answer.icon,
             docs: answer.docs,
             isDefault: answer.isDefault,
+            isLegacy: answer.isLegacy,
         }))
 }
 
@@ -105,12 +106,14 @@ const formatLabelMap: Record<string, string> = {
     markdown: "Markdown",
     json: "JSON",
     "cursor-rules-json": "JSON",
+    zip: "ZIP Archive",
 }
 
 const formatMimeTypeMap: Record<string, string> = {
     markdown: "text/markdown",
     json: "application/json",
     "cursor-rules-json": "application/json",
+    zip: "application/zip",
 }
 
 /**
