@@ -38,6 +38,8 @@ const structuredData = {
     "Scan a GitHub repo to auto-detect stack, frameworks, and tooling",
     "Context-aware questions with best-practice suggestions",
     "Instant boilerplate generation with smart defaults",
+    "Claude Skill Builder for custom AI capabilities",
+    "Generate Skill.md files for Claude AI",
   ],
   keywords: [
     "AI coding guidelines",
@@ -51,6 +53,10 @@ const structuredData = {
     "AI repo analyzer",
     "GitHub repo scanner for Copilot",
     "repo-aware coding guidelines",
+    "Claude Skill Builder",
+    "generate Skill.md file",
+    "Claude custom skills",
+    "AI agent capabilities",
   ],
 };
 
@@ -83,6 +89,9 @@ export const metadata: Metadata = {
     "generate coding standards from GitHub repo",
     "repo-aware AI coding guidelines",
     "auto-detect framework coding rules",
+    "Claude skills",
+    "Skill.md generator",
+    "custom AI capabilities",
   ],
   authors: [{ name: "DevContext" }],
   creator: "DevContext",
