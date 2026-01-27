@@ -98,7 +98,7 @@ export function Hero() {
           className="mx-auto max-w-2xl text-sm text-muted-foreground md:text-lg"
           variants={itemVariants}
         >
-          Start from scratch with a guided wizard or analyze a public GitHub repo. DevContext detects languages, frameworks, tooling, and tests to generate Copilot instructions, Cursor rules, and onboarding docs you can edit and export.
+          Start from scratch with a guided wizard or analyze a public GitHub repo. DevContext detects languages, frameworks, tooling, and tests to generate Copilot instructions, Cursor rules, onboarding docs, and custom Claude skills you can edit and export.
         </motion.p>
 
 

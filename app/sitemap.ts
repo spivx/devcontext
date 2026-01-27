@@ -9,12 +9,13 @@ const STATIC_ENTRIES: Array<{
   priority: number
   changeFrequency: MetadataRoute.Sitemap[number]["changeFrequency"]
 }> = [
-  { path: "", priority: 1, changeFrequency: "weekly" },
-  { path: "/new", priority: 0.9, changeFrequency: "weekly" },
-  { path: "/existing", priority: 0.6, changeFrequency: "monthly" },
-  { path: "/stacks", priority: 0.7, changeFrequency: "monthly" },
-  { path: "/new/stack", priority: 0.8, changeFrequency: "weekly" },
-]
+    { path: "", priority: 1, changeFrequency: "weekly" },
+    { path: "/new", priority: 0.9, changeFrequency: "weekly" },
+    { "path": "/skills", "priority": 0.85, "changeFrequency": "weekly" },
+    { path: "/existing", priority: 0.6, changeFrequency: "monthly" },
+    { path: "/stacks", priority: 0.7, changeFrequency: "monthly" },
+    { path: "/new/stack", priority: 0.8, changeFrequency: "weekly" },
+  ]
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const lastModified = new Date()
