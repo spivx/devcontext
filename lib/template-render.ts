@@ -97,14 +97,13 @@ export async function renderTemplate({
   }
 
   const replaceVariable = (key: keyof WizardResponses, fallback = 'Not specified') => {
-    const placeholder = `{{${String(key)}}}`
+    const placeholder = new RegExp(`{{${String(key)}}}`, 'g')
 
-    if (!generatedContent.includes(placeholder)) {
+    if (!template.includes(`{{${String(key)}}}`)) {
       return
     }
 
     const value = responses[key]
-
     const defaultMeta = defaultedResponses?.[key]
 
     if (value === null || value === undefined || value === '') {
@@ -149,8 +148,8 @@ export async function renderTemplate({
   replaceVariable('outputFile')
 
   const replaceStaticPlaceholder = (placeholderKey: string, value: string) => {
-    const placeholder = `{{${placeholderKey}}}`
-    if (!generatedContent.includes(placeholder)) {
+    const placeholder = new RegExp(`{{${placeholderKey}}}`, 'g')
+    if (!template.includes(`{{${placeholderKey}}}`)) {
       return
     }
     const replacement = isJsonTemplate ? escapeForJson(value) : value

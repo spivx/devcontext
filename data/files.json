@@ -24,11 +24,20 @@
                 "enabled": true
             },
             {
-                "value": "cursor-rules",
-                "label": "Cursor Rules",
+                "value": "cursor-rules-legacy",
+                "label": "Cursor Rules (JSON)",
                 "filename": ".cursor/rules",
                 "format": "json",
-                "docs": "https://docs.cursor.com/workflows/rules",
+                "docs": "https://docs.cursor.com/context/rules",
+                "enabled": true,
+                "isLegacy": true
+            },
+            {
+                "value": "cursor-rules",
+                "label": "Cursor Rules (.mdc + ZIP)",
+                "filename": "cursor-rules.zip",
+                "format": "zip",
+                "docs": "https://cursor.com/docs/context/rules",
                 "enabled": true
             }
         ]

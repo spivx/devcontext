@@ -388,9 +388,16 @@ export function StackSummaryPage({ stackId, mode }: StackSummaryPageProps) {
                   disabled={isGenerating}
                   className="flex h-[38px] min-w-[190px] items-center justify-center rounded-full px-6 py-0 text-base leading-none shadow-lg shadow-primary/20"
                 >
-                  <span className="text-sm font-semibold text-foreground">
-                    {isGenerating ? `Generating ${file.filename}…` : `Generate ${file.filename}`}
-                  </span>
+                  <div className="flex items-center gap-2">
+                    <span className="text-sm font-semibold text-foreground">
+                      {isGenerating ? `Generating ${file.filename}…` : `Generate ${file.filename}`}
+                    </span>
+                    {file.isLegacy && (
+                      <span className="rounded-full bg-amber-950/30 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-white">
+                        Legacy
+                      </span>
+                    )}
+                  </div>
                 </Button>
               )
             })}

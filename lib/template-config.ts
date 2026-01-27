@@ -105,10 +105,15 @@ export const templateCombinations: Record<string, TemplateConfig> = {
         template: 'agents-template.md',
         outputFileName: 'agents.md',
     },
-    // Cursor rules
-    'cursor-rules': {
+    // Cursor rules (Legacy)
+    'cursor-rules-legacy': {
         template: 'cursor-rules-template.json',
         outputFileName: '.cursor/rules',
+    },
+    // New Cursor rules (MDC + ZIP)
+    'cursor-rules': {
+        template: 'cursor-rules-template-mdc.md',
+        outputFileName: 'cursor-rules.zip',
     },
     // Generic JSON rules (placeholder)
     'json-rules': {
