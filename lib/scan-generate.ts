@@ -9,7 +9,7 @@ import { ANALYTICS_EVENTS } from "@/lib/analytics-events"
 
 const fileOptions = getFileOptions()
 
-export type OutputFileId = "instructions-md" | "agents-md" | "cursor-rules"
+export type OutputFileId = "instructions-md" | "agents-md" | "cursor-rules" | "cursor-rules-legacy"
 
 export async function generateFromRepoScan(
   scan: RepoScanSummary,

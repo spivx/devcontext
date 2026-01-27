@@ -98,9 +98,49 @@ export default function FinalOutputView({ fileName, fileContent, mimeType, onClo
     }, COPY_RESET_DELAY)
   }, [currentContent])
 
-  const handleDownloadClick = useCallback(() => {
+  const handleDownloadClick = useCallback(async () => {
     if (!currentContent) {
       return
+    }
+
+    if (normalizedFileName.endsWith('.zip')) {
+      try {
+        const { default: JSZip } = await import('jszip')
+        const zip = new JSZip()
+
+        // Split combined content by the FILE delimiter
+        const parts = currentContent.split('--- FILE: ')
+        let foundFiles = false
+
+        for (const part of parts) {
+          if (!part.trim()) continue
+
+          const lines = part.split('\n')
+          const firstLine = lines[0].trim()
+          if (firstLine.endsWith(' ---')) {
+            const fileName = firstLine.replace(' ---', '').trim()
+            const content = lines.slice(1).join('\n').trim()
+            zip.file(fileName, content)
+            foundFiles = true
+          }
+        }
+
+        if (foundFiles) {
+          const blob = await zip.generateAsync({ type: 'blob' })
+          const url = URL.createObjectURL(blob)
+          const link = document.createElement("a")
+          link.href = url
+          link.download = normalizedFileName
+          link.style.display = "none"
+          document.body.appendChild(link)
+          link.click()
+          document.body.removeChild(link)
+          URL.revokeObjectURL(url)
+          return
+        }
+      } catch (error) {
+        console.error('Failed to generate ZIP:', error)
+      }
     }
 
     const downloadMimeType = mimeType ?? "text/plain;charset=utf-8"

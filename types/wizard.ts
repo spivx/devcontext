@@ -18,6 +18,7 @@ export type DataAnswerSource = {
     filename?: string
     format?: string
     detection?: StackDetectionConfig
+    isLegacy?: boolean
 }
 
 export type QuestionFreeTextConfig = {
@@ -46,6 +47,7 @@ export type FileOutputConfig = {
     icon?: string
     docs?: string
     isDefault?: boolean
+    isLegacy?: boolean
 }
 
 export type WizardAnswer = {
@@ -59,6 +61,7 @@ export type WizardAnswer = {
     disabled?: boolean
     disabledLabel?: string
     docs?: string
+    isLegacy?: boolean
     filename?: string
     format?: string
     enabled?: boolean
