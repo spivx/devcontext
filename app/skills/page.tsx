@@ -35,7 +35,7 @@ export default function SkillsPage() {
     const skills = getAllSkills();
 
     return (
-        <div className="relative min-h-screen bg-background text-foreground">
+        <div className="relative min-h-screen bg-background text-foreground" data-testid="skills-page">
             <script
                 type="application/ld+json"
                 dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
@@ -62,7 +62,7 @@ export default function SkillsPage() {
                     </div>
                 </header>
 
-                <main className="container mx-auto max-w-7xl px-4 py-8 lg:px-8 flex-1">
+                <main className="container mx-auto max-w-7xl px-4 py-8 lg:px-8 flex-1" data-testid="skills-main-content">
                     <div className="mb-8 space-y-4">
                         <div className="flex flex-col gap-2">
                             <span className="text-sm font-semibold uppercase tracking-wider text-primary">Beta</span>
