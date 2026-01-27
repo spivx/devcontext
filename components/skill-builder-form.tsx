@@ -141,9 +141,10 @@ export function SkillBuilderForm({ initialSkills }: SkillBuilderFormProps) {
                                 className="pl-9"
                                 value={searchQuery}
                                 onChange={(e) => setSearchQuery(e.target.value)}
+                                data-testid="skill-search-input"
                             />
                         </div>
-                        <Button onClick={handleCreateNew} variant="secondary">
+                        <Button onClick={handleCreateNew} variant="secondary" data-testid="create-custom-skill-button">
                             Create Custom
                         </Button>
                     </div>
@@ -159,6 +160,7 @@ export function SkillBuilderForm({ initialSkills }: SkillBuilderFormProps) {
                                     selectedSkillId === skill.id && "border-primary bg-primary/5 ring-1 ring-primary"
                                 )}
                                 onClick={() => loadTemplate(skill)}
+                                data-testid={`skill-card-${skill.id}`}
                             >
                                 <div className="flex items-start justify-between gap-2">
                                     <div className="flex items-center gap-2">
@@ -198,6 +200,7 @@ export function SkillBuilderForm({ initialSkills }: SkillBuilderFormProps) {
                             exit={{ x: "100%" }}
                             transition={{ type: "spring", damping: 20, stiffness: 300 }}
                             className="fixed inset-y-0 right-0 z-50 flex h-full w-full max-w-2xl flex-col border-l bg-background shadow-xl sm:max-w-[800px]"
+                            data-testid="skill-drawer"
                         >
                             {/* Drawer Header */}
                             <div className="flex items-center justify-between border-b px-6 py-4">
@@ -209,7 +212,7 @@ export function SkillBuilderForm({ initialSkills }: SkillBuilderFormProps) {
                                         Customize metadata and content before downloading.
                                     </p>
                                 </div>
-                                <Button variant="ghost" size="icon" onClick={handleCloseDrawer}>
+                                <Button variant="ghost" size="icon" onClick={handleCloseDrawer} data-testid="close-drawer-button">
                                     <X className="h-5 w-5" />
                                 </Button>
                             </div>
@@ -225,6 +228,7 @@ export function SkillBuilderForm({ initialSkills }: SkillBuilderFormProps) {
                                                 ? "bg-background shadow text-foreground"
                                                 : "text-muted-foreground hover:text-foreground"
                                         )}
+                                        data-testid="editor-tab-button"
                                     >
                                         <Settings2 className="h-4 w-4" />
                                         Editor
@@ -237,13 +241,14 @@ export function SkillBuilderForm({ initialSkills }: SkillBuilderFormProps) {
                                                 ? "bg-background shadow text-foreground"
                                                 : "text-muted-foreground hover:text-foreground"
                                         )}
+                                        data-testid="preview-tab-button"
                                     >
                                         <Eye className="h-4 w-4" />
                                         Preview
                                     </button>
                                 </div>
 
-                                <Button onClick={handleDownload} size="sm">
+                                <Button onClick={handleDownload} size="sm" data-testid="download-skill-button">
                                     <Download className="mr-2 h-4 w-4" />
                                     Download
                                 </Button>
@@ -299,11 +304,12 @@ export function SkillBuilderForm({ initialSkills }: SkillBuilderFormProps) {
                                                 className="min-h-[400px] font-mono text-sm leading-relaxed"
                                                 value={data.content}
                                                 onChange={(e) => handleChange("content", e.target.value)}
+                                                data-testid="skill-content-input"
                                             />
                                         </div>
                                     </div>
                                 ) : (
-                                    <div className="h-full rounded-lg border bg-muted/30 p-6 font-mono text-sm whitespace-pre-wrap animate-in fade-in slide-in-from-bottom-2 duration-300">
+                                    <div className="h-full rounded-lg border bg-muted/30 p-6 font-mono text-sm whitespace-pre-wrap animate-in fade-in slide-in-from-bottom-2 duration-300" data-testid="skill-preview-content">
                                         {preview}
                                     </div>
                                 )}
