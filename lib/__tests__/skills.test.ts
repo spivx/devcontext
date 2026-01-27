@@ -68,7 +68,7 @@ Content B`
     it('uses id as name if name is missing in frontmatter', () => {
         vi.mocked(fs.existsSync).mockReturnValue(true)
         vi.mocked(fs.readdirSync).mockReturnValue(['test-skill.md'] as any)
-        vi.mocked(fs.readFileSync).mockReturnValue('--- \n description: desc \n --- \n content')
+        vi.mocked(fs.readFileSync).mockReturnValue('---\ndescription: desc\n---\ncontent')
 
         const skills = getAllSkills()
 
